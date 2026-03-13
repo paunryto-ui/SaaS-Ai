@@ -597,11 +597,11 @@ function closeLangMenu(){document.getElementById('langMenu').style.display='none
 // STYLE
 // ═══════════════════════════════════════════════
 var STYLE_PROMPTS={
-  normal:'Jawab dengan nada ramah dan natural.',
-  learn:'Jelaskan secara pedagogis dengan contoh dan analogi yang mudah dipahami.',
-  brief:'Jawab sangat singkat dan langsung ke poin utama. Maksimal 3-4 kalimat.',
-  explain:'Berikan penjelasan mendalam, detail, dan komprehensif.',
-  formal:'Gunakan bahasa yang formal, profesional, dan sopan.'
+  normal:'Gaya bicara kamu santai, asik, dan kayak ngobrol sama temen sendiri. Boleh pakai emoji yang relevan buat bikin jawaban lebih hidup dan ekspresif (tapi jangan lebay). Jangan kaku!',
+  learn:'Jelasin dengan gaya yang fun dan engaging, pakai analogi yang relate, contoh nyata, dan emoji buat highlight poin penting 🎯. Bikin belajar jadi menyenangkan!',
+  brief:'Jawab singkat, padat, langsung ke inti. Maksimal 3-4 kalimat. Boleh pakai 1-2 emoji yang pas ✨.',
+  explain:'Jelasin secara mendalam dan detail. Gunakan emoji sebagai penanda bagian penting 🔍, tips 💡, atau warning ⚠️ biar lebih mudah dibaca.',
+  formal:'Gunakan bahasa yang profesional dan sopan. Emoji boleh dipakai secara terbatas dan hanya jika benar-benar menambah kejelasan.'
 };
 function setStyle(code, label){
   currentStyle=code;
@@ -956,10 +956,11 @@ function send(){
   var langNames={id:'Indonesia',en:'English',ar:'Arabic',zh:'Chinese',ja:'Japanese',ko:'Korean',es:'Spanish',fr:'French',de:'German',pt:'Portuguese',ru:'Russian',hi:'Hindi'};
   var langInstruction=currentLang!=='id'?'Always respond in '+langNames[currentLang]+'.':'';
   var styleInstruction=STYLE_PROMPTS[currentStyle]||'';
-  var sysPrompt='Kamu adalah SaaS AI, asisten AI yang cerdas, cepat, dan sangat membantu. '
+  var sysPrompt='Kamu adalah SaaS AI — asisten AI yang pinter, asik, dan nggak pernah boring. '
+    +'Kamu ngobrol kayak temen yang helpful banget, bukan robot kaku. Pakai emoji secara natural buat bikin jawaban lebih ekspresif dan enak dibaca. '
     +styleInstruction+' '+langInstruction
-    +' Gunakan markdown untuk format yang rapi. Jika ada gambar, analisis dan deskripsikan dengan detail.'
-    +(isEditRequest?' Jika diminta edit foto, jelaskan perubahan yang disarankan dan buat deskripsi teknis yang detail.':'');
+    +' Format jawaban pakai markdown kalau perlu biar rapi. Kalau ada gambar, analisis dengan detail dan antusias.'
+    +(isEditRequest?' Kalau diminta edit foto, jelasin perubahan yang disarankan dengan detail dan kasih masukan kreatif ya! 🎨':'');
 
   // Web search prefix
   if(webSearchOn && text) {
