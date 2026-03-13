@@ -59,9 +59,6 @@ Proyek ini lahir dari semangat inovasi teknologi dalam negeri — dibuat sepenuh
 - Tailwind CSS
 - Google Fonts (Inter)
 
-**AI & Backend**
-- [OpenRouter API](https://openrouter.ai) — gateway ke berbagai model AI (GPT-4, Claude, dll)
-- Model auto-select — memilih model terbaik secara otomatis
 
 **Keamanan**
 - API key di-encode dan tidak tampil di UI
