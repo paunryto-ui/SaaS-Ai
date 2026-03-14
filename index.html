@@ -661,6 +661,29 @@ function applyI18N(){
   setText('help_me_lbl',t.help_me);
   setText('sub_lbl',t.sub);
   setText('disclaimer_lbl',t.disclaimer);
+  // Update style menu labels
+  Object.keys(STYLE_LABELS).forEach(function(code){
+    var el=document.getElementById('style_'+code);
+    if(el){
+      var icons={normal:'✦ ',learn:'📚 ',brief:'⚡ ',explain:'🔍 ',formal:'👔 '};
+      el.textContent=(icons[code]||'')+((STYLE_LABELS[code]&&STYLE_LABELS[code][currentLang])||code);
+    }
+  });
+  // Update current styleLbl
+  var slbl=document.getElementById('styleLbl');
+  if(slbl) slbl.textContent=(STYLE_LABELS[currentStyle]&&STYLE_LABELS[currentStyle][currentLang])||currentStyle;
+  // Update pills in tools menu
+  var briefBtn=document.getElementById('tl_brief_btn');
+  if(briefBtn) briefBtn.textContent=(STYLE_LABELS.brief&&STYLE_LABELS.brief[currentLang])||t.brief||'Ringkas';
+  var formalBtn=document.getElementById('tl_formal_btn');
+  if(formalBtn) formalBtn.textContent=(STYLE_LABELS.formal&&STYLE_LABELS.formal[currentLang])||t.formal||'Formal';
+  // Update deepPill toggleDeep label
+  var dpill=document.getElementById('deepPill');
+  if(dpill){
+    var span=dpill.querySelector('span');
+    if(span) span.textContent=(STYLE_LABELS.explain&&STYLE_LABELS.explain[currentLang])||'Mendalam';
+  }
+
   setText('limitWarnTxt',t.limitTitle||'Daily limit reached.');
   setText('toolModalCancelBtn',t.cancel||'Cancel');
   var ctrlHints={"id": "Ctrl+Enter untuk kirim", "en": "Ctrl+Enter to send", "ja": "Ctrl+Enterで送信", "ko": "Ctrl+Enter로 전송", "zh": "Ctrl+Enter发送", "ar": "Ctrl+Enter للإرسال", "es": "Ctrl+Enter para enviar", "fr": "Ctrl+Enter pour envoyer", "de": "Ctrl+Enter zum Senden", "pt": "Ctrl+Enter para enviar", "ru": "Ctrl+Enter для отправки", "hi": "Ctrl+Enter भेजने के लिए"};
@@ -787,9 +810,18 @@ var STYLE_PROMPTS={
   explain:'Jelasin secara mendalam dan detail. Gunakan emoji sebagai penanda bagian penting 🔍, tips 💡, atau warning ⚠️ biar lebih mudah dibaca. Strukturkan jawaban dengan jelas.',
   formal:'Gunakan bahasa yang profesional dan sopan. Emoji boleh dipakai secara sangat terbatas jika menambah kejelasan.'
 };
+
+var STYLE_LABELS={
+  normal:{id:'Normal',en:'Normal',ja:'普通',ko:'보통',zh:'普通',ar:'عادي',es:'Normal',fr:'Normal',de:'Normal',pt:'Normal',ru:'Обычный',hi:'सामान्य'},
+  learn:{id:'Pembelajaran',en:'Learning',ja:'学習',ko:'학습',zh:'学习',ar:'تعلم',es:'Aprendizaje',fr:'Apprentissage',de:'Lernen',pt:'Aprendizado',ru:'Обучение',hi:'शिक्षा'},
+  brief:{id:'Ringkas',en:'Concise',ja:'簡潔',ko:'간결',zh:'简洁',ar:'موجز',es:'Conciso',fr:'Concis',de:'Kurz',pt:'Conciso',ru:'Краткий',hi:'संक्षिप्त'},
+  explain:{id:'Menjelaskan',en:'Detailed',ja:'詳細',ko:'상세',zh:'详细',ar:'مفصل',es:'Detallado',fr:'Détaillé',de:'Detailliert',pt:'Detalhado',ru:'Подробный',hi:'विस्तृत'},
+  formal:{id:'Formal',en:'Formal',ja:'フォーマル',ko:'공식',zh:'正式',ar:'رسمي',es:'Formal',fr:'Formel',de:'Formal',pt:'Formal',ru:'Официальный',hi:'औपचारिक'}
+};
 function setStyle(code,label){
   currentStyle=code;
-  document.getElementById('styleLbl').textContent=label;
+  var lbl=(STYLE_LABELS[code]&&STYLE_LABELS[code][currentLang])||label||code;
+  document.getElementById('styleLbl').textContent=lbl;
   document.querySelectorAll('.style-item').forEach(function(el){el.classList.remove('active');});
   var el=document.getElementById('style_'+code);if(el)el.classList.add('active');
   savePrefs();
@@ -830,8 +862,10 @@ function toggleDeep(){
   deepOn=!deepOn;
   var pill=document.getElementById('deepPill');
   if(pill)pill.classList.toggle('active',deepOn);
-  if(deepOn)setStyle('explain','Menjelaskan');
-  else setStyle('normal','Normal');
+  var explainLbl=(STYLE_LABELS.explain&&STYLE_LABELS.explain[currentLang])||'Menjelaskan';
+  var normalLbl=(STYLE_LABELS.normal&&STYLE_LABELS.normal[currentLang])||'Normal';
+  if(deepOn)setStyle('explain',explainLbl);
+  else setStyle('normal',normalLbl);
 }
 
 // ═══════════════════════════════════════════
@@ -922,7 +956,7 @@ function loadPrefs(){
       if(p.theme){isDark=p.theme==='dark';applyTheme(p.theme);}
       var flagMap={id:'🇮🇩 Indonesia',en:'🇬🇧 English',ar:'🇸🇦 العربية',zh:'🇨🇳 中文',ja:'🇯🇵 日本語',ko:'🇰🇷 한국어',es:'🇪🇸 Español',fr:'🇫🇷 Français',de:'🇩🇪 Deutsch',pt:'🇧🇷 Português',ru:'🇷🇺 Русский',hi:'🇮🇳 हिन्दी'};
       if(p.lang)setLang(p.lang,flagMap[p.lang]||p.lang);
-      if(p.style)setStyle(p.style,p.style);
+      if(p.style){var sLbl=(STYLE_LABELS[p.style]&&STYLE_LABELS[p.style][currentLang])||p.style;setStyle(p.style,sLbl);}
     }
   }catch(e){}
 }
