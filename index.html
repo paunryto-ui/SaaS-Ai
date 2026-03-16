@@ -378,10 +378,15 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
         <button onclick="openSidebar()" class="topbar-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="model-badge" onclick="openSidebar()">
+        <div class="model-badge" onclick="toggleModelMenu()" id="modelBadge">
           <div id="logoTopbar" style="width:18px;height:18px;flex-shrink:0"></div>
-          <span>SaaS AI</span>
+          <span id="modelBadgeLbl">Auto (Terbaik)</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <!-- Model selector popup -->
+        <div id="modelMenu" class="popup" style="display:none;top:54px;left:0;min-width:280px;z-index:300">
+          <div style="padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em">Model</div>
+          <div id="modelList"></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
@@ -456,9 +461,9 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
           <!-- Upload -->
           <button class="tool-row" onclick="document.getElementById('fileIn').click();closeTools()">
             <div class="tool-ico">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
-            <div><div class="tool-title" id="tl_upload"></div><div class="tool-sub" id="tl_upload_sub"></div></div>
+            <div><div class="tool-title" id="tl_upload"></div><div class="tool-sub" id="tl_upload_sub">Foto, PDF, Word, Excel, TXT, Kode…</div></div>
           </button>
           <!-- Edit photo -->
           <button class="tool-row" onclick="triggerImgEdit()">
@@ -518,7 +523,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
               <span id="webSearchCheck" style="display:none"></span>
-              <input id="fileIn" type="file" accept="image/*" multiple style="display:none" onchange="onFile(event)"/>
+              <input id="fileIn" type="file" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.ppt,.pptx,.json,.md,.html,.css,.js,.py,.java,.cpp,.c,.ts,.xml" multiple style="display:none" onchange="onFile(event)"/>
               <input id="fileInEdit" type="file" accept="image/*" style="display:none" onchange="onFileEdit(event)"/>
               <!-- Pills -->
               <button id="webPill" class="pill-btn" onclick="toggleWebSearch()">
@@ -559,9 +564,9 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K=atob('c2stb3ItdjEtNmM1ZjJjOGViMGIyYmJiNDFhNjNmNjA4MDEwYjNhMjVjMTIxMDIyMzYzMGM4NzdiMjY1Yzk1Mzg4MzI4MmRkMA==');
+var _K=atob('c2stb3ItdjEtZTA5MGMyNjVlZWVmMjFlMjZmNjNhOTc4MDdiYWRiM2IyNWM0MmU4ZTRjY2FlMjAzOGFhZWZjNzhjYTUwMTM3NA==');
 var API='https://openrouter.ai/api/v1/chat/completions';
-var MODEL='anthropic/claude-3.5-haiku';
+// Models now managed by MODELS array + currentModel/currentModelVision
 var MSG_LIMIT=100;
 var RESET_HOUR=2;
 
@@ -994,19 +999,50 @@ function insertPrompt(text){
 // FILES
 // ═══════════════════════════════════════════
 function onFile(e){
-  // Auto-detect image ratio when loaded
+  var IMAGE_TYPES=['image/jpeg','image/png','image/gif','image/webp','image/bmp','image/svg+xml','image/tiff'];
+  var TEXT_TYPES=['text/plain','text/csv','text/html','text/css','text/javascript','application/json','application/xml','text/xml','text/x-python','text/x-java-source','text/x-c','application/javascript','text/markdown'];
+
   Array.from(e.target.files||[]).forEach(function(f){
-    var r=new FileReader();
-    r.onload=function(ev){
-      var img=new Image();
-      img.onload=function(){
-        var ratio=(img.width/img.height).toFixed(2);
-        images.push({url:ev.target.result,ratio:ratio,w:img.width,h:img.height});
+    var isImg=IMAGE_TYPES.indexOf(f.type)>-1||f.type.startsWith('image/');
+    var isText=TEXT_TYPES.indexOf(f.type)>-1||f.name.match(/\.(txt|csv|md|html|css|js|ts|py|java|cpp|c|json|xml|yaml|yml|sh|sql|log)$/i);
+
+    if(isImg){
+      // Image — read as data URL for Vision
+      var r=new FileReader();
+      r.onload=function(ev){
+        var img=new Image();
+        img.onload=function(){
+          var ratio=(img.width/img.height).toFixed(2);
+          images.push({url:ev.target.result,ratio:ratio,w:img.width,h:img.height,name:f.name,kind:'image'});
+          renderThumbs();updateSendBtn();
+        };
+        img.src=ev.target.result;
+      };
+      r.readAsDataURL(f);
+    } else if(isText){
+      // Plain text file — read as text
+      var r2=new FileReader();
+      r2.onload=function(ev){
+        images.push({url:null,text:ev.target.result,name:f.name,kind:'text',ext:f.name.split('.').pop().toLowerCase()});
         renderThumbs();updateSendBtn();
       };
-      img.src=ev.target.result;
-    };
-    r.readAsDataURL(f);
+      r2.readAsText(f,'UTF-8');
+    } else {
+      // Binary docs (PDF, Word, Excel, PPT) — read as ArrayBuffer then extract what we can
+      var r3=new FileReader();
+      r3.onload=function(ev){
+        // Try to extract text from common formats
+        var ext=f.name.split('.').pop().toLowerCase();
+        var raw='';
+        try{
+          // For PDFs / Word docs, we send filename + size hint and let Claude know it's attached
+          raw='[File: '+f.name+' ('+Math.round(f.size/1024)+'KB) — '+ext.toUpperCase()+' document attached. Please note I am uploading this file for you to help me with its content. Since binary file parsing is limited in-browser, please ask me to paste specific text or sections if needed.]';
+        }catch(ex){raw='[File: '+f.name+']';}
+        images.push({url:null,text:raw,name:f.name,kind:'doc',ext:ext});
+        renderThumbs();updateSendBtn();
+      };
+      r3.readAsArrayBuffer(f);
+    }
   });
   e.target.value='';
 }
@@ -1015,14 +1051,26 @@ function renderThumbs(){
   w.innerHTML='';
   images.forEach(function(img,i){
     var d=document.createElement('div');
-    var ratio=img.ratio||1;
-    var thumbW=Math.round(52*Math.min(ratio,2));
-    d.style.cssText='position:relative;width:'+thumbW+'px;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0';
-    if(img.isEdit)d.style.boxShadow='0 0 0 2px var(--accent)';
-    d.innerHTML='<img src="'+img.url+'" style="width:100%;height:100%;object-fit:cover" alt=""/>'
-      +(img.isEdit?'<div style="position:absolute;bottom:2px;left:2px;font-size:9px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:4px;font-weight:700">EDIT</div>':'')
-      +(img.ratio?'<div style="position:absolute;top:2px;left:2px;font-size:8px;background:rgba(0,0,0,.55);color:#fff;padding:1px 4px;border-radius:3px">'+img.w+'×'+img.h+'</div>':'')
-      +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
+    if(img.kind==='image'){
+      var ratio=img.ratio||1;
+      var thumbW=Math.round(52*Math.min(ratio,2));
+      d.style.cssText='position:relative;width:'+thumbW+'px;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0';
+      if(img.isEdit)d.style.boxShadow='0 0 0 2px var(--accent)';
+      d.innerHTML='<img src="'+img.url+'" style="width:100%;height:100%;object-fit:cover" alt=""/>'
+        +(img.isEdit?'<div style="position:absolute;bottom:2px;left:2px;font-size:9px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:4px;font-weight:700">EDIT</div>':'')
+        +(img.ratio?'<div style="position:absolute;top:2px;left:2px;font-size:8px;background:rgba(0,0,0,.55);color:#fff;padding:1px 4px;border-radius:3px">'+img.w+'×'+img.h+'</div>':'')
+        +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
+    } else {
+      // Document / text file chip
+      var extColors={pdf:'#e74c3c',doc:'#2980b9',docx:'#2980b9',xls:'#27ae60',xlsx:'#27ae60',ppt:'#e67e22',pptx:'#e67e22',txt:'#7f8c8d',csv:'#27ae60',json:'#8e44ad',js:'#f1c40f',py:'#3498db',java:'#e74c3c',md:'#7f8c8d',html:'#e67e22',css:'#2980b9'};
+      var ext=(img.ext||'file').toLowerCase();
+      var color=extColors[ext]||'#7f8c8d';
+      var shortName=img.name.length>14?img.name.slice(0,11)+'…':img.name;
+      d.style.cssText='position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;height:52px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;padding:2px';
+      d.innerHTML='<div style="font-size:9px;font-weight:800;color:#fff;background:'+color+';padding:2px 5px;border-radius:4px;text-transform:uppercase">'+ext+'</div>'
+        +'<div style="font-size:8px;color:var(--text3);text-align:center;line-height:1.2;max-width:56px;overflow:hidden;word-break:break-all">'+shortName+'</div>'
+        +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
+    }
     w.appendChild(d);
   });
 }
@@ -1055,6 +1103,7 @@ document.addEventListener('click',function(e){
       if(id==='toolsMenu')closeTools();
       else if(id==='langMenu'&&el)el.style.display='none';
       else if(id==='styleMenu'&&el)el.style.display='none';
+      else if(id==='modelMenu'&&el)el.style.display='none';
     }
   });
 });
@@ -1117,7 +1166,11 @@ function msgHTML(m){
     });
     var text=typeof m.content==='string'?escHtml(m.content):'';
     if(Array.isArray(m.content))m.content.forEach(function(c){if(c.type==='text')text=escHtml(c.text);});
-    return '<div class="msg-user fade-up"><div class="bubble">'+imgs+(text?'<span>'+text+'</span>':'')+'</div></div>';
+    // Hide auto-generated fallback text when images are present (only show if user actually typed something)
+    var hasImgs=(m._imgs&&m._imgs.length>0);
+    var isAutoText=(text==='Analyze this image.'||text==='Analyze this file.'||text==='Analisis gambar ini.'||text==='');
+    var showText=text&&!(hasImgs&&isAutoText);
+    return '<div class="msg-user fade-up"><div class="bubble">'+imgs+(showText?'<span>'+text+'</span>':'')+'</div></div>';
   }
   var content=m.content||'';
   var imgResult='';
@@ -1139,6 +1192,62 @@ function typingHTML(){
 }
 function downloadImg(url){var a=document.createElement('a');a.href=url;a.download='saas-ai-photo.jpg';a.click();}
 
+
+// ═══════════════════════════════════════════
+// MODEL SELECTOR
+// ═══════════════════════════════════════════
+var MODELS=[
+  {id:'anthropic/claude-3.5-sonnet', label:'Claude 3.5 Sonnet', desc:'Cerdas & gratis via OpenRouter', icon:'✨', vision:true},
+  {id:'openrouter/auto',             label:'Auto (Terbaik)',     desc:'Pilih model terbaik otomatis',   icon:'🎯', vision:true},
+];
+
+var currentModel=MODELS[1];
+var currentModelVision=MODELS[1]; // auto for vision too
+
+function renderModelList(){
+  var w=document.getElementById('modelList');
+  if(!w)return;
+  w.innerHTML='';
+  MODELS.forEach(function(m){
+    var isActive=(m.id===currentModel.id);
+    var isDisabled=(m.id==='anthropic/claude-3.5-sonnet');
+    var d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;transition:background .12s;position:relative;'
+      +(isDisabled?'cursor:not-allowed;opacity:0.45;filter:blur(0.4px);':'cursor:pointer;');
+    if(!isDisabled){
+      d.onmouseover=function(){this.style.background='var(--hover)';}
+      d.onmouseout=function(){this.style.background=isActive?'var(--active)':'';}
+    }
+    if(isActive) d.style.background='var(--active)';
+    d.innerHTML='<div style="width:28px;height:28px;border-radius:8px;background:'+(isDisabled?'rgba(0,0,0,0.35)':'var(--bg3)')+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;'+(isDisabled?'filter:grayscale(1)':'')+'">'+(isDisabled?'🔒':m.icon)+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13.5px;font-weight:'+(isActive?'700':'500')+';color:'+(isDisabled?'var(--text4)':(isActive?'var(--accent)':'var(--text)'))+'">'
+          +m.label+(isDisabled?' <span style="font-size:10px;background:rgba(0,0,0,0.3);color:#888;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle">Tidak tersedia</span>':'')
+        +'</div>'
+        +'<div style="font-size:11.5px;color:var(--text4)">'+m.desc+(m.vision?' · 👁️ Vision':'')+'</div>'
+      +'</div>'
+      +(isActive?'<div style="color:var(--accent);font-size:14px">✓</div>':'');
+    if(!isDisabled){
+      d.onclick=function(){
+        currentModel=m;
+        if(m.vision) currentModelVision=m;
+        else currentModelVision=MODELS[0];
+        document.getElementById('modelBadgeLbl').textContent=m.label;
+        closeModelMenu();
+        renderModelList();
+      };
+    }
+    w.appendChild(d);
+  });
+}
+
+function toggleModelMenu(){
+  var m=document.getElementById('modelMenu');
+  var open=m.style.display==='block';
+  if(!open) renderModelList();
+  m.style.display=open?'none':'block';
+}
+function closeModelMenu(){document.getElementById('modelMenu').style.display='none';}
 // ═══════════════════════════════════════════
 // SEND - with real photo editing via Claude Vision
 // ═══════════════════════════════════════════
@@ -1151,14 +1260,42 @@ function send(){
     curId=id;renderHistory();
   }
   var isEditRequest=images.some(function(i){return i.isEdit;});
+  var hasImages=images.some(function(i){return i.kind==='image';});
+  var hasDocs=images.some(function(i){return i.kind==='text'||i.kind==='doc';});
   var userContent;
   if(images.length>0){
-    userContent=images.map(function(img){return{type:'image_url',image_url:{url:img.url}};});
-    userContent.push({type:'text',text:text||'Analyze this image.'});
+    userContent=[];
+    // First add all image items for Vision
+    images.forEach(function(img){
+      if(img.kind==='image'&&img.url){
+        if(img.url.startsWith('data:')){
+          var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
+          if(matches){
+            userContent.push({type:'image',source:{type:'base64',media_type:matches[1],data:matches[2]}});
+          } else {
+            userContent.push({type:'image_url',image_url:{url:img.url}});
+          }
+        } else {
+          userContent.push({type:'image_url',image_url:{url:img.url}});
+        }
+      }
+    });
+    // Then prepend document/text file contents as text block
+    var docParts='';
+    images.forEach(function(img){
+      if(img.kind==='text'&&img.text){
+        docParts+='=== FILE: '+img.name+' ===\n'+img.text+'\n\n';
+      } else if(img.kind==='doc'&&img.text){
+        docParts+=img.text+'\n\n';
+      }
+    });
+    var finalText=(docParts?docParts:'')+(text||(hasImages?'Analyze this image.':'Analyze this file.'));
+    userContent.push({type:'text',text:finalText});
   } else {
     userContent=text;
   }
-  var userMsg={role:'user',content:userContent,_imgs:images.map(function(x){return x.url;})};
+  var images_present=hasImages;
+  var userMsg={role:'user',content:userContent,_imgs:images.filter(function(x){return x.kind==='image';}).map(function(x){return x.url;})};
   getCur().msgs.push(userMsg);
   document.getElementById('inp').value='';
   document.getElementById('inp').style.height='auto';
@@ -1171,7 +1308,13 @@ function send(){
   var lang=currentLang!=='id'?'Always respond in '+langNames[currentLang]+'. ':'' ;
   var styleInst=STYLE_PROMPTS[currentStyle]||'';
   var webInst=webSearchOn?' When relevant, simulate web search results to provide up-to-date information. Format search results naturally.':'';
-  var imgInst=isEditRequest?' The user has sent a photo for editing. Describe in detail what edits/improvements you would make to match their prompt. Be specific about: color corrections, composition changes, background modifications, style transformations, enhancement techniques. Describe the result vividly.':'';
+  var imgInst=isEditRequest
+    ?' You are an expert photo editor and visual artist. The user wants you to edit their photo. '
+    +'Analyze the image carefully, then describe EXACTLY how you would apply the requested edit/effect. '
+    +'Be very specific and visual: describe colors, light, texture, mood changes. '
+    +'Show your expertise with technical terms (bloom, vignette, color grade, etc). '
+    +'Make the user FEEL the transformation. End with practical tips if they want to apply it in apps like Lightroom, Photoshop, or VSCO.'
+    :' For images: analyze thoroughly with specific, accurate observations.';
   
   var sysPrompt='You are SaaS AI — an exceptionally intelligent, fast, and helpful AI assistant. '
     +'You are powered by cutting-edge AI and always provide accurate, thoughtful, high-quality responses. '
@@ -1188,8 +1331,8 @@ function send(){
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
     body:JSON.stringify({
-      model:MODEL,
-      max_tokens:4096,
+      model:(images_present?currentModelVision.id:currentModel.id),
+      max_tokens:7900,
       temperature:0.7,
       messages:[{role:'system',content:sysPrompt}].concat(history)
     })
