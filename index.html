@@ -658,7 +658,7 @@ body:not(.dark) #logoSidebar img {
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K='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';
+var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODELS_TEXT=[
   'anthropic/claude-3.5-haiku',
@@ -1332,7 +1332,8 @@ function send(){
   
   var modelList=images_present?MODELS_VISION:MODELS_TEXT;
   
-  function doFetch(modelToUse){
+  function doFetch(modelToUse, maxTok){
+    maxTok = maxTok || 2048;
     return fetch(API,{
       method:'POST',
       mode:'cors',
@@ -1340,31 +1341,59 @@ function send(){
         'Content-Type':'application/json',
         'Authorization':'Bearer '+_K,
         'HTTP-Referer':'https://saas-ai.app',
-        'X-Title':'SaaS AI',
-        'X-Requested-With':'XMLHttpRequest'
+        'X-Title':'SaaS AI'
       },
       body:JSON.stringify({
         model:modelToUse,
-        max_tokens:4096,
+        max_tokens:maxTok,
         temperature:0.7,
         messages:[{role:'system',content:sysPrompt}].concat(history)
       })
     }).then(function(res){
-      if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
-      return res.json();
-    }).then(function(data){
-      if(!data.choices||!data.choices[0]||!data.choices[0].message)throw new Error('Empty response');
-      return data;
+      return res.json().then(function(data){
+        if(!res.ok){
+          var msg=(data.error&&data.error.message)?data.error.message:'HTTP '+res.status;
+          var err=new Error(msg);
+          // Token/credit error → retry same model with fewer tokens
+          var affordMatch=msg.match(/can only afford (\d+)/i);
+          if(affordMatch){
+            var canAfford=parseInt(affordMatch[1]);
+            if(canAfford>=100){
+              err.retryTokens=Math.floor(canAfford*0.85);
+            } else {
+              err.fatal=true; // truly out of credits
+            }
+          } else if(res.status===401||res.status===402||
+             msg.toLowerCase().includes('user not found')||
+             msg.toLowerCase().includes('invalid api key')||
+             msg.toLowerCase().includes('no auth')){
+            err.fatal=true;
+          }
+          throw err;
+        }
+        if(!data.choices||!data.choices[0]||!data.choices[0].message)throw new Error('Empty response');
+        return data;
+      });
     });
   }
-  
-  // Try each model in sequence until one works
-  function tryModels(idx){
-    if(idx>=modelList.length)return Promise.reject(new Error('Semua model sedang tidak tersedia. Coba lagi beberapa saat.'));
-    return doFetch(modelList[idx]).catch(function(){return tryModels(idx+1);});
+
+  // Try each model — adaptive token retry, skip on provider errors
+  function tryModels(idx, maxTok){
+    maxTok = maxTok || 2048;
+    if(idx>=modelList.length)return Promise.reject(new Error('Model AI sedang sibuk. Coba lagi sebentar.'));
+    return doFetch(modelList[idx], maxTok).catch(function(err){
+      if(err.fatal) return Promise.reject(new Error('API key error: '+err.message));
+      if(err.retryTokens){
+        // Same model, fewer tokens
+        return doFetch(modelList[idx], err.retryTokens).catch(function(){
+          return tryModels(idx+1, err.retryTokens);
+        });
+      }
+      return tryModels(idx+1, maxTok);
+    });
   }
-  
-  tryModels(0)
+
+  tryModels(0, 2048)
   .then(function(data){
     var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
     var sess=getCur();
@@ -1384,8 +1413,12 @@ function send(){
   .catch(function(err){
     var errDetail=err&&err.message?err.message:'Unknown error';
     var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed to fetch');
-    var msg=isConn?'Koneksi gagal. Periksa internet kamu dan coba lagi.':errDetail;
-    showSorryOverlay(msg, true);
+    var isCredit=errDetail.toLowerCase().includes('credit')||errDetail.toLowerCase().includes('afford');
+    var msg=isCredit
+      ?'Kredit OpenRouter habis. Top up di openrouter.ai/settings/credits'
+      :isConn?'Koneksi gagal. Periksa internet kamu.'
+      :errDetail;
+    showSorryOverlay(msg, !isCredit);
   })
   .finally(function(){loading=false;renderMsgs();updateSendBtn();});
 }
