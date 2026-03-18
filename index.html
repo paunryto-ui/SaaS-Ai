@@ -658,10 +658,12 @@ body:not(.dark) #logoSidebar img {
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K='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';
+var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
-var MODEL='anthropic/claude-3.5-haiku';
-var MODEL_VISION='anthropic/claude-3.5-sonnet';
+var MODEL='deepseek/deepseek-chat-v3-0324:free';
+var MODEL_VISION='google/gemini-2.0-flash-exp:free';
+var MODEL_FALLBACK='meta-llama/llama-3.3-70b-instruct:free';
+var MODEL_VISION_FALLBACK='meta-llama/llama-3.2-11b-vision-instruct:free';
 var MSG_LIMIT=100;
 var RESET_HOUR=2;
 
@@ -1249,39 +1251,44 @@ function send(){
     curId=id;renderHistory();
   }
   var isEditRequest=images.some(function(i){return i.isEdit;});
-  var userContent;
+  var capturedImgs=images.slice();
+  var images_present=capturedImgs.length>0;
+  var userDisplayContent; // stored & shown in UI
+  var userApiContent;     // sent to API (may have fallback text)
   if(images.length>0){
-    userContent=[];
-    images.forEach(function(img){
-      // Handle base64 data URLs properly for Claude via OpenRouter
+    userDisplayContent=[];
+    userApiContent=[];
+    capturedImgs.forEach(function(img){
+      var block;
       if(img.url.startsWith('data:')){
         var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
         if(matches){
-          userContent.push({
-            type:'image',
-            source:{
-              type:'base64',
-              media_type:matches[1],
-              data:matches[2]
-            }
-          });
+          block={type:'image',source:{type:'base64',media_type:matches[1],data:matches[2]}};
         } else {
-          userContent.push({type:'image_url',image_url:{url:img.url}});
+          block={type:'image_url',image_url:{url:img.url}};
         }
       } else {
-        userContent.push({type:'image_url',image_url:{url:img.url}});
+        block={type:'image_url',image_url:{url:img.url}};
       }
+      userDisplayContent.push(block);
+      userApiContent.push(block);
     });
-    userContent.push({type:'text',text:text||'Analyze this image.'});
+    if(text){
+      var textBlock={type:'text',text:text};
+      userDisplayContent.push(textBlock);
+      userApiContent.push(textBlock);
+    } else {
+      // Only send to API silently, don't show in UI
+      userApiContent.push({type:'text',text:'Describe what you see in this image in detail.'});
+    }
   } else {
-    userContent=text;
+    userDisplayContent=text;
+    userApiContent=text;
   }
-  var userMsg={role:'user',content:userContent,_imgs:images.map(function(x){return x.url;})};
+  var userMsg={role:'user',content:userDisplayContent,_imgs:capturedImgs.map(function(x){return x.url;})};
   getCur().msgs.push(userMsg);
   document.getElementById('inp').value='';
   document.getElementById('inp').style.height='auto';
-  var capturedImgs=images.slice();
-  var images_present=capturedImgs.length>0;
   images=[];pendingImgEdit=null;
   renderThumbs();loading=true;updateSendBtn();renderMsgs();
 
@@ -1307,28 +1314,44 @@ function send(){
     +'For analysis: be insightful, structured, and actionable. '
     +'For images: analyze thoroughly with specific, accurate observations.';
 
-  var history=getCur().msgs.slice(-20).map(function(m){return{role:m.role,content:m.content};});
+  var history=getCur().msgs.slice(-20).map(function(m,idx,arr){
+    // Last user message: use apiContent (may include silent fallback text for images)
+    if(idx===arr.length-1&&m.role==='user'){
+      return {role:'user',content:userApiContent};
+    }
+    return {role:m.role,content:m.content};
+  });
   
-  fetch(API,{
-    method:'POST',
-    mode:'cors',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':'Bearer '+_K,
-      'HTTP-Referer':'https://saas-ai.app',
-      'X-Title':'SaaS AI',
-      'X-Requested-With':'XMLHttpRequest'
-    },
-    body:JSON.stringify({
-      model:(images_present?MODEL_VISION:MODEL),
-      max_tokens:2048,
-      temperature:0.7,
-      messages:[{role:'system',content:sysPrompt}].concat(history)
-    })
-  })
-  .then(function(res){
-    if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
-    return res.json();
+  var primaryModel=images_present?MODEL_VISION:MODEL;
+  var fallbackModel=images_present?MODEL_VISION_FALLBACK:MODEL_FALLBACK;
+  
+  function doFetch(modelToUse){
+    return fetch(API,{
+      method:'POST',
+      mode:'cors',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+_K,
+        'HTTP-Referer':'https://saas-ai.app',
+        'X-Title':'SaaS AI',
+        'X-Requested-With':'XMLHttpRequest'
+      },
+      body:JSON.stringify({
+        model:modelToUse,
+        max_tokens:4096,
+        temperature:0.7,
+        messages:[{role:'system',content:sysPrompt}].concat(history)
+      })
+    }).then(function(res){
+      if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
+      return res.json();
+    });
+  }
+  
+  doFetch(primaryModel)
+  .catch(function(err){
+    // Auto-fallback to secondary free model
+    return doFetch(fallbackModel);
   })
   .then(function(data){
     var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
@@ -1347,19 +1370,10 @@ function send(){
     }
   })
   .catch(function(err){
-    var sess=getCur();
     var errDetail=err&&err.message?err.message:'Unknown error';
-    var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed');
-    var isToken=errDetail.toLowerCase().includes('max_tokens')||errDetail.toLowerCase().includes('credits')||errDetail.toLowerCase().includes('afford');
-    var msg;
-    if(isToken){
-      msg='Kredit OpenRouter tidak cukup. Top up di openrouter.ai/settings/credits atau coba lagi dengan pesan lebih pendek.';
-    } else if(isConn){
-      msg='Harap tunggu, SaaS AI akan pulih kembali segera.';
-    } else {
-      msg=errDetail;
-    }
-    showSorryOverlay(msg, !isToken);
+    var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed to fetch');
+    var msg=isConn?'Koneksi gagal. Periksa internet kamu dan coba lagi.':errDetail;
+    showSorryOverlay(msg, true);
   })
   .finally(function(){loading=false;renderMsgs();updateSendBtn();});
 }
