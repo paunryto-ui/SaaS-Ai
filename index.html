@@ -91,8 +91,8 @@ textarea::-webkit-scrollbar{display:none}
 .ic{font-family:'Geist Mono',monospace;font-size:12.5px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--accent)}
 
 /* Input */
-#inputWrap{border-radius:18px;border:1px solid var(--border);background:var(--input-bg);box-shadow:var(--input-shadow)}
-#inp{font-size:15px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:'Geist',sans-serif}
+#inputWrap{border-radius:28px;border:1px solid var(--border);background:var(--input-bg);box-shadow:0 2px 16px rgba(0,0,0,.07);transition:box-shadow .2s,border-color .2s}
+#inp{font-size:16px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:'Geist',sans-serif}
 #inp::placeholder{color:var(--text4)}
 
 /* Send button */
@@ -198,9 +198,109 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
   from{transform:scaleY(.4);transform-origin:center}
   to{transform:scaleY(1);transform-origin:center}
 }
+
+/* ─── SPLASH SCREEN ─────────────────────────────────── */
+#splashScreen{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#splashScreen.hiding{opacity:0;transform:scale(1.03);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
+.splash-logo-wrap{width:130px;height:130px;margin-bottom:26px;animation:splashIn .7s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 0 28px rgba(168,139,250,.55));}
+.splash-logo-wrap img{width:100%;height:100%;object-fit:contain}
+@keyframes splashIn{from{opacity:0;transform:scale(.3) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.splash-title{font-size:32px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8,#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;margin-bottom:6px;animation:shimmerTxt 3s linear infinite,fadeUp .6s ease .25s both;}
+@keyframes shimmerTxt{0%{background-position:0%}100%{background-position:200%}}
+.splash-sub{font-size:14px;color:#666;margin-bottom:36px;animation:fadeUp .5s ease .4s both}
+.splash-form{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(320px,88vw);animation:fadeUp .5s ease .5s both;}
+.splash-input{width:100%;padding:13px 18px;border-radius:14px;border:1.5px solid #222236;background:#111122;color:#eee;font-size:15px;font-family:'Geist',sans-serif;outline:none;text-align:center;caret-color:#818cf8;transition:border-color .2s,box-shadow .2s;}
+.splash-input::placeholder{color:#3a3a52}
+.splash-input:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(129,140,248,.18)}
+.splash-btn{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);color:#fff;font-size:14.5px;font-weight:700;font-family:'Geist',sans-serif;box-shadow:0 4px 18px rgba(129,140,248,.3);transition:opacity .18s,transform .18s;}
+.splash-btn:hover{opacity:.87;transform:translateY(-1px)}
+/* ─── Error Pop-up ───────────────────────────────────── */
+.error-overlay{position:fixed;inset:0;z-index:8000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);animation:fadeInBg .2s ease;}
+@keyframes fadeInBg{from{opacity:0}to{opacity:1}}
+.error-bubble{background:var(--bg,#fff);border:1px solid var(--border,#e5e5e5);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);animation:popUp .25s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes popUp{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.error-icon-wrap{width:48px;height:48px;border-radius:50%;background:#fff3f3;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;}
+body.dark .error-icon-wrap{background:#2a1515}
+.error-title{font-size:15px;font-weight:700;color:var(--text,#1a1918);margin-bottom:8px;letter-spacing:-.01em;}
+.error-msg{font-size:13.5px;color:var(--text3,#6b6a68);line-height:1.65;margin-bottom:22px;}
+.error-btn-row{display:flex;gap:10px;justify-content:center;}
+.error-close-btn{padding:9px 22px;border-radius:10px;border:1px solid var(--border,#e5e5e5);background:var(--bg,#fff);color:var(--text2,#3d3c3a);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:background .15s;}
+.error-close-btn:hover{background:var(--hover,#f0f0f0)}
+.error-retry-btn{padding:9px 22px;border-radius:10px;border:none;background:var(--text,#1a1918);color:var(--bg,#fff);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:opacity .15s;}
+.error-retry-btn:hover{opacity:.82}
+body.dark .error-retry-btn{background:var(--text,#efefef);color:var(--bg,#141414)}
+/* ─── AI Avatar Animasi ───────────────────────────────────────── */
+.ai-avatar{width:36px;height:36px;border-radius:50%;overflow:visible;flex-shrink:0;margin-top:4px;position:relative}
+.ai-avatar-anim{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid transparent;background-clip:padding-box;position:relative;display:flex;align-items:center;justify-content:center;animation:avatarGlow 3s ease-in-out infinite;overflow:hidden;}
+@keyframes avatarGlow{0%,100%{box-shadow:0 0 8px rgba(129,140,248,.5),0 0 0 2px rgba(129,140,248,.2)}50%{box-shadow:0 0 16px rgba(244,114,182,.6),0 0 0 2px rgba(244,114,182,.3)}}
+.av-face{position:relative;width:24px;height:22px}
+.av-head{width:22px;height:16px;border-radius:5px;background:linear-gradient(135deg,#818cf8,#6366f1);position:absolute;top:2px;left:1px;box-shadow:0 2px 6px rgba(99,102,241,.5);}
+.av-eye{width:5px;height:5px;border-radius:50%;background:#fff;position:absolute;top:4px;animation:eyeBlink 4s ease-in-out infinite;}
+.av-eye-l{left:4px}.av-eye-r{right:4px}
+.av-eye::after{content:'';position:absolute;width:2.5px;height:2.5px;background:#1e1b4b;border-radius:50%;top:1px;left:1px;animation:eyeLook 4s ease-in-out infinite;}
+@keyframes eyeBlink{0%,90%,100%{height:5px}93%,97%{height:1px}}
+@keyframes eyeLook{0%,100%{transform:translate(0,0)}25%{transform:translate(1px,-1px)}75%{transform:translate(-1px,0)}}
+.av-mouth{width:8px;height:3px;border-radius:0 0 4px 4px;background:#a5b4fc;position:absolute;bottom:4px;left:7px;animation:mouthTalk 2s ease-in-out infinite;}
+@keyframes mouthTalk{0%,100%{height:3px;border-radius:0 0 4px 4px}50%{height:5px;border-radius:0 0 6px 6px}}
+.av-antenna{width:2px;height:5px;background:#818cf8;position:absolute;top:-3px;left:10px;border-radius:1px;}
+.av-antenna::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;background:#f472b6;top:-4px;left:-1px;animation:antennaPulse 1.5s ease-in-out infinite;box-shadow:0 0 6px #f472b6;}
+@keyframes antennaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.av-body{width:14px;height:5px;border-radius:2px;background:linear-gradient(135deg,#6366f1,#818cf8);position:absolute;bottom:0;left:5px;}
+.av-thinking .av-mouth{animation:mouthThink 0.6s ease-in-out infinite!important}
+@keyframes mouthThink{0%,100%{width:8px}50%{width:4px;border-radius:50%}}
+.av-thinking .av-eye::after{animation:eyeThink 0.8s ease-in-out infinite!important}
+@keyframes eyeThink{0%,100%{transform:translate(0,0)}50%{transform:translate(0,-2px)}}
+#planBadge,#badgeRow,.plan-badge{display:none!important}
+
+50%{opacity:0}}
+
+/* ─── Input bar Claude.ai style ──── */
+#inputWrap:focus-within{
+  border-color:rgba(128,128,128,.5);
+  box-shadow:0 4px 24px rgba(0,0,0,.1);
+}
+/* ─── Greeting typewriter cursor ─── */
+#greetingLbl::after{
+  content:'|';
+  display:inline-block;
+  margin-left:2px;
+  color:var(--accent,#8c8c8c);
+  animation:greetBlink .7s step-end infinite;
+  font-weight:300;
+  opacity:1;
+}
+#greetingLbl.done::after{display:none}
+@keyframes greetBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ─── Logo background fix ─── */
+#logoEmpty img, #logoTopbar img, #logoSidebar img {
+  mix-blend-mode: screen;
+  border-radius: 10px;
+}
+body:not(.dark) #logoEmpty img,
+body:not(.dark) #logoTopbar img,
+body:not(.dark) #logoSidebar img {
+  mix-blend-mode: multiply;
+}
+.splash-logo-wrap img {
+  mix-blend-mode: screen;
+}
 </style>
 </head>
 <body class="light">
+
+<!-- SPLASH SCREEN -->
+<div id="splashScreen" style="display:none">
+  <div class="splash-logo-wrap" id="splashLogoImg"></div>
+  <div class="splash-title">SaaS AI</div>
+  <div class="splash-sub">Your intelligent AI assistant</div>
+  <div class="splash-form">
+    <input class="splash-input" id="splashNameInput" type="text"
+      placeholder="Enter your name..." maxlength="32"
+      onkeydown="if(event.key==='Enter')splashContinue()"/>
+    <button class="splash-btn" onclick="splashContinue()">Get Started →</button>
+  </div>
+</div>
 
 <div id="overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.3);backdrop-filter:blur(2px)"></div>
 
@@ -357,9 +457,9 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
     </div>
     <div style="border-top:1px solid var(--border);padding:10px">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--bg3)">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">P</div>
+        <div id="sidebarAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">?</div>
         <div style="flex:1;min-width:0">
-          <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0"></p>
+          <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:pointer" onclick="resetName()" title="Ganti nama">👤 <span id="sidebarNameLbl">...</span></p>
           <p id="limitSmall" style="font-size:11px;color:var(--text4);margin:0">0 / 100</p>
         </div>
         <button onclick="document.getElementById('settingsPanel').style.display='flex'" class="topbar-btn" title="Settings" style="padding:5px">
@@ -378,15 +478,10 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
         <button onclick="openSidebar()" class="topbar-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="model-badge" onclick="toggleModelMenu()" id="modelBadge">
+        <div class="model-badge" onclick="openSidebar()">
           <div id="logoTopbar" style="width:18px;height:18px;flex-shrink:0"></div>
-          <span id="modelBadgeLbl">Auto (Terbaik)</span>
+          <span>SaaS AI</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <!-- Model selector popup -->
-        <div id="modelMenu" class="popup" style="display:none;top:54px;left:0;min-width:280px;z-index:300">
-          <div style="padding:8px 12px 6px;font-size:11px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.08em">Model</div>
-          <div id="modelList"></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
@@ -440,8 +535,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
     <!-- EMPTY STATE -->
     <div id="emptyEl" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;overflow-y:auto;background:var(--bg)">
       <div id="logoEmpty" style="width:72px;height:72px;margin-bottom:20px;flex-shrink:0"></div>
-      <h1 id="help_me_lbl" style="font-size:26px;font-weight:700;color:var(--text);margin:0 0 8px;letter-spacing:-.02em"></h1>
-      <p id="sub_lbl" style="font-size:14px;color:var(--text4);margin:0 0 30px;max-width:360px;line-height:1.65"></p>
+      <h1 id="greetingLbl" style="font-size:clamp(24px,4vw,36px);font-weight:700;color:var(--text);margin:0 0 30px;letter-spacing:-.02em"></h1>
       <div id="suggests" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:560px;width:100%"></div>
     </div>
 
@@ -461,9 +555,9 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
           <!-- Upload -->
           <button class="tool-row" onclick="document.getElementById('fileIn').click();closeTools()">
             <div class="tool-ico">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
-            <div><div class="tool-title" id="tl_upload"></div><div class="tool-sub" id="tl_upload_sub">Foto, PDF, Word, Excel, TXT, Kode…</div></div>
+            <div><div class="tool-title" id="tl_upload"></div><div class="tool-sub" id="tl_upload_sub"></div></div>
           </button>
           <!-- Edit photo -->
           <button class="tool-row" onclick="triggerImgEdit()">
@@ -523,7 +617,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
               <span id="webSearchCheck" style="display:none"></span>
-              <input id="fileIn" type="file" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.ppt,.pptx,.json,.md,.html,.css,.js,.py,.java,.cpp,.c,.ts,.xml" multiple style="display:none" onchange="onFile(event)"/>
+              <input id="fileIn" type="file" accept="image/*" multiple style="display:none" onchange="onFile(event)"/>
               <input id="fileInEdit" type="file" accept="image/*" style="display:none" onchange="onFileEdit(event)"/>
               <!-- Pills -->
               <button id="webPill" class="pill-btn" onclick="toggleWebSearch()">
@@ -564,9 +658,10 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K=atob('c2stb3ItdjEtZTA5MGMyNjVlZWVmMjFlMjZmNjNhOTc4MDdiYWRiM2IyNWM0MmU4ZTRjY2FlMjAzOGFhZWZjNzhjYTUwMTM3NA==');
+var _K=atob('c2stb3ItdjEtMDA2OGE2NTI2YTUzODkyMDc4ZjcxYjliZTgzMmU0ZWE1ZTUyYzY3MmEyMTcyZWZhMTVlN2FlM2E5MDc0MWQ4OQ==');
 var API='https://openrouter.ai/api/v1/chat/completions';
-// Models now managed by MODELS array + currentModel/currentModelVision
+var MODEL='anthropic/claude-3.5-haiku';
+var MODEL_VISION='anthropic/claude-3.5-sonnet';
 var MSG_LIMIT=100;
 var RESET_HOUR=2;
 
@@ -618,7 +713,9 @@ function renderLogos(){
   var defs={logoSidebar:'28px',logoTopbar:'18px',logoEmpty:'68px'};
   Object.keys(defs).forEach(function(id){
     var el=document.getElementById(id);
-    if(el) el.innerHTML='<img src="'+src+'" style="width:'+defs[id]+';height:'+defs[id]+';object-fit:contain" alt="SaaS AI"/>';
+    var isLogo = id==='logoEmpty';
+    var br = isLogo?'border-radius:16px;':'border-radius:6px;';
+    if(el) el.innerHTML='<img src="'+src+'" style="width:'+defs[id]+';height:'+defs[id]+';object-fit:contain;'+br+'mix-blend-mode:screen" alt="SaaS AI"/>';
   });
 }
 
@@ -663,8 +760,7 @@ function applyI18N(){
   setText('limitSub_el',t.limitSub);
   setText('limitClose_btn',t.close);
   // Empty state
-  setText('help_me_lbl',t.help_me);
-  setText('sub_lbl',t.sub);
+  updateGreeting();
   setText('disclaimer_lbl',t.disclaimer);
   // Update style menu labels
   Object.keys(STYLE_LABELS).forEach(function(code){
@@ -999,50 +1095,19 @@ function insertPrompt(text){
 // FILES
 // ═══════════════════════════════════════════
 function onFile(e){
-  var IMAGE_TYPES=['image/jpeg','image/png','image/gif','image/webp','image/bmp','image/svg+xml','image/tiff'];
-  var TEXT_TYPES=['text/plain','text/csv','text/html','text/css','text/javascript','application/json','application/xml','text/xml','text/x-python','text/x-java-source','text/x-c','application/javascript','text/markdown'];
-
+  // Auto-detect image ratio when loaded
   Array.from(e.target.files||[]).forEach(function(f){
-    var isImg=IMAGE_TYPES.indexOf(f.type)>-1||f.type.startsWith('image/');
-    var isText=TEXT_TYPES.indexOf(f.type)>-1||f.name.match(/\.(txt|csv|md|html|css|js|ts|py|java|cpp|c|json|xml|yaml|yml|sh|sql|log)$/i);
-
-    if(isImg){
-      // Image — read as data URL for Vision
-      var r=new FileReader();
-      r.onload=function(ev){
-        var img=new Image();
-        img.onload=function(){
-          var ratio=(img.width/img.height).toFixed(2);
-          images.push({url:ev.target.result,ratio:ratio,w:img.width,h:img.height,name:f.name,kind:'image'});
-          renderThumbs();updateSendBtn();
-        };
-        img.src=ev.target.result;
-      };
-      r.readAsDataURL(f);
-    } else if(isText){
-      // Plain text file — read as text
-      var r2=new FileReader();
-      r2.onload=function(ev){
-        images.push({url:null,text:ev.target.result,name:f.name,kind:'text',ext:f.name.split('.').pop().toLowerCase()});
+    var r=new FileReader();
+    r.onload=function(ev){
+      var img=new Image();
+      img.onload=function(){
+        var ratio=(img.width/img.height).toFixed(2);
+        images.push({url:ev.target.result,ratio:ratio,w:img.width,h:img.height});
         renderThumbs();updateSendBtn();
       };
-      r2.readAsText(f,'UTF-8');
-    } else {
-      // Binary docs (PDF, Word, Excel, PPT) — read as ArrayBuffer then extract what we can
-      var r3=new FileReader();
-      r3.onload=function(ev){
-        // Try to extract text from common formats
-        var ext=f.name.split('.').pop().toLowerCase();
-        var raw='';
-        try{
-          // For PDFs / Word docs, we send filename + size hint and let Claude know it's attached
-          raw='[File: '+f.name+' ('+Math.round(f.size/1024)+'KB) — '+ext.toUpperCase()+' document attached. Please note I am uploading this file for you to help me with its content. Since binary file parsing is limited in-browser, please ask me to paste specific text or sections if needed.]';
-        }catch(ex){raw='[File: '+f.name+']';}
-        images.push({url:null,text:raw,name:f.name,kind:'doc',ext:ext});
-        renderThumbs();updateSendBtn();
-      };
-      r3.readAsArrayBuffer(f);
-    }
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(f);
   });
   e.target.value='';
 }
@@ -1051,26 +1116,14 @@ function renderThumbs(){
   w.innerHTML='';
   images.forEach(function(img,i){
     var d=document.createElement('div');
-    if(img.kind==='image'){
-      var ratio=img.ratio||1;
-      var thumbW=Math.round(52*Math.min(ratio,2));
-      d.style.cssText='position:relative;width:'+thumbW+'px;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0';
-      if(img.isEdit)d.style.boxShadow='0 0 0 2px var(--accent)';
-      d.innerHTML='<img src="'+img.url+'" style="width:100%;height:100%;object-fit:cover" alt=""/>'
-        +(img.isEdit?'<div style="position:absolute;bottom:2px;left:2px;font-size:9px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:4px;font-weight:700">EDIT</div>':'')
-        +(img.ratio?'<div style="position:absolute;top:2px;left:2px;font-size:8px;background:rgba(0,0,0,.55);color:#fff;padding:1px 4px;border-radius:3px">'+img.w+'×'+img.h+'</div>':'')
-        +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
-    } else {
-      // Document / text file chip
-      var extColors={pdf:'#e74c3c',doc:'#2980b9',docx:'#2980b9',xls:'#27ae60',xlsx:'#27ae60',ppt:'#e67e22',pptx:'#e67e22',txt:'#7f8c8d',csv:'#27ae60',json:'#8e44ad',js:'#f1c40f',py:'#3498db',java:'#e74c3c',md:'#7f8c8d',html:'#e67e22',css:'#2980b9'};
-      var ext=(img.ext||'file').toLowerCase();
-      var color=extColors[ext]||'#7f8c8d';
-      var shortName=img.name.length>14?img.name.slice(0,11)+'…':img.name;
-      d.style.cssText='position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;height:52px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);flex-shrink:0;padding:2px';
-      d.innerHTML='<div style="font-size:9px;font-weight:800;color:#fff;background:'+color+';padding:2px 5px;border-radius:4px;text-transform:uppercase">'+ext+'</div>'
-        +'<div style="font-size:8px;color:var(--text3);text-align:center;line-height:1.2;max-width:56px;overflow:hidden;word-break:break-all">'+shortName+'</div>'
-        +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
-    }
+    var ratio=img.ratio||1;
+    var thumbW=Math.round(52*Math.min(ratio,2));
+    d.style.cssText='position:relative;width:'+thumbW+'px;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0';
+    if(img.isEdit)d.style.boxShadow='0 0 0 2px var(--accent)';
+    d.innerHTML='<img src="'+img.url+'" style="width:100%;height:100%;object-fit:cover" alt=""/>'
+      +(img.isEdit?'<div style="position:absolute;bottom:2px;left:2px;font-size:9px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:4px;font-weight:700">EDIT</div>':'')
+      +(img.ratio?'<div style="position:absolute;top:2px;left:2px;font-size:8px;background:rgba(0,0,0,.55);color:#fff;padding:1px 4px;border-radius:3px">'+img.w+'×'+img.h+'</div>':'')
+      +'<button onclick="removeImg('+i+')" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700">×</button>';
     w.appendChild(d);
   });
 }
@@ -1103,7 +1156,6 @@ document.addEventListener('click',function(e){
       if(id==='toolsMenu')closeTools();
       else if(id==='langMenu'&&el)el.style.display='none';
       else if(id==='styleMenu'&&el)el.style.display='none';
-      else if(id==='modelMenu'&&el)el.style.display='none';
     }
   });
 });
@@ -1166,11 +1218,7 @@ function msgHTML(m){
     });
     var text=typeof m.content==='string'?escHtml(m.content):'';
     if(Array.isArray(m.content))m.content.forEach(function(c){if(c.type==='text')text=escHtml(c.text);});
-    // Hide auto-generated fallback text when images are present (only show if user actually typed something)
-    var hasImgs=(m._imgs&&m._imgs.length>0);
-    var isAutoText=(text==='Analyze this image.'||text==='Analyze this file.'||text==='Analisis gambar ini.'||text==='');
-    var showText=text&&!(hasImgs&&isAutoText);
-    return '<div class="msg-user fade-up"><div class="bubble">'+imgs+(showText?'<span>'+text+'</span>':'')+'</div></div>';
+    return '<div class="msg-user fade-up"><div class="bubble">'+imgs+(text?'<span>'+text+'</span>':'')+'</div></div>';
   }
   var content=m.content||'';
   var imgResult='';
@@ -1182,72 +1230,16 @@ function msgHTML(m){
       +'<button class="img-dl-btn" onclick="downloadImg(\''+m._editedImg+'\')">⬇ '+(t.download||'Download')+'</button><br/>';
   }
   return '<div class="msg-ai fade-up">'
-    +'<div class="ai-avatar"><img src="'+(isDark?LOGO_DARK_B64:LOGO_LIGHT_B64)+'" style="width:100%;height:100%;object-fit:contain" alt=""/></div>'
+    +makeAIAvatar(false)
     +'<div class="content md-content">'+imgResult+parseMd(content)+'</div>'
     +'</div>';
 }
 function typingHTML(){
-  return '<div class="msg-ai"><div class="ai-avatar"><img src="'+(isDark?LOGO_DARK_B64:LOGO_LIGHT_B64)+'" style="width:100%;height:100%;object-fit:contain" alt=""/></div>'
+  return '<div class="msg-ai">'+makeAIAvatar(true)
     +'<div class="content" style="padding-top:8px"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>';
 }
 function downloadImg(url){var a=document.createElement('a');a.href=url;a.download='saas-ai-photo.jpg';a.click();}
 
-
-// ═══════════════════════════════════════════
-// MODEL SELECTOR
-// ═══════════════════════════════════════════
-var MODELS=[
-  {id:'anthropic/claude-3.5-sonnet', label:'Claude 3.5 Sonnet', desc:'Cerdas & gratis via OpenRouter', icon:'✨', vision:true},
-  {id:'openrouter/auto',             label:'Auto (Terbaik)',     desc:'Pilih model terbaik otomatis',   icon:'🎯', vision:true},
-];
-
-var currentModel=MODELS[1];
-var currentModelVision=MODELS[1]; // auto for vision too
-
-function renderModelList(){
-  var w=document.getElementById('modelList');
-  if(!w)return;
-  w.innerHTML='';
-  MODELS.forEach(function(m){
-    var isActive=(m.id===currentModel.id);
-    var isDisabled=(m.id==='anthropic/claude-3.5-sonnet');
-    var d=document.createElement('div');
-    d.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;transition:background .12s;position:relative;'
-      +(isDisabled?'cursor:not-allowed;opacity:0.45;filter:blur(0.4px);':'cursor:pointer;');
-    if(!isDisabled){
-      d.onmouseover=function(){this.style.background='var(--hover)';}
-      d.onmouseout=function(){this.style.background=isActive?'var(--active)':'';}
-    }
-    if(isActive) d.style.background='var(--active)';
-    d.innerHTML='<div style="width:28px;height:28px;border-radius:8px;background:'+(isDisabled?'rgba(0,0,0,0.35)':'var(--bg3)')+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;'+(isDisabled?'filter:grayscale(1)':'')+'">'+(isDisabled?'🔒':m.icon)+'</div>'
-      +'<div style="flex:1;min-width:0">'
-        +'<div style="font-size:13.5px;font-weight:'+(isActive?'700':'500')+';color:'+(isDisabled?'var(--text4)':(isActive?'var(--accent)':'var(--text)'))+'">'
-          +m.label+(isDisabled?' <span style="font-size:10px;background:rgba(0,0,0,0.3);color:#888;padding:1px 6px;border-radius:8px;margin-left:4px;vertical-align:middle">Tidak tersedia</span>':'')
-        +'</div>'
-        +'<div style="font-size:11.5px;color:var(--text4)">'+m.desc+(m.vision?' · 👁️ Vision':'')+'</div>'
-      +'</div>'
-      +(isActive?'<div style="color:var(--accent);font-size:14px">✓</div>':'');
-    if(!isDisabled){
-      d.onclick=function(){
-        currentModel=m;
-        if(m.vision) currentModelVision=m;
-        else currentModelVision=MODELS[0];
-        document.getElementById('modelBadgeLbl').textContent=m.label;
-        closeModelMenu();
-        renderModelList();
-      };
-    }
-    w.appendChild(d);
-  });
-}
-
-function toggleModelMenu(){
-  var m=document.getElementById('modelMenu');
-  var open=m.style.display==='block';
-  if(!open) renderModelList();
-  m.style.display=open?'none':'block';
-}
-function closeModelMenu(){document.getElementById('modelMenu').style.display='none';}
 // ═══════════════════════════════════════════
 // SEND - with real photo editing via Claude Vision
 // ═══════════════════════════════════════════
@@ -1260,46 +1252,39 @@ function send(){
     curId=id;renderHistory();
   }
   var isEditRequest=images.some(function(i){return i.isEdit;});
-  var hasImages=images.some(function(i){return i.kind==='image';});
-  var hasDocs=images.some(function(i){return i.kind==='text'||i.kind==='doc';});
   var userContent;
   if(images.length>0){
     userContent=[];
-    // First add all image items for Vision
     images.forEach(function(img){
-      if(img.kind==='image'&&img.url){
-        if(img.url.startsWith('data:')){
-          var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
-          if(matches){
-            userContent.push({type:'image',source:{type:'base64',media_type:matches[1],data:matches[2]}});
-          } else {
-            userContent.push({type:'image_url',image_url:{url:img.url}});
-          }
+      // Handle base64 data URLs properly for Claude via OpenRouter
+      if(img.url.startsWith('data:')){
+        var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
+        if(matches){
+          userContent.push({
+            type:'image',
+            source:{
+              type:'base64',
+              media_type:matches[1],
+              data:matches[2]
+            }
+          });
         } else {
           userContent.push({type:'image_url',image_url:{url:img.url}});
         }
+      } else {
+        userContent.push({type:'image_url',image_url:{url:img.url}});
       }
     });
-    // Then prepend document/text file contents as text block
-    var docParts='';
-    images.forEach(function(img){
-      if(img.kind==='text'&&img.text){
-        docParts+='=== FILE: '+img.name+' ===\n'+img.text+'\n\n';
-      } else if(img.kind==='doc'&&img.text){
-        docParts+=img.text+'\n\n';
-      }
-    });
-    var finalText=(docParts?docParts:'')+(text||(hasImages?'Analyze this image.':'Analyze this file.'));
-    userContent.push({type:'text',text:finalText});
+    userContent.push({type:'text',text:text||'Analyze this image.'});
   } else {
     userContent=text;
   }
-  var images_present=hasImages;
-  var userMsg={role:'user',content:userContent,_imgs:images.filter(function(x){return x.kind==='image';}).map(function(x){return x.url;})};
+  var userMsg={role:'user',content:userContent,_imgs:images.map(function(x){return x.url;})};
   getCur().msgs.push(userMsg);
   document.getElementById('inp').value='';
   document.getElementById('inp').style.height='auto';
   var capturedImgs=images.slice();
+  var images_present=capturedImgs.length>0;
   images=[];pendingImgEdit=null;
   renderThumbs();loading=true;updateSendBtn();renderMsgs();
 
@@ -1329,10 +1314,17 @@ function send(){
   
   fetch(API,{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+    mode:'cors',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+_K,
+      'HTTP-Referer':'https://saas-ai.app',
+      'X-Title':'SaaS AI',
+      'X-Requested-With':'XMLHttpRequest'
+    },
     body:JSON.stringify({
-      model:(images_present?currentModelVision.id:currentModel.id),
-      max_tokens:7900,
+      model:(images_present?MODEL_VISION:MODEL),
+      max_tokens:4096,
       temperature:0.7,
       messages:[{role:'system',content:sysPrompt}].concat(history)
     })
@@ -1359,9 +1351,12 @@ function send(){
   })
   .catch(function(err){
     var sess=getCur();
+    var errDetail=err&&err.message?err.message:'Unknown error';
+    var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed');
+    showSorryOverlay(isConn?'Harap tunggu, SaaS AI akan pulih kembali segera.':errDetail, true);
     var errMsgs={id:'⚠️ Oops, ada error nih: ',en:'⚠️ Error: ',ja:'⚠️ エラー: ',ko:'⚠️ 오류: '};
     var errPre=errMsgs[currentLang]||errMsgs['en'];
-    if(sess)sess.msgs.push({role:'assistant',content:errPre+err.message+'\n\n'+
+    if(false&&sess)sess.msgs.push({role:'assistant',content:errPre+err.message+'\n\n'+
       (currentLang==='id'?'Coba lagi ya! 🙏':currentLang==='ja'?'もう一度お試しください！':'Please try again! 🙏')});
   })
   .finally(function(){loading=false;renderMsgs();updateSendBtn();});
@@ -1446,6 +1441,115 @@ function renderSuggests(){
   });
 }
 
+
+// ── Greeting ──────────────────────────────────────────────────────
+var USER_NAME = '';
+var GREETINGS = {
+  id:{morning:'Selamat pagi',afternoon:'Selamat siang',evening:'Selamat sore',night:'Selamat malam'},
+  en:{morning:'Good morning',afternoon:'Good afternoon',evening:'Good evening',night:'Good night'},
+  ja:{morning:'おはようございます',afternoon:'こんにちは',evening:'こんばんは',night:'おやすみなさい'},
+  ko:{morning:'좋은 아침이에요',afternoon:'안녕하세요',evening:'좋은 저녁이에요',night:'안녕히 주무세요'},
+  zh:{morning:'早上好',afternoon:'下午好',evening:'晚上好',night:'晚安'},
+  ar:{morning:'صباح الخير',afternoon:'مساء الخير',evening:'مساء الخير',night:'مساء الخير'},
+  es:{morning:'Buenos días',afternoon:'Buenas tardes',evening:'Buenas tardes',night:'Buenas noches'},
+  fr:{morning:'Bonjour',afternoon:'Bonjour',evening:'Bonsoir',night:'Bonne nuit'},
+  de:{morning:'Guten Morgen',afternoon:'Guten Tag',evening:'Guten Abend',night:'Gute Nacht'},
+  pt:{morning:'Bom dia',afternoon:'Boa tarde',evening:'Boa tarde',night:'Boa noite'},
+  ru:{morning:'Доброе утро',afternoon:'Добрый день',evening:'Добрый вечер',night:'Спокойной ночи'},
+  hi:{morning:'सुप्रभात',afternoon:'नमस्ते',evening:'शुभ संध्या',night:'शुभ रात्रि'}
+};
+function getTimePeriod(){var h=new Date().getHours();return h>=5&&h<11?'morning':h>=11&&h<15?'afternoon':h>=15&&h<19?'evening':'night';}
+var _greetTimer=null;
+function updateGreeting(){
+  var el=document.getElementById('greetingLbl');
+  if(!el)return;
+  var g=GREETINGS[currentLang]||GREETINGS['id'];
+  var fullText=g[getTimePeriod()]+', '+(USER_NAME||'');
+  // Typewriter effect
+  if(_greetTimer)clearInterval(_greetTimer);
+  el.textContent='';
+  el.classList.remove('done');
+  var i=0;
+  _greetTimer=setInterval(function(){
+    el.textContent=fullText.slice(0,i+1);
+    i++;
+    if(i>=fullText.length){
+      clearInterval(_greetTimer);
+      _greetTimer=null;
+      setTimeout(function(){el.classList.add('done');},600);
+    }
+  },45);
+}
+
+// ── Splash ─────────────────────────────────────────────────────────
+function initSplash(){
+  var sl=document.getElementById('splashLogoImg');
+  if(sl){var src=isDark?LOGO_DARK_B64:LOGO_LIGHT_B64;sl.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain;border-radius:20px;mix-blend-mode:screen"/>';}
+  try{var saved=localStorage.getItem('saas_username');if(saved&&saved.trim()){USER_NAME=saved.trim();hideSplash(true);return;}}catch(e){}
+  document.getElementById('splashScreen').style.display='flex';
+  setTimeout(function(){var inp=document.getElementById('splashNameInput');if(inp)inp.focus();},500);
+}
+function splashContinue(){
+  var inp=document.getElementById('splashNameInput');
+  var name=(inp?inp.value:'').trim();
+  if(!name){if(inp){inp.style.borderColor='#f472b6';inp.focus();}return;}
+  USER_NAME=name;
+  try{localStorage.setItem('saas_username',name);}catch(e){}
+  hideSplash(false);
+}
+function hideSplash(instant){
+  var sp=document.getElementById('splashScreen');
+  if(!sp)return;
+  updateSidebarName();
+  if(instant){sp.style.display='none';updateGreeting();return;}
+  sp.classList.add('hiding');
+  setTimeout(function(){sp.style.display='none';updateGreeting();},450);
+}
+function updateSidebarName(){
+  var lbl=document.getElementById('sidebarNameLbl');
+  if(lbl)lbl.textContent=USER_NAME||'...';
+  var av=document.getElementById('sidebarAvatar');
+  if(av)av.textContent=(USER_NAME||'?').charAt(0).toUpperCase();
+}
+function resetName(){
+  try{localStorage.removeItem('saas_username');}catch(e){}
+  USER_NAME='';
+  var sl=document.getElementById('splashLogoImg');
+  if(sl){var src=isDark?LOGO_DARK_B64:LOGO_LIGHT_B64;sl.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain;border-radius:20px;mix-blend-mode:screen"/>';}
+  var inp=document.getElementById('splashNameInput');
+  if(inp)inp.value='';
+  var sp=document.getElementById('splashScreen');
+  if(sp){sp.classList.remove('hiding');sp.style.display='flex';}
+  setTimeout(function(){if(inp)inp.focus();},300);
+  closeSidebar();
+}
+
+// ── AI Avatar Character ────────────────────────────────────────────
+function makeAIAvatar(thinking){
+  return '<div class="ai-avatar"><div class="ai-avatar-anim'+(thinking?' av-thinking':'')+'"><div class="av-face"><div class="av-antenna"></div><div class="av-head"><div class="av-eye av-eye-l"></div><div class="av-eye av-eye-r"></div><div class="av-mouth"></div></div><div class="av-body"></div></div></div></div>';
+}
+
+// ── Error Pop-up ───────────────────────────────────────────────────
+function showSorryOverlay(msg,canRetry){
+  var ex=document.getElementById('sorryOverlay');
+  if(ex)ex.remove();
+  var o=document.createElement('div');
+  o.id='sorryOverlay';
+  o.className='error-overlay';
+  o.onclick=function(e){if(e.target===o)o.remove();};
+  var closeJs='document.getElementById('+String.fromCharCode(39)+'sorryOverlay'+String.fromCharCode(39)+').remove()';
+  var h='<div class="error-bubble">';
+  h+='<div class="error-icon-wrap">⚠️</div>';
+  h+='<div class="error-title">SaaS AI sedang bermasalah</div>';
+  h+='<div class="error-msg">'+(msg||'Harap tunggu, SaaS AI akan pulih kembali segera.')+'</div>';
+  h+='<div class="error-btn-row">';
+  h+='<button class="error-close-btn" onclick="'+closeJs+'">Tutup</button>';
+  if(canRetry)h+='<button class="error-retry-btn" onclick="'+closeJs+';send()">Coba lagi</button>';
+  h+='</div></div>';
+  o.innerHTML=h;
+  document.body.appendChild(o);
+}
+
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
@@ -1455,6 +1559,7 @@ function renderSuggests(){
   loadLimit();
   applyI18N();
   updateSendBtn();
+  initSplash();
   // Daily reset check
   try{var r=localStorage.getItem('saas_limit_v2');if(r){var d=JSON.parse(r);if(d.date!==new Date().toDateString()){localStorage.removeItem('saas_limit_v2');msgCount=0;updateLimitUI();}}}catch(e){}
   // Notify permission
