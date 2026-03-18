@@ -658,7 +658,7 @@ body:not(.dark) #logoSidebar img {
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K=atob('c2stb3ItdjEtMDA2OGE2NTI2YTUzODkyMDc4ZjcxYjliZTgzMmU0ZWE1ZTUyYzY3MmEyMTcyZWZhMTVlN2FlM2E5MDc0MWQ4OQ==');
+var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='anthropic/claude-3.5-haiku';
 var MODEL_VISION='anthropic/claude-3.5-sonnet';
@@ -998,9 +998,6 @@ function onFileEdit(e){
     pendingImgEdit={url:ev.target.result,name:f.name};
     images.push({url:ev.target.result,isEdit:true});
     renderThumbs();
-    var t=I18N[currentLang]||I18N['id'];
-    var prompts={id:'Edit foto ini sesuai instruksiku: ',en:'Edit this photo according to my instructions: ',ja:'この写真を編集してください: ',ko:'이 사진을 편집해주세요: ',zh:'按照我的指示编辑这张照片: ',ar:'قم بتحرير هذه الصورة وفق تعليماتي: ',es:'Edita esta foto según mis instrucciones: ',fr:'Modifiez cette photo selon mes instructions: ',de:'Bearbeite dieses Foto nach meinen Anweisungen: ',pt:'Edite esta foto de acordo com minhas instruções: ',ru:'Отредактируй эту фотографию по моим инструкциям: ',hi:'मेरे निर्देशों के अनुसार इस फ़ोटो को संपादित करें: '};
-    document.getElementById('inp').value=prompts[currentLang]||prompts['en'];
     onInpChange();document.getElementById('inp').focus();
   };
   r.readAsDataURL(f);
@@ -1324,7 +1321,7 @@ function send(){
     },
     body:JSON.stringify({
       model:(images_present?MODEL_VISION:MODEL),
-      max_tokens:4096,
+      max_tokens:2048,
       temperature:0.7,
       messages:[{role:'system',content:sysPrompt}].concat(history)
     })
@@ -1353,11 +1350,16 @@ function send(){
     var sess=getCur();
     var errDetail=err&&err.message?err.message:'Unknown error';
     var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed');
-    showSorryOverlay(isConn?'Harap tunggu, SaaS AI akan pulih kembali segera.':errDetail, true);
-    var errMsgs={id:'⚠️ Oops, ada error nih: ',en:'⚠️ Error: ',ja:'⚠️ エラー: ',ko:'⚠️ 오류: '};
-    var errPre=errMsgs[currentLang]||errMsgs['en'];
-    if(false&&sess)sess.msgs.push({role:'assistant',content:errPre+err.message+'\n\n'+
-      (currentLang==='id'?'Coba lagi ya! 🙏':currentLang==='ja'?'もう一度お試しください！':'Please try again! 🙏')});
+    var isToken=errDetail.toLowerCase().includes('max_tokens')||errDetail.toLowerCase().includes('credits')||errDetail.toLowerCase().includes('afford');
+    var msg;
+    if(isToken){
+      msg='Kredit OpenRouter tidak cukup. Top up di openrouter.ai/settings/credits atau coba lagi dengan pesan lebih pendek.';
+    } else if(isConn){
+      msg='Harap tunggu, SaaS AI akan pulih kembali segera.';
+    } else {
+      msg=errDetail;
+    }
+    showSorryOverlay(msg, !isToken);
   })
   .finally(function(){loading=false;renderMsgs();updateSendBtn();});
 }
