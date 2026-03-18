@@ -660,10 +660,21 @@ body:not(.dark) #logoSidebar img {
 // ═══════════════════════════════════════════
 var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
-var MODEL='deepseek/deepseek-chat-v3-0324:free';
-var MODEL_VISION='google/gemini-2.0-flash-exp:free';
-var MODEL_FALLBACK='meta-llama/llama-3.3-70b-instruct:free';
-var MODEL_VISION_FALLBACK='meta-llama/llama-3.2-11b-vision-instruct:free';
+var MODELS_TEXT=[
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'deepseek/deepseek-chat-v3-0324:free',
+  'qwen/qwen3-235b-a22b:free',
+  'mistralai/mistral-small-3.1-24b-instruct:free',
+  'google/gemma-3-27b-it:free',
+  'deepseek/deepseek-r1:free'
+];
+var MODELS_VISION=[
+  'qwen/qwen2.5-vl-72b-instruct:free',
+  'google/gemini-2.0-flash-exp:free',
+  'meta-llama/llama-3.2-11b-vision-instruct:free',
+  'mistralai/mistral-small-3.1-24b-instruct:free',
+  'meta-llama/llama-3.3-70b-instruct:free'
+];
 var MSG_LIMIT=100;
 var RESET_HOUR=2;
 
@@ -1322,8 +1333,7 @@ function send(){
     return {role:m.role,content:m.content};
   });
   
-  var primaryModel=images_present?MODEL_VISION:MODEL;
-  var fallbackModel=images_present?MODEL_VISION_FALLBACK:MODEL_FALLBACK;
+  var modelList=images_present?MODELS_VISION:MODELS_TEXT;
   
   function doFetch(modelToUse){
     return fetch(API,{
@@ -1345,14 +1355,19 @@ function send(){
     }).then(function(res){
       if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
       return res.json();
+    }).then(function(data){
+      if(!data.choices||!data.choices[0]||!data.choices[0].message)throw new Error('Empty response');
+      return data;
     });
   }
   
-  doFetch(primaryModel)
-  .catch(function(err){
-    // Auto-fallback to secondary free model
-    return doFetch(fallbackModel);
-  })
+  // Try each model in sequence until one works
+  function tryModels(idx){
+    if(idx>=modelList.length)return Promise.reject(new Error('Semua model sedang tidak tersedia. Coba lagi beberapa saat.'));
+    return doFetch(modelList[idx]).catch(function(){return tryModels(idx+1);});
+  }
+  
+  tryModels(0)
   .then(function(data){
     var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
     var sess=getCur();
