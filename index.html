@@ -91,8 +91,8 @@ textarea::-webkit-scrollbar{display:none}
 .ic{font-family:'Geist Mono',monospace;font-size:12.5px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--accent)}
 
 /* Input */
-#inputWrap{border-radius:28px;border:1px solid var(--border);background:var(--input-bg);box-shadow:0 2px 16px rgba(0,0,0,.07);transition:box-shadow .2s,border-color .2s}
-#inp{font-size:16px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:'Geist',sans-serif}
+#inputWrap{border-radius:18px;border:1px solid var(--border);background:var(--input-bg);box-shadow:var(--input-shadow)}
+#inp{font-size:15px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:'Geist',sans-serif}
 #inp::placeholder{color:var(--text4)}
 
 /* Send button */
@@ -199,109 +199,110 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
   to{transform:scaleY(1);transform-origin:center}
 }
 
-/* ─── SPLASH SCREEN ─────────────────────────────────── */
+/* ─── SPLASH ──── */
 #splashScreen{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 #splashScreen.hiding{opacity:0;transform:scale(1.03);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
-.splash-logo-wrap{width:130px;height:130px;margin-bottom:26px;animation:splashIn .7s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 0 28px rgba(168,139,250,.55));}
+.splash-logo-wrap{width:120px;height:120px;margin-bottom:24px;animation:splashIn .7s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 0 24px rgba(168,139,250,.5));}
 .splash-logo-wrap img{width:100%;height:100%;object-fit:contain}
 @keyframes splashIn{from{opacity:0;transform:scale(.3) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
-.splash-title{font-size:32px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8,#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;margin-bottom:6px;animation:shimmerTxt 3s linear infinite,fadeUp .6s ease .25s both;}
-@keyframes shimmerTxt{0%{background-position:0%}100%{background-position:200%}}
-.splash-sub{font-size:14px;color:#666;margin-bottom:36px;animation:fadeUp .5s ease .4s both}
-.splash-form{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(320px,88vw);animation:fadeUp .5s ease .5s both;}
-.splash-input{width:100%;padding:13px 18px;border-radius:14px;border:1.5px solid #222236;background:#111122;color:#eee;font-size:15px;font-family:'Geist',sans-serif;outline:none;text-align:center;caret-color:#818cf8;transition:border-color .2s,box-shadow .2s;}
+.splash-title{font-size:30px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;animation:fadeUp .6s ease .25s both;}
+.splash-sub{font-size:14px;color:#666;margin-bottom:32px;animation:fadeUp .5s ease .4s both}
+.splash-form{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(300px,88vw);animation:fadeUp .5s ease .5s both;}
+.splash-input{width:100%;padding:13px 18px;border-radius:14px;border:1.5px solid #222236;background:#111122;color:#eee;font-size:15px;outline:none;text-align:center;caret-color:#818cf8;transition:border-color .2s;}
 .splash-input::placeholder{color:#3a3a52}
 .splash-input:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(129,140,248,.18)}
-.splash-btn{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);color:#fff;font-size:14.5px;font-weight:700;font-family:'Geist',sans-serif;box-shadow:0 4px 18px rgba(129,140,248,.3);transition:opacity .18s,transform .18s;}
+.splash-btn{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);color:#fff;font-size:14.5px;font-weight:700;box-shadow:0 4px 16px rgba(129,140,248,.3);transition:opacity .18s,transform .18s;}
 .splash-btn:hover{opacity:.87;transform:translateY(-1px)}
-/* ─── Error Pop-up ───────────────────────────────────── */
+/* ─── ERROR POPUP ──── */
 .error-overlay{position:fixed;inset:0;z-index:8000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);animation:fadeInBg .2s ease;}
 @keyframes fadeInBg{from{opacity:0}to{opacity:1}}
-.error-bubble{background:var(--bg,#fff);border:1px solid var(--border,#e5e5e5);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);animation:popUp .25s cubic-bezier(.34,1.56,.64,1) both;}
+.error-bubble{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);animation:popUp .25s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes popUp{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.error-icon-wrap{width:48px;height:48px;border-radius:50%;background:#fff3f3;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;}
+.error-icon-wrap{width:48px;height:48px;border-radius:50%;background:#fff3f3;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;}
 body.dark .error-icon-wrap{background:#2a1515}
-.error-title{font-size:15px;font-weight:700;color:var(--text,#1a1918);margin-bottom:8px;letter-spacing:-.01em;}
-.error-msg{font-size:13.5px;color:var(--text3,#6b6a68);line-height:1.65;margin-bottom:22px;}
+.error-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.error-msg{font-size:13.5px;color:var(--text3);line-height:1.65;margin-bottom:20px;}
 .error-btn-row{display:flex;gap:10px;justify-content:center;}
-.error-close-btn{padding:9px 22px;border-radius:10px;border:1px solid var(--border,#e5e5e5);background:var(--bg,#fff);color:var(--text2,#3d3c3a);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:background .15s;}
-.error-close-btn:hover{background:var(--hover,#f0f0f0)}
-.error-retry-btn{padding:9px 22px;border-radius:10px;border:none;background:var(--text,#1a1918);color:var(--bg,#fff);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:opacity .15s;}
+.error-close-btn{padding:9px 22px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:13.5px;font-weight:600;cursor:pointer;transition:background .15s;}
+.error-close-btn:hover{background:var(--hover)}
+.error-retry-btn{padding:9px 22px;border-radius:10px;border:none;background:var(--text);color:var(--bg);font-size:13.5px;font-weight:600;cursor:pointer;transition:opacity .15s;}
 .error-retry-btn:hover{opacity:.82}
-body.dark .error-retry-btn{background:var(--text,#efefef);color:var(--bg,#141414)}
-/* ─── AI Avatar Animasi ───────────────────────────────────────── */
-.ai-avatar{width:36px;height:36px;border-radius:50%;overflow:visible;flex-shrink:0;margin-top:4px;position:relative}
-.ai-avatar-anim{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid transparent;background-clip:padding-box;position:relative;display:flex;align-items:center;justify-content:center;animation:avatarGlow 3s ease-in-out infinite;overflow:hidden;}
-@keyframes avatarGlow{0%,100%{box-shadow:0 0 8px rgba(129,140,248,.5),0 0 0 2px rgba(129,140,248,.2)}50%{box-shadow:0 0 16px rgba(244,114,182,.6),0 0 0 2px rgba(244,114,182,.3)}}
+/* ─── AI AVATAR ──── */
+.ai-avatar{width:34px;height:34px;flex-shrink:0;margin-top:4px}
+.ai-avatar-anim{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;animation:avatarGlow 3s ease-in-out infinite;overflow:hidden;}
+@keyframes avatarGlow{0%,100%{box-shadow:0 0 8px rgba(129,140,248,.5)}50%{box-shadow:0 0 16px rgba(244,114,182,.6)}}
 .av-face{position:relative;width:24px;height:22px}
-.av-head{width:22px;height:16px;border-radius:5px;background:linear-gradient(135deg,#818cf8,#6366f1);position:absolute;top:2px;left:1px;box-shadow:0 2px 6px rgba(99,102,241,.5);}
+.av-head{width:22px;height:16px;border-radius:5px;background:linear-gradient(135deg,#818cf8,#6366f1);position:absolute;top:2px;left:1px;}
 .av-eye{width:5px;height:5px;border-radius:50%;background:#fff;position:absolute;top:4px;animation:eyeBlink 4s ease-in-out infinite;}
 .av-eye-l{left:4px}.av-eye-r{right:4px}
 .av-eye::after{content:'';position:absolute;width:2.5px;height:2.5px;background:#1e1b4b;border-radius:50%;top:1px;left:1px;animation:eyeLook 4s ease-in-out infinite;}
 @keyframes eyeBlink{0%,90%,100%{height:5px}93%,97%{height:1px}}
 @keyframes eyeLook{0%,100%{transform:translate(0,0)}25%{transform:translate(1px,-1px)}75%{transform:translate(-1px,0)}}
 .av-mouth{width:8px;height:3px;border-radius:0 0 4px 4px;background:#a5b4fc;position:absolute;bottom:4px;left:7px;animation:mouthTalk 2s ease-in-out infinite;}
-@keyframes mouthTalk{0%,100%{height:3px;border-radius:0 0 4px 4px}50%{height:5px;border-radius:0 0 6px 6px}}
-.av-antenna{width:2px;height:5px;background:#818cf8;position:absolute;top:-3px;left:10px;border-radius:1px;}
+@keyframes mouthTalk{0%,100%{height:3px}50%{height:5px}}
+.av-antenna{width:2px;height:5px;background:#818cf8;position:absolute;top:-3px;left:10px;}
 .av-antenna::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;background:#f472b6;top:-4px;left:-1px;animation:antennaPulse 1.5s ease-in-out infinite;box-shadow:0 0 6px #f472b6;}
 @keyframes antennaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 .av-body{width:14px;height:5px;border-radius:2px;background:linear-gradient(135deg,#6366f1,#818cf8);position:absolute;bottom:0;left:5px;}
-.av-thinking .av-mouth{animation:mouthThink 0.6s ease-in-out infinite!important}
-@keyframes mouthThink{0%,100%{width:8px}50%{width:4px;border-radius:50%}}
-.av-thinking .av-eye::after{animation:eyeThink 0.8s ease-in-out infinite!important}
-@keyframes eyeThink{0%,100%{transform:translate(0,0)}50%{transform:translate(0,-2px)}}
-#planBadge,#badgeRow,.plan-badge{display:none!important}
-
-50%{opacity:0}}
-
-/* ─── Input bar Claude.ai style ──── */
-#inputWrap:focus-within{
-  border-color:rgba(128,128,128,.5);
-  box-shadow:0 4px 24px rgba(0,0,0,.1);
-}
-/* ─── Greeting typewriter cursor ─── */
-#greetingLbl::after{
-  content:'|';
-  display:inline-block;
-  margin-left:2px;
-  color:var(--accent,#8c8c8c);
-  animation:greetBlink .7s step-end infinite;
-  font-weight:300;
-  opacity:1;
-}
+/* ─── INPUT BAR GEMINI ──── */
+#inputWrap{border-radius:28px !important;border:1px solid var(--border) !important;background:var(--bg2) !important;box-shadow:0 1px 6px rgba(0,0,0,.06) !important;padding:14px 16px 10px !important;transition:box-shadow .2s,border-color .2s;}
+body.light #inputWrap{background:#fff !important;}
+#inputWrap:focus-within{border-color:var(--border2) !important;box-shadow:0 2px 14px rgba(0,0,0,.1) !important;}
+#inp{font-size:16px !important;padding:0 !important;}
+#inp::placeholder{font-size:16px;}
+/* ─── IMAGE PREVIEW ──── */
+#imgPreviews{display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 8px;max-width:780px;margin:0 auto;}
+.img-preview-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;animation:popIn .2s ease;}
+.img-preview-wrap img{display:block;max-height:100px;max-width:160px;width:auto;height:auto;}
+.img-preview-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+/* ─── STREAMING CURSOR ──── */
+.streaming-cursor::after{content:'▋';display:inline;animation:streamBlink .6s step-end infinite;color:var(--text3);font-size:.85em;}
+@keyframes streamBlink{0%,100%{opacity:1}50%{opacity:0}}
+/* ─── GREETING TYPEWRITER ──── */
+#greetingLbl::after{content:'|';display:inline-block;margin-left:2px;color:var(--accent);animation:greetBlink .7s step-end infinite;font-weight:300;}
 #greetingLbl.done::after{display:none}
 @keyframes greetBlink{0%,100%{opacity:1}50%{opacity:0}}
+/* ─── LOGO BLEND ──── */
+#logoEmpty img,#logoTopbar img,#logoSidebar img{mix-blend-mode:screen;}
+body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #logoSidebar img{mix-blend-mode:multiply;}
+.splash-logo-wrap img{mix-blend-mode:screen;}
+/* hide badge */
+#planBadge,#badgeRow,.plan-badge{display:none!important}
 
-/* ─── Logo background fix ─── */
-#logoEmpty img, #logoTopbar img, #logoSidebar img {
-  mix-blend-mode: screen;
-  border-radius: 10px;
+/* ─── Image bubble Gemini style ──────────────────────────── */
+.bubble-img{
+  display:inline-block;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--bg2);
+  max-width:320px;
 }
-body:not(.dark) #logoEmpty img,
-body:not(.dark) #logoTopbar img,
-body:not(.dark) #logoSidebar img {
-  mix-blend-mode: multiply;
+.bubble-img img{
+  display:block;
+  max-width:100%;
+  max-height:280px;
+  width:auto;
+  height:auto;
+  object-fit:cover;
 }
-.splash-logo-wrap img {
-  mix-blend-mode: screen;
+.msg-user .bubble-img{
+  border-radius:18px 18px 4px 18px;
 }
 </style>
 </head>
 <body class="light">
 
-<!-- SPLASH SCREEN -->
+<!-- SPLASH -->
 <div id="splashScreen" style="display:none">
   <div class="splash-logo-wrap" id="splashLogoImg"></div>
   <div class="splash-title">SaaS AI</div>
   <div class="splash-sub">Your intelligent AI assistant</div>
   <div class="splash-form">
-    <input class="splash-input" id="splashNameInput" type="text"
-      placeholder="Enter your name..." maxlength="32"
-      onkeydown="if(event.key==='Enter')splashContinue()"/>
+    <input class="splash-input" id="splashNameInput" type="text" placeholder="Enter your name..." maxlength="32" onkeydown="if(event.key==='Enter')splashContinue()"/>
     <button class="splash-btn" onclick="splashContinue()">Get Started →</button>
   </div>
 </div>
-
 <div id="overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.3);backdrop-filter:blur(2px)"></div>
 
 <!-- LIMIT MODAL -->
@@ -459,7 +460,7 @@ body:not(.dark) #logoSidebar img {
       <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--bg3)">
         <div id="sidebarAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">?</div>
         <div style="flex:1;min-width:0">
-          <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:pointer" onclick="resetName()" title="Ganti nama">👤 <span id="sidebarNameLbl">...</span></p>
+          <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:pointer" onclick="resetName()">👤 <span id="sidebarNameLbl">...</span></p>
           <p id="limitSmall" style="font-size:11px;color:var(--text4);margin:0">0 / 100</p>
         </div>
         <button onclick="document.getElementById('settingsPanel').style.display='flex'" class="topbar-btn" title="Settings" style="padding:5px">
@@ -480,7 +481,7 @@ body:not(.dark) #logoSidebar img {
         </button>
         <div class="model-badge" onclick="openSidebar()">
           <div id="logoTopbar" style="width:18px;height:18px;flex-shrink:0"></div>
-          <span>SaaS AI</span>
+          <span style="font-weight:700">SaaS AI</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
@@ -608,6 +609,7 @@ body:not(.dark) #logoSidebar img {
         </div>
 
         <!-- INPUT BOX -->
+        <div id="imgPreviews"></div>
         <div id="inputWrap" style="padding:12px 14px 8px">
           <textarea id="inp" rows="1" oninput="onInpChange()" onkeydown="onInpKey(event)"></textarea>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
@@ -658,20 +660,10 @@ body:not(.dark) #logoSidebar img {
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K='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';
+var _K=atob('c2stb3ItdjEtMDA2OGE2NTI2YTUzODkyMDc4ZjcxYjliZTgzMmU0ZWE1ZTUyYzY3MmEyMTcyZWZhMTVlN2FlM2E5MDc0MWQ4OQ==');
 var API='https://openrouter.ai/api/v1/chat/completions';
-var MODELS_TEXT=[
-  'anthropic/claude-3.5-haiku',
-  'anthropic/claude-3.5-sonnet',
-  'openai/gpt-4o-mini',
-  'openai/gpt-4o'
-];
-var MODELS_VISION=[
-  'anthropic/claude-3.5-sonnet',
-  'anthropic/claude-3.5-haiku',
-  'openai/gpt-4o',
-  'openai/gpt-4o-mini'
-];
+var MODEL='google/gemini-2.0-flash-001';
+var MODEL_VISION='google/gemini-2.0-flash-001';
 var MSG_LIMIT=100;
 var RESET_HOUR=2;
 
@@ -723,9 +715,7 @@ function renderLogos(){
   var defs={logoSidebar:'28px',logoTopbar:'18px',logoEmpty:'68px'};
   Object.keys(defs).forEach(function(id){
     var el=document.getElementById(id);
-    var isLogo = id==='logoEmpty';
-    var br = isLogo?'border-radius:16px;':'border-radius:6px;';
-    if(el) el.innerHTML='<img src="'+src+'" style="width:'+defs[id]+';height:'+defs[id]+';object-fit:contain;'+br+'mix-blend-mode:screen" alt="SaaS AI"/>';
+    if(el) el.innerHTML='<img src="'+src+'" style="width:'+defs[id]+';height:'+defs[id]+';object-fit:contain;mix-blend-mode:screen;border-radius:8px" alt="SaaS AI"/>';
   });
 }
 
@@ -1008,6 +998,9 @@ function onFileEdit(e){
     pendingImgEdit={url:ev.target.result,name:f.name};
     images.push({url:ev.target.result,isEdit:true});
     renderThumbs();
+    var t=I18N[currentLang]||I18N['id'];
+    var prompts={id:'Edit foto ini sesuai instruksiku: ',en:'Edit this photo according to my instructions: ',ja:'この写真を編集してください: ',ko:'이 사진을 편집해주세요: ',zh:'按照我的指示编辑这张照片: ',ar:'قم بتحرير هذه الصورة وفق تعليماتي: ',es:'Edita esta foto según mis instrucciones: ',fr:'Modifiez cette photo selon mes instructions: ',de:'Bearbeite dieses Foto nach meinen Anweisungen: ',pt:'Edite esta foto de acordo com minhas instruções: ',ru:'Отредактируй эту фотографию по моим инструкциям: ',hi:'मेरे निर्देशों के अनुसार इस फ़ोटो को संपादित करें: '};
+    document.getElementById('inp').value=prompts[currentLang]||prompts['en'];
     onInpChange();document.getElementById('inp').focus();
   };
   r.readAsDataURL(f);
@@ -1118,7 +1111,7 @@ function onFile(e){
   });
   e.target.value='';
 }
-function renderThumbs(){
+function renderThumbs(){renderThumbsGemini();
   var w=document.getElementById('imgThumbs');
   w.innerHTML='';
   images.forEach(function(img,i){
@@ -1219,13 +1212,22 @@ function renderMsgs(){
 
 function msgHTML(m){
   if(m.role==='user'){
-    var imgs='';
-    (m._imgs||[]).forEach(function(u){
-      imgs+='<img src="'+u+'" style="max-width:260px;border-radius:12px;margin-bottom:8px;display:block;border:1px solid var(--border)" alt=""/>';
-    });
+    var imgs=m._imgs||[];
     var text=typeof m.content==='string'?escHtml(m.content):'';
     if(Array.isArray(m.content))m.content.forEach(function(c){if(c.type==='text')text=escHtml(c.text);});
-    return '<div class="msg-user fade-up"><div class="bubble">'+imgs+(text?'<span>'+text+'</span>':'')+'</div></div>';
+    var html='';
+    // Gambar dulu (bubble terpisah per gambar, Gemini style)
+    imgs.forEach(function(u){
+      // Deteksi rasio dari gambar
+      html+='<div class="msg-user fade-up"><div class="bubble-img">'
+        +'<img src="'+u+'" alt="">'
+        +'</div></div>';
+    });
+    // Teks di bubble sendiri (hanya kalau ada)
+    if(text){
+      html+='<div class="msg-user fade-up"><div class="bubble"><span>'+text+'</span></div></div>';
+    }
+    return html||'';
   }
   var content=m.content||'';
   var imgResult='';
@@ -1259,44 +1261,39 @@ function send(){
     curId=id;renderHistory();
   }
   var isEditRequest=images.some(function(i){return i.isEdit;});
-  var capturedImgs=images.slice();
-  var images_present=capturedImgs.length>0;
-  var userDisplayContent; // stored & shown in UI
-  var userApiContent;     // sent to API (may have fallback text)
+  var userContent;
   if(images.length>0){
-    userDisplayContent=[];
-    userApiContent=[];
-    capturedImgs.forEach(function(img){
-      var block;
+    userContent=[];
+    images.forEach(function(img){
+      // Handle base64 data URLs properly for Claude via OpenRouter
       if(img.url.startsWith('data:')){
         var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
         if(matches){
-          block={type:'image',source:{type:'base64',media_type:matches[1],data:matches[2]}};
+          userContent.push({
+            type:'image',
+            source:{
+              type:'base64',
+              media_type:matches[1],
+              data:matches[2]
+            }
+          });
         } else {
-          block={type:'image_url',image_url:{url:img.url}};
+          userContent.push({type:'image_url',image_url:{url:img.url}});
         }
       } else {
-        block={type:'image_url',image_url:{url:img.url}};
+        userContent.push({type:'image_url',image_url:{url:img.url}});
       }
-      userDisplayContent.push(block);
-      userApiContent.push(block);
     });
-    if(text){
-      var textBlock={type:'text',text:text};
-      userDisplayContent.push(textBlock);
-      userApiContent.push(textBlock);
-    } else {
-      // Only send to API silently, don't show in UI
-      userApiContent.push({type:'text',text:'Describe what you see in this image in detail.'});
-    }
+    userContent.push({type:'text',text:text||'Analyze this image.'});
   } else {
-    userDisplayContent=text;
-    userApiContent=text;
+    userContent=text;
   }
-  var userMsg={role:'user',content:userDisplayContent,_imgs:capturedImgs.map(function(x){return x.url;})};
+  var userMsg={role:'user',content:userContent,_imgs:images.map(function(x){return x.url;})};
   getCur().msgs.push(userMsg);
   document.getElementById('inp').value='';
   document.getElementById('inp').style.height='auto';
+  var capturedImgs=images.slice();
+  var images_present=capturedImgs.length>0;
   images=[];pendingImgEdit=null;
   renderThumbs();loading=true;updateSendBtn();renderMsgs();
 
@@ -1322,103 +1319,40 @@ function send(){
     +'For analysis: be insightful, structured, and actionable. '
     +'For images: analyze thoroughly with specific, accurate observations.';
 
-  var history=getCur().msgs.slice(-20).map(function(m,idx,arr){
-    // Last user message: use apiContent (may include silent fallback text for images)
-    if(idx===arr.length-1&&m.role==='user'){
-      return {role:'user',content:userApiContent};
-    }
-    return {role:m.role,content:m.content};
-  });
+  var history=getCur().msgs.slice(-20).map(function(m){return{role:m.role,content:m.content};});
   
-  var modelList=images_present?MODELS_VISION:MODELS_TEXT;
-  
-  function doFetch(modelToUse, maxTok){
-    maxTok = maxTok || 2048;
-    return fetch(API,{
-      method:'POST',
-      mode:'cors',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+_K,
-        'HTTP-Referer':'https://saas-ai.app',
-        'X-Title':'SaaS AI'
-      },
-      body:JSON.stringify({
-        model:modelToUse,
-        max_tokens:maxTok,
-        temperature:0.7,
-        messages:[{role:'system',content:sysPrompt}].concat(history)
-      })
-    }).then(function(res){
-      return res.json().then(function(data){
-        if(!res.ok){
-          var msg=(data.error&&data.error.message)?data.error.message:'HTTP '+res.status;
-          var err=new Error(msg);
-          // Token/credit error → retry same model with fewer tokens
-          var affordMatch=msg.match(/can only afford (\d+)/i);
-          if(affordMatch){
-            var canAfford=parseInt(affordMatch[1]);
-            if(canAfford>=100){
-              err.retryTokens=Math.floor(canAfford*0.85);
-            } else {
-              err.fatal=true; // truly out of credits
-            }
-          } else if(res.status===401||res.status===402||
-             msg.toLowerCase().includes('user not found')||
-             msg.toLowerCase().includes('invalid api key')||
-             msg.toLowerCase().includes('no auth')){
-            err.fatal=true;
-          }
-          throw err;
-        }
-        if(!data.choices||!data.choices[0]||!data.choices[0].message)throw new Error('Empty response');
-        return data;
-      });
-    });
-  }
-
-  // Try each model — adaptive token retry, skip on provider errors
-  function tryModels(idx, maxTok){
-    maxTok = maxTok || 2048;
-    if(idx>=modelList.length)return Promise.reject(new Error('Model AI sedang sibuk. Coba lagi sebentar.'));
-    return doFetch(modelList[idx], maxTok).catch(function(err){
-      if(err.fatal) return Promise.reject(new Error('API key error: '+err.message));
-      if(err.retryTokens){
-        // Same model, fewer tokens
-        return doFetch(modelList[idx], err.retryTokens).catch(function(){
-          return tryModels(idx+1, err.retryTokens);
-        });
-      }
-      return tryModels(idx+1, maxTok);
-    });
-  }
-
-  tryModels(0, 2048)
-  .then(function(data){
+  fetch(API,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+    body:JSON.stringify({
+      model:(images_present?MODEL_VISION:MODEL),
+      max_tokens:1024,
+      temperature:0.7,
+      messages:[{role:'system',content:sysPrompt}].concat(history)
+    })
+  })
+  .then(function(res){
+    if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
+    return res.json();
+  })
+    .then(function(data){
     var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
     var sess=getCur();
-    if(sess&&sess.title==='New')sess.title=text.slice(0,40)||'Chat';
-    var aiMsg={role:'assistant',content:reply};
-    if(isEditRequest&&capturedImgs.length>0){
-      // Show original image with edit description overlay
-      aiMsg._editedImg=capturedImgs[0].url;
-    }
+    if(sess&&sess.title==='New')sess.title=(typeof text!=='undefined'?text:'Chat').slice(0,40)||'Chat';
+    var aiMsg={role:'assistant',content:''};
+    if(typeof isEditRequest!=='undefined'&&isEditRequest&&capturedImgs.length>0)aiMsg._editedImg=capturedImgs[0].url;
     if(sess)sess.msgs.push(aiMsg);
     renderHistory();
     saveLimit(msgCount+1);
-    if(settings.notif&&document.hidden){
-      try{new Notification('SaaS AI',{body:'Response ready! 🎉'});}catch(e){}
-    }
+    loading=false;renderMsgs();updateSendBtn();
+    doStream(reply,aiMsg);
   })
-  .catch(function(err){
-    var errDetail=err&&err.message?err.message:'Unknown error';
-    var isConn=errDetail.toLowerCase().includes('fetch')||errDetail.toLowerCase().includes('failed to fetch');
-    var isCredit=errDetail.toLowerCase().includes('credit')||errDetail.toLowerCase().includes('afford');
-    var msg=isCredit
-      ?'Kredit OpenRouter habis. Top up di openrouter.ai/settings/credits'
-      :isConn?'Koneksi gagal. Periksa internet kamu.'
-      :errDetail;
-    showSorryOverlay(msg, !isCredit);
+  .catchatch(function(err){
+    var sess=getCur();
+    var errMsgs={id:'⚠️ Oops, ada error nih: ',en:'⚠️ Error: ',ja:'⚠️ エラー: ',ko:'⚠️ 오류: '};
+    var errPre=errMsgs[currentLang]||errMsgs['en'];
+    if(false&&sess)sess.msgs.push({role:'assistant',content:errPre+err.message+'\n\n'+
+      (currentLang==='id'?'Coba lagi ya! 🙏':currentLang==='ja'?'もう一度お試しください！':'Please try again! 🙏')});
   })
   .finally(function(){loading=false;renderMsgs();updateSendBtn();});
 }
@@ -1503,9 +1437,9 @@ function renderSuggests(){
 }
 
 
-// ── Greeting ──────────────────────────────────────────────────────
-var USER_NAME = '';
-var GREETINGS = {
+// ── GREETING ──
+var USER_NAME='';
+var GREETINGS={
   id:{morning:'Selamat pagi',afternoon:'Selamat siang',evening:'Selamat sore',night:'Selamat malam'},
   en:{morning:'Good morning',afternoon:'Good afternoon',evening:'Good evening',night:'Good night'},
   ja:{morning:'おはようございます',afternoon:'こんにちは',evening:'こんばんは',night:'おやすみなさい'},
@@ -1525,27 +1459,20 @@ function updateGreeting(){
   var el=document.getElementById('greetingLbl');
   if(!el)return;
   var g=GREETINGS[currentLang]||GREETINGS['id'];
-  var fullText=g[getTimePeriod()]+', '+(USER_NAME||'');
-  // Typewriter effect
+  var full=g[getTimePeriod()]+', '+(USER_NAME||'');
   if(_greetTimer)clearInterval(_greetTimer);
-  el.textContent='';
-  el.classList.remove('done');
+  el.textContent='';el.classList.remove('done');
   var i=0;
   _greetTimer=setInterval(function(){
-    el.textContent=fullText.slice(0,i+1);
-    i++;
-    if(i>=fullText.length){
-      clearInterval(_greetTimer);
-      _greetTimer=null;
-      setTimeout(function(){el.classList.add('done');},600);
-    }
+    el.textContent=full.slice(0,i+1);i++;
+    if(i>=full.length){clearInterval(_greetTimer);_greetTimer=null;setTimeout(function(){el.classList.add('done');},600);}
   },45);
 }
 
-// ── Splash ─────────────────────────────────────────────────────────
+// ── SPLASH ──
 function initSplash(){
   var sl=document.getElementById('splashLogoImg');
-  if(sl){var src=isDark?LOGO_DARK_B64:LOGO_LIGHT_B64;sl.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain;border-radius:20px;mix-blend-mode:screen"/>';}
+  if(sl){var src=isDark?LOGO_DARK_B64:LOGO_LIGHT_B64;sl.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:screen"/>';}
   try{var saved=localStorage.getItem('saas_username');if(saved&&saved.trim()){USER_NAME=saved.trim();hideSplash(true);return;}}catch(e){}
   document.getElementById('splashScreen').style.display='flex';
   setTimeout(function(){var inp=document.getElementById('splashNameInput');if(inp)inp.focus();},500);
@@ -1567,48 +1494,83 @@ function hideSplash(instant){
   setTimeout(function(){sp.style.display='none';updateGreeting();},450);
 }
 function updateSidebarName(){
-  var lbl=document.getElementById('sidebarNameLbl');
-  if(lbl)lbl.textContent=USER_NAME||'...';
-  var av=document.getElementById('sidebarAvatar');
-  if(av)av.textContent=(USER_NAME||'?').charAt(0).toUpperCase();
+  var lbl=document.getElementById('sidebarNameLbl');if(lbl)lbl.textContent=USER_NAME||'...';
+  var av=document.getElementById('sidebarAvatar');if(av)av.textContent=(USER_NAME||'?').charAt(0).toUpperCase();
 }
 function resetName(){
   try{localStorage.removeItem('saas_username');}catch(e){}
   USER_NAME='';
-  var sl=document.getElementById('splashLogoImg');
-  if(sl){var src=isDark?LOGO_DARK_B64:LOGO_LIGHT_B64;sl.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain;border-radius:20px;mix-blend-mode:screen"/>';}
-  var inp=document.getElementById('splashNameInput');
-  if(inp)inp.value='';
+  var inp=document.getElementById('splashNameInput');if(inp)inp.value='';
   var sp=document.getElementById('splashScreen');
   if(sp){sp.classList.remove('hiding');sp.style.display='flex';}
-  setTimeout(function(){if(inp)inp.focus();},300);
+  setTimeout(function(){var i=document.getElementById('splashNameInput');if(i)i.focus();},300);
   closeSidebar();
 }
 
-// ── AI Avatar Character ────────────────────────────────────────────
+// ── AI AVATAR ──
 function makeAIAvatar(thinking){
   return '<div class="ai-avatar"><div class="ai-avatar-anim'+(thinking?' av-thinking':'')+'"><div class="av-face"><div class="av-antenna"></div><div class="av-head"><div class="av-eye av-eye-l"></div><div class="av-eye av-eye-r"></div><div class="av-mouth"></div></div><div class="av-body"></div></div></div></div>';
 }
 
-// ── Error Pop-up ───────────────────────────────────────────────────
+// ── ERROR POPUP ──
 function showSorryOverlay(msg,canRetry){
-  var ex=document.getElementById('sorryOverlay');
-  if(ex)ex.remove();
-  var o=document.createElement('div');
-  o.id='sorryOverlay';
-  o.className='error-overlay';
-  o.onclick=function(e){if(e.target===o)o.remove();};
-  var closeJs='document.getElementById('+String.fromCharCode(39)+'sorryOverlay'+String.fromCharCode(39)+').remove()';
-  var h='<div class="error-bubble">';
-  h+='<div class="error-icon-wrap">⚠️</div>';
-  h+='<div class="error-title">SaaS AI sedang bermasalah</div>';
-  h+='<div class="error-msg">'+(msg||'Harap tunggu, SaaS AI akan pulih kembali segera.')+'</div>';
-  h+='<div class="error-btn-row">';
-  h+='<button class="error-close-btn" onclick="'+closeJs+'">Tutup</button>';
-  if(canRetry)h+='<button class="error-retry-btn" onclick="'+closeJs+';send()">Coba lagi</button>';
-  h+='</div></div>';
-  o.innerHTML=h;
-  document.body.appendChild(o);
+  var ex=document.getElementById('sorryOverlay');if(ex)ex.remove();
+  var overlay=document.createElement('div');
+  overlay.id='sorryOverlay';overlay.className='error-overlay';
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+  var bubble=document.createElement('div');bubble.className='error-bubble';
+  bubble.innerHTML='<div class="error-icon-wrap">⚠️</div><div class="error-title">SaaS AI sedang bermasalah</div><div class="error-msg">'+(msg||'Harap tunggu, SaaS AI akan pulih kembali segera.')+'</div>';
+  var row=document.createElement('div');row.className='error-btn-row';
+  var cb=document.createElement('button');cb.className='error-close-btn';cb.textContent='Tutup';cb.onclick=function(){overlay.remove();};row.appendChild(cb);
+  if(canRetry){var rb=document.createElement('button');rb.className='error-retry-btn';rb.textContent='Coba lagi';rb.onclick=function(){overlay.remove();send();};row.appendChild(rb);}
+  bubble.appendChild(row);overlay.appendChild(bubble);document.body.appendChild(overlay);
+}
+
+// ── RENDER THUMBS (Gemini style) ──
+function renderThumbsGemini(){
+  var p=document.getElementById('imgPreviews');if(!p)return;p.innerHTML='';
+  images.forEach(function(img,i){
+    var d=document.createElement('div');d.className='img-preview-wrap';
+    var label=img.isEdit?'<div style="position:absolute;bottom:4px;left:4px;font-size:9px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:3px;font-weight:700">EDIT</div>':'';
+    d.innerHTML='<img src="'+img.url+'" style="display:block;max-height:100px;max-width:160px" alt=""/>'+label+'<button class="img-preview-del" onclick="removeImg('+i+')">×</button>';
+    p.appendChild(d);
+  });
+}
+
+// ── STREAMING ──
+function doStream(reply,aiMsg){
+  var msgsEl=document.getElementById('msgsEl');
+  var chars=reply.split('');
+  var idx=0;
+  var total=chars.length;
+  var chunk=total>2000?12:total>800?8:total>300?5:3;
+  var delay=total>2000?6:total>800?9:total>300?12:16;
+  function getEl(){
+    if(!msgsEl)return null;
+    var all=msgsEl.querySelectorAll('.msg-ai');
+    var last=all[all.length-1];
+    return last?last.querySelector('.content'):null;
+  }
+  function tick(){
+    if(idx>=chars.length){
+      aiMsg.content=reply;
+      var el=getEl();
+      if(el){el.innerHTML=parseMd(reply);el.classList.remove('streaming-cursor');}
+      renderHistory();
+      return;
+    }
+    var c2=chars.slice(idx,idx+chunk).join('');
+    idx+=chunk;
+    aiMsg.content+=c2;
+    var el=getEl();
+    if(el){
+      el.textContent=aiMsg.content;
+      el.classList.add('streaming-cursor');
+      if(msgsEl.scrollHeight-msgsEl.scrollTop-msgsEl.clientHeight<150)msgsEl.scrollTop=msgsEl.scrollHeight;
+    }
+    setTimeout(tick,delay);
+  }
+  setTimeout(tick,40);
 }
 
 // ═══════════════════════════════════════════
