@@ -7,7 +7,7 @@
 **Asisten Kecerdasan Buatan Buatan Indonesia**
 
 ![Made in Indonesia](https://img.shields.io/badge/Made%20in-Indonesia%20🇮🇩-red?style=flat-square)
-![Built by Person](https://img.shields.io/badge/Built%20by-Person-blue?style=flat-square)
+![Built by Wira](https://img.shields.io/badge/Built%20by-Wira-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-Proprietary-gray?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 
@@ -29,12 +29,12 @@ Proyek ini lahir dari semangat inovasi teknologi dalam negeri — dibuat sepenuh
 
 | | |
 |---|---|
-| **Nama** | Wira |
+| **Nama** | Person |
 | **Asal** | Indonesia 🇮🇩 |
 | **Bidang** | Pengembangan Aplikasi AI & Web |
 | **Teknologi** | HTML, CSS, JavaScript, OpenRouter API |
 | **Filosofi** | *"Teknologi untuk semua, tanpa terkecuali."* |
-| **Tahun** | 2025 |
+| **Tahun** | 2026 |
 
 ---
 
@@ -80,15 +80,6 @@ Proyek ini lahir dari semangat inovasi teknologi dalam negeri — dibuat sepenuh
 
 ---
 
-## Struktur File
-
-```
-saas-ai/
-├── saas-ai.html      # File utama aplikasi (all-in-one)
-├── README.md         # Dokumentasi ini
-└── logo.png          # Logo SaaS AI
-```
-
 ---
 
 ## Visi & Misi
@@ -103,7 +94,7 @@ Membangun teknologi AI yang mudah diakses, aman digunakan, dan bermanfaat bagi s
 
 ## Hak Cipta
 
-© 2025 SaaS AI. Hak cipta dilindungi.
+© 2026 SaaS AI. Hak cipta dilindungi.
 
 Proyek ini adalah karya pribadi **Wira**, developer asal Indonesia. Seluruh kode, desain, dan konsep adalah milik pembuatnya. Dilarang mendistribusikan ulang atau mengklaim sebagai karya sendiri tanpa izin tertulis.
 
@@ -113,6 +104,6 @@ Proyek ini adalah karya pribadi **Wira**, developer asal Indonesia. Seluruh kode
 
 Dibangun dengan ❤️ dari Indonesia
 
-**SaaS AI · by Wira · 🇮🇩 Indonesia · 2025**
+**SaaS AI · by Wira · 🇮🇩 Indonesia · 2026**
 
 </div>
