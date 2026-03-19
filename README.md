@@ -11,7 +11,7 @@
 ![License](https://img.shields.io/badge/License-Proprietary-gray?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 
-> *"AI yang dibangun dari semangat Indonesia, untuk semua."*
+> *"AI yang dibangun dari ❤️, untuk semua."*
 
 </div>
 
