@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/your-username/saas-ai/main/logo.png" width="80" alt="SaaS AI Logo"/>
+<img src="https://raw.githubusercontent.com/paunryto-ui/saas-ai/main/logo.png" width="80" alt="SaaS AI Logo"/>
 
 # SaaS AI
 
