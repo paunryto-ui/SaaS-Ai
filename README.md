@@ -7,7 +7,7 @@
 **Asisten Kecerdasan Buatan Buatan Indonesia**
 
 ![Made in Indonesia](https://img.shields.io/badge/Made%20in-Indonesia%20🇮🇩-red?style=flat-square)
-![Built by Person Who Love Coding](https://img.shields.io/badge/Built%20by-Wira-blue?style=flat-square)
+![Built by Person](https://img.shields.io/badge/Built%20by-Person-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-Proprietary-gray?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 
