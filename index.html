@@ -289,6 +289,14 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 .msg-user .bubble-img{
   border-radius:18px 18px 4px 18px;
 }
+
+/* ─── Upgrade Button ─── */
+@keyframes shimmerUpgrade{
+  0%{transform:translateX(-100%)}
+  100%{transform:translateX(200%)}
+}
+
+@keyframes dot1pulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body class="light">
@@ -388,14 +396,21 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
     <!-- Account Info -->
     <div class="settings-section">
       <h3 id="st_account"></h3>
+
+      <!-- UPGRADE BUTTON - besar, biru menyala, multibahasa -->
+      <button id="upgradeBtn" onclick="showUpgradeModal()" style="width:100%;margin-bottom:12px;padding:14px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#0ea5e9,#6366f1,#818cf8);color:#fff;font-size:15px;font-weight:800;font-family:inherit;letter-spacing:.02em;box-shadow:0 4px 20px rgba(99,102,241,.45);transition:opacity .15s,transform .15s;position:relative;overflow:hidden" onmouseover="this.style.opacity='.88';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">
+        <span style="position:relative;z-index:1">⚡ <span id="upgradeBtnLabel">Upgrade</span> ✦</span>
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);animation:shimmerUpgrade 2.5s linear infinite"></div>
+      </button>
+
       <div style="background:var(--bg3);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span id="st_plan" style="font-size:13px;color:var(--text3)"></span>
-          <span class="info-chip" id="st_free_chip">✦ </span>
+          <span class="info-chip" id="st_free_chip">✦ <span id="planNameLabel">Gratis</span></span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span id="st_messages" style="font-size:13px;color:var(--text3)"></span>
-          <span class="info-chip" id="settingsMsgCount">0 / 100</span>
+          <span class="info-chip" id="settingsMsgCount">0 / 20</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span id="st_reset" style="font-size:13px;color:var(--text3)"></span>
@@ -461,7 +476,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
         <div id="sidebarAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">?</div>
         <div style="flex:1;min-width:0">
           <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:pointer" onclick="resetName()">👤 <span id="sidebarNameLbl">...</span></p>
-          <p id="limitSmall" style="font-size:11px;color:var(--text4);margin:0">0 / 100</p>
+          <p id="limitSmall" style="font-size:11px;color:var(--text4);margin:0">0 / 20</p>
         </div>
         <button onclick="document.getElementById('settingsPanel').style.display='flex'" class="topbar-btn" title="Settings" style="padding:5px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -664,7 +679,7 @@ var _K=atob('c2stb3ItdjEtMDA2OGE2NTI2YTUzODkyMDc4ZjcxYjliZTgzMmU0ZWE1ZTUyYzY3MmE
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='google/gemini-2.0-flash-001';
 var MODEL_VISION='google/gemini-2.0-flash-001';
-var MSG_LIMIT=100;
+var MSG_LIMIT=20;
 var RESET_HOUR=2;
 
 var I18N={"id": {"placeholder": "Tanya apa saja...", "newchat": "Chat Baru", "conversations": "Percakapan", "nochats": "Belum ada chat.", "user": "Pengguna", "settings": "Pengaturan", "appearance": "Tampilan", "colormode": "Mode warna", "light": "Terang", "dark": "Gelap", "auto": "Otomatis", "font": "Font chat", "default": "Bawaan", "mono": "Mono", "serif": "Serif", "dyslexic": "Disleksia", "language": "Bahasa", "account": "Info Akun", "plan": "Paket", "messages": "Pesan hari ini", "reset": "Reset harian", "free": "Gratis", "help_me": "Ada yang bisa dibantu?", "sub": "SaaS AI siap membantu dengan pertanyaan, kode, analisis, edit foto, dan banyak lagi.", "disclaimer": "SaaS AI dapat membuat kesalahan.", "limitTitle": "Batas Harian Tercapai", "limitMsg": "Kamu sudah menggunakan 100 pesan hari ini.", "limitSub": "Tersisa", "close": "Tutup", "cancel": "Batal", "translating": "Terjemahkan ke bahasa", "upload": "Tambah foto & file", "upload_sub": "Upload gambar atau dokumen", "edit_photo": "Edit & perbaiki foto", "edit_sub": "Ubah foto sesuai prompt", "websearch": "Cari di web", "websearch_sub": "Aktifkan pencarian internet", "websearch_on": "Web Aktif", "analysis": "Analisis mendalam", "analysis_sub": "Analisa detail & komprehensif", "codegen": "Generate kode", "codegen_sub": "Buat kode dari deskripsi", "summarize": "Rangkum teks", "summarize_sub": "Ringkas jadi poin utama", "translate": "Terjemahkan", "translate_sub": "Pilih bahasa tujuan", "style": "Gaya", "normal": "Normal", "brief": "Ringkas", "formal": "Formal", "copied": "Tersalin!", "copy": "Salin", "download": "Unduh Foto", "enhanced": "AI Enhanced", "notification": "Notifikasi", "notif_label": "Penyelesaian respons", "notif_desc": "Notifikasi ketika AI selesai merespons"}, "en": {"placeholder": "Ask anything...", "newchat": "New Chat", "conversations": "Conversations", "nochats": "No chats yet.", "user": "User", "settings": "Settings", "appearance": "Appearance", "colormode": "Color mode", "light": "Light", "dark": "Dark", "auto": "Auto", "font": "Chat font", "default": "Default", "mono": "Mono", "serif": "Serif", "dyslexic": "Dyslexic", "language": "Language", "account": "Account Info", "plan": "Plan", "messages": "Messages today", "reset": "Daily reset", "free": "Free", "help_me": "How can I help?", "sub": "SaaS AI is ready to help with questions, code, analysis, photo editing, and more.", "disclaimer": "SaaS AI can make mistakes.", "limitTitle": "Daily Limit Reached", "limitMsg": "You have used 100 messages today.", "limitSub": "Remaining", "close": "Close", "cancel": "Cancel", "translating": "Translate to language", "upload": "Add photo & file", "upload_sub": "Upload image or document", "edit_photo": "Edit & enhance photo", "edit_sub": "Edit photo based on your prompt", "websearch": "Search web", "websearch_sub": "Enable internet search", "websearch_on": "Web Active", "analysis": "Deep analysis", "analysis_sub": "Detailed & comprehensive analysis", "codegen": "Generate code", "codegen_sub": "Create code from description", "summarize": "Summarize text", "summarize_sub": "Condense to key points", "translate": "Translate", "translate_sub": "Choose target language", "style": "Style", "normal": "Normal", "brief": "Concise", "formal": "Formal", "copied": "Copied!", "copy": "Copy", "download": "Download Photo", "enhanced": "AI Enhanced", "notification": "Notifications", "notif_label": "Response completion", "notif_desc": "Notify when AI finishes responding"}, "ja": {"placeholder": "何でも聞いてください...", "newchat": "新しいチャット", "conversations": "会話", "nochats": "チャットなし", "user": "ユーザー", "settings": "設定", "appearance": "外観", "colormode": "カラーモード", "light": "ライト", "dark": "ダーク", "auto": "自動", "font": "フォント", "default": "デフォルト", "mono": "モノ", "serif": "セリフ", "dyslexic": "ディスレクシア", "language": "言語", "account": "アカウント情報", "plan": "プラン", "messages": "本日のメッセージ", "reset": "毎日リセット", "free": "無料", "help_me": "何かお手伝いできますか？", "sub": "SaaS AIは質問、コード、分析、写真編集などをお手伝いします。", "disclaimer": "SaaS AIは間違いを犯す可能性があります。", "limitTitle": "デイリー制限に達しました", "limitMsg": "本日100件のメッセージを使用しました。", "limitSub": "残り", "close": "閉じる", "cancel": "キャンセル", "translating": "翻訳する言語", "upload": "写真・ファイルを追加", "upload_sub": "画像またはドキュメントをアップロード", "edit_photo": "写真を編集・強化", "edit_sub": "プロンプトに基づいて写真を編集", "websearch": "ウェブ検索", "websearch_sub": "インターネット検索を有効にする", "websearch_on": "ウェブ有効", "analysis": "詳細分析", "analysis_sub": "詳細かつ包括的な分析", "codegen": "コード生成", "codegen_sub": "説明からコードを作成", "summarize": "テキスト要約", "summarize_sub": "要点に凝縮", "translate": "翻訳", "translate_sub": "ターゲット言語を選択", "style": "スタイル", "normal": "普通", "brief": "簡潔", "formal": "正式", "copied": "コピーしました！", "copy": "コピー", "download": "写真をダウンロード", "enhanced": "AI強化済み", "notification": "通知", "notif_label": "応答完了", "notif_desc": "AIの応答が完了したら通知"}, "ko": {"placeholder": "무엇이든 물어보세요...", "newchat": "새 채팅", "conversations": "대화", "nochats": "채팅 없음", "user": "사용자", "settings": "설정", "appearance": "외관", "colormode": "색상 모드", "light": "라이트", "dark": "다크", "auto": "자동", "font": "채팅 폰트", "default": "기본", "mono": "모노", "serif": "세리프", "dyslexic": "난독증", "language": "언어", "account": "계정 정보", "plan": "플랜", "messages": "오늘 메시지", "reset": "매일 초기화", "free": "무료", "help_me": "무엇을 도와드릴까요?", "sub": "SaaS AI는 질문, 코드, 분석, 사진 편집 등을 도와드립니다.", "disclaimer": "SaaS AI는 실수할 수 있습니다.", "limitTitle": "일일 한도 도달", "limitMsg": "오늘 100개의 메시지를 사용했습니다.", "limitSub": "남은 시간", "close": "닫기", "cancel": "취소", "translating": "번역할 언어", "upload": "사진 및 파일 추가", "upload_sub": "이미지 또는 문서 업로드", "edit_photo": "사진 편집 및 향상", "edit_sub": "프롬프트에 따라 사진 편집", "websearch": "웹 검색", "websearch_sub": "인터넷 검색 활성화", "websearch_on": "웹 활성", "analysis": "심층 분석", "analysis_sub": "상세하고 종합적인 분석", "codegen": "코드 생성", "codegen_sub": "설명에서 코드 생성", "summarize": "텍스트 요약", "summarize_sub": "핵심 요점으로 압축", "translate": "번역", "translate_sub": "대상 언어 선택", "style": "스타일", "normal": "보통", "brief": "간결", "formal": "공식", "copied": "복사됨!", "copy": "복사", "download": "사진 다운로드", "enhanced": "AI 향상됨", "notification": "알림", "notif_label": "응답 완료", "notif_desc": "AI 응답 완료 시 알림"}, "zh": {"placeholder": "有什么可以帮你的？", "newchat": "新建聊天", "conversations": "对话", "nochats": "暂无聊天", "user": "用户", "settings": "设置", "appearance": "外观", "colormode": "颜色模式", "light": "浅色", "dark": "深色", "auto": "自动", "font": "聊天字体", "default": "默认", "mono": "等宽", "serif": "衬线", "dyslexic": "阅读障碍", "language": "语言", "account": "账户信息", "plan": "方案", "messages": "今日消息", "reset": "每日重置", "free": "免费", "help_me": "有什么我可以帮忙的？", "sub": "SaaS AI 随时为您提供问答、代码、分析、照片编辑等服务。", "disclaimer": "SaaS AI 可能出错。", "limitTitle": "已达每日限额", "limitMsg": "您今天已使用 100 条消息。", "limitSub": "剩余时间", "close": "关闭", "cancel": "取消", "translating": "翻译成语言", "upload": "添加照片和文件", "upload_sub": "上传图片或文档", "edit_photo": "编辑和增强照片", "edit_sub": "根据提示编辑照片", "websearch": "网络搜索", "websearch_sub": "启用互联网搜索", "websearch_on": "网络已启用", "analysis": "深度分析", "analysis_sub": "详细全面的分析", "codegen": "生成代码", "codegen_sub": "根据描述生成代码", "summarize": "总结文本", "summarize_sub": "压缩成要点", "translate": "翻译", "translate_sub": "选择目标语言", "style": "风格", "normal": "普通", "brief": "简洁", "formal": "正式", "copied": "已复制！", "copy": "复制", "download": "下载照片", "enhanced": "AI 已增强", "notification": "通知", "notif_label": "响应完成", "notif_desc": "AI 完成响应时通知"}, "ar": {"placeholder": "اسأل أي شيء...", "newchat": "محادثة جديدة", "conversations": "المحادثات", "nochats": "لا توجد محادثات", "user": "مستخدم", "settings": "الإعدادات", "appearance": "المظهر", "colormode": "وضع الألوان", "light": "فاتح", "dark": "داكن", "auto": "تلقائي", "font": "خط الدردشة", "default": "افتراضي", "mono": "أحادي", "serif": "مزخرف", "dyslexic": "عسر القراءة", "language": "اللغة", "account": "معلومات الحساب", "plan": "الخطة", "messages": "رسائل اليوم", "reset": "إعادة التعيين اليومية", "free": "مجاني", "help_me": "كيف يمكنني مساعدتك؟", "sub": "SaaS AI جاهز لمساعدتك في الأسئلة والكود والتحليل وتحرير الصور والمزيد.", "disclaimer": "يمكن أن يرتكب SaaS AI أخطاء.", "limitTitle": "تم الوصول إلى الحد اليومي", "limitMsg": "لقد استخدمت 100 رسالة اليوم.", "limitSub": "المتبقي", "close": "إغلاق", "cancel": "إلغاء", "translating": "ترجمة إلى اللغة", "upload": "إضافة صورة وملف", "upload_sub": "رفع صورة أو مستند", "edit_photo": "تحرير وتحسين الصورة", "edit_sub": "تحرير الصورة بناءً على التعليمات", "websearch": "البحث على الويب", "websearch_sub": "تفعيل البحث على الإنترنت", "websearch_on": "الويب نشط", "analysis": "تحليل معمق", "analysis_sub": "تحليل مفصل وشامل", "codegen": "توليد الكود", "codegen_sub": "إنشاء كود من الوصف", "summarize": "تلخيص النص", "summarize_sub": "تكثيف إلى النقاط الرئيسية", "translate": "ترجمة", "translate_sub": "اختر اللغة الهدف", "style": "الأسلوب", "normal": "عادي", "brief": "موجز", "formal": "رسمي", "copied": "تم النسخ!", "copy": "نسخ", "download": "تنزيل الصورة", "enhanced": "تم التحسين بالذكاء الاصطناعي", "notification": "الإشعارات", "notif_label": "اكتمال الرد", "notif_desc": "إشعار عند اكتمال رد الذكاء الاصطناعي"}, "es": {"placeholder": "Pregunta lo que quieras...", "newchat": "Nueva Chat", "conversations": "Conversaciones", "nochats": "Sin chats aún.", "user": "Usuario", "settings": "Configuración", "appearance": "Apariencia", "colormode": "Modo de color", "light": "Claro", "dark": "Oscuro", "auto": "Auto", "font": "Fuente del chat", "default": "Predeterminado", "mono": "Mono", "serif": "Serif", "dyslexic": "Dislexia", "language": "Idioma", "account": "Info de cuenta", "plan": "Plan", "messages": "Mensajes hoy", "reset": "Restablecimiento diario", "free": "Gratis", "help_me": "¿En qué puedo ayudarte?", "sub": "SaaS AI está listo para ayudarte con preguntas, código, análisis, edición de fotos y más.", "disclaimer": "SaaS AI puede cometer errores.", "limitTitle": "Límite diario alcanzado", "limitMsg": "Has usado 100 mensajes hoy.", "limitSub": "Tiempo restante", "close": "Cerrar", "cancel": "Cancelar", "translating": "Traducir al idioma", "upload": "Agregar foto y archivo", "upload_sub": "Subir imagen o documento", "edit_photo": "Editar y mejorar foto", "edit_sub": "Edita la foto según tu prompt", "websearch": "Buscar en web", "websearch_sub": "Activar búsqueda en internet", "websearch_on": "Web Activo", "analysis": "Análisis profundo", "analysis_sub": "Análisis detallado y completo", "codegen": "Generar código", "codegen_sub": "Crear código desde descripción", "summarize": "Resumir texto", "summarize_sub": "Condensar a puntos clave", "translate": "Traducir", "translate_sub": "Elegir idioma destino", "style": "Estilo", "normal": "Normal", "brief": "Conciso", "formal": "Formal", "copied": "¡Copiado!", "copy": "Copiar", "download": "Descargar foto", "enhanced": "Mejorado con IA", "notification": "Notificaciones", "notif_label": "Respuesta completada", "notif_desc": "Notificar cuando la IA termine de responder"}, "fr": {"placeholder": "Posez n'importe quelle question...", "newchat": "Nouveau chat", "conversations": "Conversations", "nochats": "Aucun chat.", "user": "Utilisateur", "settings": "Paramètres", "appearance": "Apparence", "colormode": "Mode couleur", "light": "Clair", "dark": "Sombre", "auto": "Auto", "font": "Police de chat", "default": "Défaut", "mono": "Mono", "serif": "Serif", "dyslexic": "Dyslexie", "language": "Langue", "account": "Infos compte", "plan": "Forfait", "messages": "Messages aujourd'hui", "reset": "Réinitialisation quotidienne", "free": "Gratuit", "help_me": "Comment puis-je vous aider?", "sub": "SaaS AI est prêt à vous aider avec des questions, du code, des analyses, l'édition de photos et plus encore.", "disclaimer": "SaaS AI peut faire des erreurs.", "limitTitle": "Limite quotidienne atteinte", "limitMsg": "Vous avez utilisé 100 messages aujourd'hui.", "limitSub": "Temps restant", "close": "Fermer", "cancel": "Annuler", "translating": "Traduire en langue", "upload": "Ajouter photo et fichier", "upload_sub": "Télécharger image ou document", "edit_photo": "Modifier et améliorer la photo", "edit_sub": "Modifier la photo selon votre prompt", "websearch": "Rechercher sur le web", "websearch_sub": "Activer la recherche internet", "websearch_on": "Web Actif", "analysis": "Analyse approfondie", "analysis_sub": "Analyse détaillée et complète", "codegen": "Générer du code", "codegen_sub": "Créer du code à partir d une description", "summarize": "Résumer le texte", "summarize_sub": "Condenser en points clés", "translate": "Traduire", "translate_sub": "Choisir la langue cible", "style": "Style", "normal": "Normal", "brief": "Concis", "formal": "Formel", "copied": "Copié!", "copy": "Copier", "download": "Télécharger la photo", "enhanced": "Amélioré par IA", "notification": "Notifications", "notif_label": "Réponse terminée", "notif_desc": "Notifier quand l'IA a fini de répondre"}, "de": {"placeholder": "Frag mich alles...", "newchat": "Neuer Chat", "conversations": "Gespräche", "nochats": "Noch keine Chats.", "user": "Benutzer", "settings": "Einstellungen", "appearance": "Aussehen", "colormode": "Farbmodus", "light": "Hell", "dark": "Dunkel", "auto": "Auto", "font": "Chat-Schriftart", "default": "Standard", "mono": "Mono", "serif": "Serif", "dyslexic": "Legasthenie", "language": "Sprache", "account": "Kontoinformationen", "plan": "Plan", "messages": "Nachrichten heute", "reset": "Täglicher Reset", "free": "Kostenlos", "help_me": "Wie kann ich helfen?", "sub": "SaaS AI hilft Ihnen mit Fragen, Code, Analysen, Fotobearbeitung und mehr.", "disclaimer": "SaaS AI kann Fehler machen.", "limitTitle": "Tageslimit erreicht", "limitMsg": "Sie haben heute 100 Nachrichten verwendet.", "limitSub": "Verbleibend", "close": "Schließen", "cancel": "Abbrechen", "translating": "Übersetzen in Sprache", "upload": "Foto und Datei hinzufügen", "upload_sub": "Bild oder Dokument hochladen", "edit_photo": "Foto bearbeiten und verbessern", "edit_sub": "Foto nach Prompt bearbeiten", "websearch": "Im Web suchen", "websearch_sub": "Internetsuche aktivieren", "websearch_on": "Web Aktiv", "analysis": "Tiefenanalyse", "analysis_sub": "Detaillierte und umfassende Analyse", "codegen": "Code generieren", "codegen_sub": "Code aus Beschreibung erstellen", "summarize": "Text zusammenfassen", "summarize_sub": "Auf Schlüsselpunkte verdichten", "translate": "Übersetzen", "translate_sub": "Zielsprache wählen", "style": "Stil", "normal": "Normal", "brief": "Kurz", "formal": "Formal", "copied": "Kopiert!", "copy": "Kopieren", "download": "Foto herunterladen", "enhanced": "KI-verbessert", "notification": "Benachrichtigungen", "notif_label": "Antwort abgeschlossen", "notif_desc": "Benachrichtigen, wenn KI fertig ist"}, "pt": {"placeholder": "Pergunte qualquer coisa...", "newchat": "Novo Chat", "conversations": "Conversas", "nochats": "Sem chats.", "user": "Usuário", "settings": "Configurações", "appearance": "Aparência", "colormode": "Modo de cor", "light": "Claro", "dark": "Escuro", "auto": "Auto", "font": "Fonte do chat", "default": "Padrão", "mono": "Mono", "serif": "Serif", "dyslexic": "Dislexia", "language": "Idioma", "account": "Info da conta", "plan": "Plano", "messages": "Mensagens hoje", "reset": "Redefinição diária", "free": "Grátis", "help_me": "Como posso ajudar?", "sub": "SaaS AI está pronto para ajudá-lo com perguntas, código, análise, edição de fotos e muito mais.", "disclaimer": "SaaS AI pode cometer erros.", "limitTitle": "Limite diário atingido", "limitMsg": "Você usou 100 mensagens hoje.", "limitSub": "Restante", "close": "Fechar", "cancel": "Cancelar", "translating": "Traduzir para idioma", "upload": "Adicionar foto e arquivo", "upload_sub": "Carregar imagem ou documento", "edit_photo": "Editar e melhorar foto", "edit_sub": "Editar foto com base no prompt", "websearch": "Pesquisar na web", "websearch_sub": "Ativar pesquisa na internet", "websearch_on": "Web Ativo", "analysis": "Análise profunda", "analysis_sub": "Análise detalhada e abrangente", "codegen": "Gerar código", "codegen_sub": "Criar código a partir de descrição", "summarize": "Resumir texto", "summarize_sub": "Condensar em pontos principais", "translate": "Traduzir", "translate_sub": "Escolher idioma de destino", "style": "Estilo", "normal": "Normal", "brief": "Conciso", "formal": "Formal", "copied": "Copiado!", "copy": "Copiar", "download": "Baixar foto", "enhanced": "Aprimorado por IA", "notification": "Notificações", "notif_label": "Resposta concluída", "notif_desc": "Notificar quando a IA terminar de responder"}, "ru": {"placeholder": "Задайте любой вопрос...", "newchat": "Новый чат", "conversations": "Беседы", "nochats": "Нет чатов.", "user": "Пользователь", "settings": "Настройки", "appearance": "Внешний вид", "colormode": "Цветовой режим", "light": "Светлый", "dark": "Тёмный", "auto": "Авто", "font": "Шрифт чата", "default": "По умолчанию", "mono": "Моно", "serif": "Засечки", "dyslexic": "Дислексия", "language": "Язык", "account": "Информация об аккаунте", "plan": "Тариф", "messages": "Сообщений сегодня", "reset": "Ежедневный сброс", "free": "Бесплатно", "help_me": "Чем могу помочь?", "sub": "SaaS AI готов помочь с вопросами, кодом, анализом, редактированием фото и многим другим.", "disclaimer": "SaaS AI может ошибаться.", "limitTitle": "Дневной лимит достигнут", "limitMsg": "Вы использовали 100 сообщений сегодня.", "limitSub": "Осталось", "close": "Закрыть", "cancel": "Отмена", "translating": "Перевести на язык", "upload": "Добавить фото и файл", "upload_sub": "Загрузить изображение или документ", "edit_photo": "Редактировать и улучшить фото", "edit_sub": "Редактировать фото по запросу", "websearch": "Поиск в Интернете", "websearch_sub": "Включить интернет-поиск", "websearch_on": "Сеть активна", "analysis": "Глубокий анализ", "analysis_sub": "Детальный и всесторонний анализ", "codegen": "Генерировать код", "codegen_sub": "Создать код из описания", "summarize": "Резюмировать текст", "summarize_sub": "Сжать до ключевых моментов", "translate": "Перевести", "translate_sub": "Выбрать целевой язык", "style": "Стиль", "normal": "Обычный", "brief": "Краткий", "formal": "Официальный", "copied": "Скопировано!", "copy": "Копировать", "download": "Скачать фото", "enhanced": "Улучшено ИИ", "notification": "Уведомления", "notif_label": "Ответ завершён", "notif_desc": "Уведомлять, когда ИИ закончит отвечать"}, "hi": {"placeholder": "कुछ भी पूछें...", "newchat": "नई चैट", "conversations": "वार्तालाप", "nochats": "कोई चैट नहीं।", "user": "उपयोगकर्ता", "settings": "सेटिंग्स", "appearance": "दिखावट", "colormode": "रंग मोड", "light": "हल्का", "dark": "गहरा", "auto": "स्वचालित", "font": "चैट फ़ॉन्ट", "default": "डिफ़ॉल्ट", "mono": "मोनो", "serif": "सेरिफ़", "dyslexic": "डिस्लेक्सिया", "language": "भाषा", "account": "खाता जानकारी", "plan": "योजना", "messages": "आज के संदेश", "reset": "दैनिक रीसेट", "free": "मुफ़्त", "help_me": "मैं कैसे मदद कर सकता हूँ?", "sub": "SaaS AI प्रश्नों, कोड, विश्लेषण, फ़ोटो संपादन आदि में मदद के लिए तैयार है।", "disclaimer": "SaaS AI गलतियाँ कर सकता है।", "limitTitle": "दैनिक सीमा पहुँच गई", "limitMsg": "आपने आज 100 संदेश उपयोग किए हैं।", "limitSub": "शेष", "close": "बंद करें", "cancel": "रद्द करें", "translating": "भाषा में अनुवाद करें", "upload": "फ़ोटो और फ़ाइल जोड़ें", "upload_sub": "छवि या दस्तावेज़ अपलोड करें", "edit_photo": "फ़ोटो संपादित और बेहतर करें", "edit_sub": "प्रॉम्प्ट के आधार पर फ़ोटो संपादित करें", "websearch": "वेब खोज", "websearch_sub": "इंटरनेट खोज सक्षम करें", "websearch_on": "वेब सक्रिय", "analysis": "गहन विश्लेषण", "analysis_sub": "विस्तृत और व्यापक विश्लेषण", "codegen": "कोड जेनरेट करें", "codegen_sub": "विवरण से कोड बनाएं", "summarize": "पाठ का सारांश", "summarize_sub": "मुख्य बिंदुओं में संक्षिप्त करें", "translate": "अनुवाद करें", "translate_sub": "लक्ष्य भाषा चुनें", "style": "शैली", "normal": "सामान्य", "brief": "संक्षिप्त", "formal": "औपचारिक", "copied": "कॉपी हो गया!", "copy": "कॉपी", "download": "फ़ोटो डाउनलोड करें", "enhanced": "AI बेहतर", "notification": "सूचनाएं", "notif_label": "प्रतिक्रिया पूर्ण", "notif_desc": "जब AI जवाब देना समाप्त करे तो सूचित करें"}};
@@ -1020,7 +1035,7 @@ function saveLimit(c){
   try{localStorage.setItem('saas_limit_v2',JSON.stringify({count:c,date:new Date().toDateString()}));}catch(e){}
   updateLimitUI();
 }
-function updateLimitUI(){
+function updateLimitUI(){updatePlanUI();
   var s=document.getElementById('limitSmall');
   if(s)s.textContent=msgCount+' / '+MSG_LIMIT;
   var mc=document.getElementById('settingsMsgCount');
@@ -1560,6 +1575,255 @@ function doStream(reply,aiMsg){
   setTimeout(tick,40);
 }
 
+
+// ══════════════════════════════════════════
+// PLAN SYSTEM
+// ══════════════════════════════════════════
+var PLANS = {
+  free:      {name:'Gratis',    limit:20,   color:'#888888'},
+  basic:     {name:'Basic',     limit:55,   color:'#38bdf8'},
+  premium:   {name:'Premium',   limit:70,   color:'#818cf8'},
+  ultra:     {name:'Ultra',     limit:155,  color:'#f472b6'},
+  permanent: {name:'Permanent', limit:9999, color:'#fbbf24'}
+};
+var currentPlan = 'free';
+
+function loadPlan(){
+  try{
+    var saved = localStorage.getItem('saas_plan');
+    if(saved){
+      var d = JSON.parse(saved);
+      if(d.plan && d.plan !== 'permanent' && d.expires && Date.now() > d.expires){
+        currentPlan = 'free';
+        localStorage.removeItem('saas_plan');
+      } else if(d.plan){
+        currentPlan = d.plan;
+      }
+    }
+  }catch(e){}
+  applyPlan();
+}
+
+function applyPlan(){
+  var plan = PLANS[currentPlan] || PLANS.free;
+  MSG_LIMIT = plan.limit;
+  updatePlanUI();
+}
+
+function updatePlanUI(){
+  var plan = PLANS[currentPlan] || PLANS.free;
+  // Plan name
+  var nameEl = document.getElementById('planNameLabel');
+  if(nameEl) nameEl.textContent = plan.name;
+  var chip = document.getElementById('st_free_chip');
+  if(chip) chip.style.color = plan.color;
+  // Upgrade button label - multibahasa
+  var upgradeLabels = {"id": "Upgrade", "en": "Upgrade", "ja": "アップグレード", "ko": "업그레이드", "zh": "升级", "ar": "ترقية", "es": "Mejorar", "fr": "Améliorer", "de": "Upgraden", "pt": "Atualizar", "ru": "Улучшить", "hi": "अपग्रेड करें"};
+  var btnLabel = document.getElementById('upgradeBtnLabel');
+  if(btnLabel) btnLabel.textContent = upgradeLabels[currentLang] || 'Upgrade';
+  // Sembunyikan jika permanent
+  var upgradeBtn = document.getElementById('upgradeBtn');
+  if(upgradeBtn) upgradeBtn.style.display = currentPlan === 'permanent' ? 'none' : 'block';
+  var isUnlimited = plan.limit >= 9999;
+  var limitText = isUnlimited ? msgCount + ' / ∞' : msgCount + ' / ' + MSG_LIMIT;
+  var el1 = document.getElementById('settingsMsgCount');
+  var el2 = document.getElementById('limitSmall');
+  if(el1) el1.textContent = limitText;
+  if(el2) el2.textContent = limitText;
+}
+
+function activatePlan(planKey, months){
+  currentPlan = planKey;
+  var data = {plan: planKey};
+  if(planKey !== 'permanent' && months){
+    data.expires = Date.now() + (months * 30 * 24 * 60 * 60 * 1000);
+  }
+  try{ localStorage.setItem('saas_plan', JSON.stringify(data)); }catch(e){}
+  applyPlan();
+  updateLimitUI();
+}
+
+function showUpgradeModal(){
+  var ex = document.getElementById('upgradeModal');
+  if(ex){ ex.remove(); return; }
+  var modal = document.createElement('div');
+  modal.id = 'upgradeModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)';
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+
+  var cards = [
+    {key:'basic',    color:'#38bdf8', label:'Basic',     msg:'55 pesan/hari',     price:'Rp 15.000', period:'/bulan',     badge:''},
+    {key:'premium',  color:'#818cf8', label:'Premium',   msg:'70 pesan/hari',     price:'Rp 29.000', period:'/bulan',     badge:'POPULER'},
+    {key:'ultra',    color:'#f472b6', label:'Ultra',     msg:'155 pesan/hari',    price:'Rp 49.000', period:'/bulan',     badge:''},
+    {key:'permanent',color:'#fbbf24', label:'Permanent', msg:'Tanpa batas ♾',    price:'Rp 199.000',period:' sekali bayar',badge:'TERBAIK'}
+  ];
+
+  var cardsHTML = cards.map(function(p){
+    var badgeHTML = p.badge ? '<span style="position:absolute;top:-10px;left:14px;background:'+p.color+';color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px">'+p.badge+'</span>' : '';
+    return '<div onclick="document.getElementById(\'upgradeModal\').remove();showPaymentModal(\''+p.key+'\')" style="border:1.5px solid '+p.color+';border-radius:14px;padding:16px;cursor:pointer;position:relative;transition:background .15s" onmouseover="this.style.background=\'rgba(255,255,255,.04)\'" onmouseout="this.style.background=\'transparent\'">'
+      +badgeHTML
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<div><span style="font-size:15px;font-weight:700;color:'+p.color+'">'+p.label+'</span>'
+        +'<span style="font-size:12px;color:var(--text3);margin-left:8px">'+p.msg+'</span></div>'
+        +'<span style="font-size:15px;font-weight:700">'+p.price+'<span style="font-size:11px;font-weight:400;color:var(--text3)">'+p.period+'</span></span>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+
+  modal.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(480px,92vw);max-height:88vh;overflow-y:auto;position:relative">'
+    +'<button onclick="document.getElementById(\'upgradeModal\').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
+    +'<div style="text-align:center;margin-bottom:24px">'
+      +'<div style="font-size:28px;margin-bottom:6px">✦</div>'
+      +'<h2 style="font-size:20px;font-weight:800;margin:0 0 4px">Upgrade SaaS AI</h2>'
+      +'<p style="font-size:13px;color:var(--text3);margin:0">Pilih paket yang sesuai kebutuhanmu</p>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">'+cardsHTML+'</div>'
+    +'<div style="background:var(--bg3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text3);text-align:center">'
+      +'🌐 Pembayaran luar negeri via PayPal — <span style="color:var(--text4)">Segera hadir</span>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(modal);
+}
+
+function showPaymentModal(planKey){
+  var plan = PLANS[planKey]; if(!plan) return;
+  var prices = {basic:15000, premium:29000, ultra:49000, permanent:199000};
+  var labels  = {basic:'Rp 15.000/bln', premium:'Rp 29.000/bln', ultra:'Rp 49.000/bln', permanent:'Rp 199.000 sekali bayar'};
+  var amount  = prices[planKey];
+  var gopayNo = '082225097900';
+
+  // GoPay deep link - buka langsung app GoPay transfer
+  // Format: gojek://gopay/transfer?phone=08xx&amount=xxx&description=xxx
+  var gopayDeep = 'gojek://gopay/transfer?phone='+gopayNo+'&amount='+amount+'&description='+encodeURIComponent('SaaS AI '+plan.name);
+  // Fallback web
+  var gopayWeb  = 'https://gojek.onelink.me/a7Hz/gopay';
+
+  var ex = document.getElementById('paymentModal'); if(ex) ex.remove();
+  var modal = document.createElement('div');
+  modal.id = 'paymentModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9001;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
+
+  modal.innerHTML = '<div id="pmBox" style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(400px,92vw);position:relative">'
+    +'<button onclick="document.getElementById(\'paymentModal\').remove();clearInterval(window._payPoll)" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
+    +'<div style="text-align:center;margin-bottom:20px">'
+      +'<div style="font-size:28px;margin-bottom:6px">💳</div>'
+      +'<h3 style="font-size:18px;font-weight:800;margin:0 0 4px">Bayar dengan GoPay</h3>'
+      +'<p style="font-size:13px;color:var(--text3);margin:0">Paket <b style="color:'+plan.color+'">'+plan.name+'</b> — <b>'+labels[planKey]+'</b></p>'
+    +'</div>'
+
+    // Nomor & jumlah
+    +'<div style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:11px;color:var(--text3);margin-bottom:6px">Transfer GoPay ke</div>'
+      +'<div style="font-size:22px;font-weight:900;letter-spacing:.05em">0822-2509-7900</div>'
+      +'<div style="font-size:13px;color:var(--text3);margin-top:2px">Nominal: <b>Rp '+amount.toLocaleString('id-ID')+'</b></div>'
+    +'</div>'
+
+    // Tombol buka GoPay
+    +'<a id="gopayBtn" href="'+gopayDeep+'" onclick="startWaitPayment(\''+planKey+'\')" style="display:block;background:#00ADE0;color:#fff;text-align:center;padding:14px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,173,224,.35)">'
+      +'<img src=\'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/100px-Gopay_logo.svg.png\' style=\'height:18px;vertical-align:middle;margin-right:8px;filter:brightness(0)invert(1)\' onerror=\'this.style.display="none"\'>'
+      +'Buka GoPay & Transfer'
+    +'</a>'
+
+    // Status menunggu (hidden dulu)
+    +'<div id="waitingPayment" style="display:none;background:var(--bg3);border-radius:12px;padding:16px;text-align:center;margin-bottom:10px">'
+      +'<div style="font-size:22px;margin-bottom:8px">⏳</div>'
+      +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">Menunggu Pembayaran...</div>'
+      +'<div style="font-size:12px;color:var(--text3);margin-bottom:12px">Selesaikan transfer di app GoPay kamu</div>'
+      +'<div style="display:flex;align-items:center;justify-content:center;gap:6px">'
+        +'<span style="width:8px;height:8px;border-radius:50%;background:#00ADE0;animation:dot1pulse 1.4s ease-in-out infinite"></span>'
+        +'<span style="width:8px;height:8px;border-radius:50%;background:#00ADE0;animation:dot1pulse 1.4s ease-in-out .2s infinite"></span>'
+        +'<span style="width:8px;height:8px;border-radius:50%;background:#00ADE0;animation:dot1pulse 1.4s ease-in-out .4s infinite"></span>'
+      +'</div>'
+      +'<button onclick="manualConfirm(\''+planKey+'\')" style="margin-top:14px;padding:9px 20px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit">Sudah transfer? Klik di sini</button>'
+    +'</div>'
+
+    // PayPal disabled
+    +'<div style="border:1.5px solid var(--border);border-radius:14px;padding:12px;opacity:.35;margin-top:8px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:18px">🌐</span>'
+        +'<div><div style="font-weight:700;font-size:13px">PayPal <span style="font-size:10px;background:var(--bg3);padding:1px 7px;border-radius:99px;color:var(--text4)">Segera hadir</span></div>'
+        +'<div style="font-size:11px;color:var(--text4)">Untuk pengguna luar negeri</div></div>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(modal);
+}
+
+function startWaitPayment(planKey){
+  // Tampilkan status menunggu
+  setTimeout(function(){
+    var w = document.getElementById('waitingPayment');
+    var btn = document.getElementById('gopayBtn');
+    if(w){ w.style.display='block'; }
+    if(btn){ btn.textContent='🔄 Buka GoPay lagi'; btn.style.fontSize='13px'; btn.style.padding='10px'; }
+  }, 1000);
+
+  // Poll setiap 3 detik - cek apakah user kembali ke tab ini
+  window._payPoll = null;
+  var attempts = 0;
+  var planKey2 = planKey;
+
+  // Deteksi user balik ke tab
+  function onVisibilityChange(){
+    if(document.visibilityState === 'visible' && attempts > 0){
+      // User kembali ke tab - tanya konfirmasi
+      clearInterval(window._payPoll);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      setTimeout(function(){ manualConfirm(planKey2); }, 800);
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange);
+
+  window._payPoll = setInterval(function(){
+    attempts++;
+    if(attempts > 60){ // Timeout 3 menit
+      clearInterval(window._payPoll);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    }
+  }, 3000);
+}
+
+function manualConfirm(planKey){
+  clearInterval(window._payPoll);
+  var el = document.getElementById('paymentModal'); if(el) el.remove();
+  var plan = PLANS[planKey]; if(!plan) return;
+
+  var modal = document.createElement('div');
+  modal.id = 'confirmModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9002;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
+  modal.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(380px,90vw);text-align:center">'
+    +'<div style="font-size:36px;margin-bottom:10px">🧾</div>'
+    +'<h3 style="font-size:17px;font-weight:800;margin:0 0 10px">Transfer berhasil?</h3>'
+    +'<p style="font-size:13px;color:var(--text3);margin:0 0 18px;line-height:1.65">'
+      +'Pastikan transfer GoPay ke <b>0822-2509-7900</b> sudah sukses sebelum mengaktifkan paket.'
+    +'</p>'
+    +'<div style="background:#fff3cd;border-radius:10px;padding:10px 14px;font-size:12px;color:#856404;margin-bottom:18px;line-height:1.6">'
+      +'⚠️ Jangan aktifkan jika transfer belum selesai. Paket tidak bisa di-rollback.'
+    +'</div>'
+    +'<div style="display:flex;gap:10px">'
+      +'<button onclick="document.getElementById(\'confirmModal\').remove();showPaymentModal(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit">Belum transfer</button>'
+      +'<button onclick="confirmAndActivate(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#00ADE0,#818cf8);color:#fff;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit">✅ Aktifkan!</button>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(modal);
+}
+
+function confirmAndActivate(planKey){
+  var el = document.getElementById('confirmModal'); if(el) el.remove();
+  activatePlan(planKey, planKey !== 'permanent' ? 1 : null);
+  var plan = PLANS[planKey];
+  var s = document.createElement('div');
+  s.style.cssText = 'position:fixed;inset:0;z-index:9003;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
+  s.innerHTML = '<div style="background:var(--bg);border:2px solid '+plan.color+';border-radius:20px;padding:36px;width:min(360px,90vw);text-align:center;animation:popIn .3s ease">'
+    +'<div style="font-size:52px;margin-bottom:12px">✨</div>'
+    +'<h3 style="font-size:20px;font-weight:800;margin:0 0 8px;color:'+plan.color+'">Paket '+plan.name+' Aktif!</h3>'
+    +'<p style="font-size:13px;color:var(--text3);margin:0 0 20px;line-height:1.65">Selamat! Kamu sekarang bisa mengirim hingga <b>'+(plan.limit>=9999?'pesan tak terbatas':plan.limit+' pesan/hari')+'</b>.</p>'
+    +'<button onclick="this.parentElement.parentElement.remove()" style="background:'+plan.color+';color:#fff;border:none;padding:12px 32px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Mulai Chat! 🚀</button>'
+  +'</div>';
+  document.body.appendChild(s);
+}
+
+
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
@@ -1567,6 +1831,7 @@ function doStream(reply,aiMsg){
   renderLogos();
   loadPrefs();
   loadLimit();
+  loadPlan();
   applyI18N();
   updateSendBtn();
   initSplash();
