@@ -1530,8 +1530,8 @@ function doStream(reply,aiMsg){
   var chars=reply.split('');
   var idx=0;
   var total=chars.length;
-  var chunk=total>2000?12:total>800?8:total>300?5:3;
-  var delay=total>2000?6:total>800?9:total>300?12:16;
+  var chunk=total>2000?6:total>800?4:total>300?3:2;
+  var delay=total>2000?14:total>800?18:total>300?22:28;
   function getEl(){
     if(!msgsEl)return null;
     var all=msgsEl.querySelectorAll('.msg-ai');
