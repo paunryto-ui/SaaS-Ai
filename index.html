@@ -1264,25 +1264,12 @@ function send(){
   var userContent;
   if(images.length>0){
     userContent=[];
+    // OpenAI/Gemini format via OpenRouter - image_url dengan base64
     images.forEach(function(img){
-      // Handle base64 data URLs properly for Claude via OpenRouter
-      if(img.url.startsWith('data:')){
-        var matches=img.url.match(/^data:([^;]+);base64,(.+)$/);
-        if(matches){
-          userContent.push({
-            type:'image',
-            source:{
-              type:'base64',
-              media_type:matches[1],
-              data:matches[2]
-            }
-          });
-        } else {
-          userContent.push({type:'image_url',image_url:{url:img.url}});
-        }
-      } else {
-        userContent.push({type:'image_url',image_url:{url:img.url}});
-      }
+      userContent.push({
+        type:'image_url',
+        image_url:{url:img.url}
+      });
     });
     userContent.push({type:'text',text:text||'Analyze this image.'});
   } else {
