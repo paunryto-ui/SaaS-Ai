@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,9 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;height:calc(var(--vh,1vh)*100)}
-body{height:100%;height:calc(var(--vh,1vh)*100);font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
+html{height:100%;height:calc(var(--vh,1vh)*100);height:100dvh}
+body{height:100%;height:calc(var(--vh,1vh)*100);height:100dvh;font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
 body.ios-device #msgsEl{padding-bottom:env(safe-area-inset-bottom)}
+body.android-device #msgsEl{padding-bottom:12px}
 @media(max-width:767px){
   .split-chat{min-height:0}
   body[data-mobile="1"] aside{max-width:80vw}
@@ -568,7 +568,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
   </div>
 </div>
 
-<div style="display:flex;height:100vh;overflow:hidden">
+<div style="display:flex;height:100vh;height:calc(var(--vh,1vh)*100);overflow:hidden">
 
   <!-- SIDEBAR -->
   <aside id="sidebar" style="position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--border);width:260px;flex-shrink:0;transform:translateX(-100%)">
@@ -699,7 +699,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
     <div id="msgsEl" style="flex:1;overflow-y:auto;display:none;background:var(--bg)"></div>
 
     <!-- INPUT AREA -->
-    <div style="flex-shrink:0;padding:10px 16px 16px;background:var(--bg)">
+    <div style="flex-shrink:0;padding:10px 16px max(16px, env(safe-area-inset-bottom, 16px));background:var(--bg)">
       <div id="limitWarnBar" style="display:none;margin-bottom:10px;padding:9px 14px;border-radius:12px;background:var(--warn-bg);border:1px solid var(--warn-border);font-size:13px;color:var(--warn-text);text-align:center;cursor:pointer" onclick="showLimitModal()">
         ⏳ <span id="limitWarnTxt">Limit harian tercapai.</span>
       </div>
@@ -856,6 +856,12 @@ var _K='sk-or-v1-1d2bb8b39fa30b23c2cce4d51830f0b9bed0a03872ee8da423ae47fcb5786c8
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='google/gemini-2.0-flash-001';
 var MODEL_VISION='google/gemini-2.0-flash-001';
+
+// Build headers — try different referers if one fails
+var _referer=window.location.origin||'https://localhost';
+function _buildHeaders(){
+  return {'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':_referer,'X-Title':'SaaS AI'};
+}
 var MSG_LIMIT=20;
 var RESET_HOUR=2;
 
@@ -1709,7 +1715,7 @@ async function runAgentLoop(initMessages,sysPrompt,images_present,sess,aiMsg){
       };
       var resp=await fetch(API,{
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+        headers:_buildHeaders(),
         body:JSON.stringify(body)
       });
       if(!resp.ok){var ej=await resp.json();throw new Error(ej.error&&ej.error.message?ej.error.message:'HTTP '+resp.status);}
@@ -2168,7 +2174,7 @@ function send(){
   })();
   fetch(API,{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+    headers:_buildHeaders(),
     body:JSON.stringify({
       model:(images_present?MODEL_VISION:MODEL),
       max_tokens:_smartTokens,
@@ -2179,9 +2185,11 @@ function send(){
   .then(function(res){
     if(!res.ok)return res.json().then(function(e){
       var msg=e.error&&e.error.message?e.error.message:'HTTP '+res.status;
-      // If credits error, retry with smaller tokens
       if(msg.toLowerCase().includes('credits')||msg.toLowerCase().includes('tokens')){
-        throw new Error('__RETRY__');
+        throw new Error('__RETRY_SMALL__');
+      }
+      if(msg.toLowerCase().includes('user not found')||res.status===401||res.status===403){
+        throw new Error('__RETRY_NOREFERER__');
       }
       throw new Error(msg);
     });
@@ -2201,18 +2209,15 @@ function send(){
   .catch(function(err){
     var sess=getCur();
     var errMsg=err.message||'';
-    if(errMsg==='__RETRY__'){
-      // Retry with minimum tokens
-      fetch(API,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
-        body:JSON.stringify({
-          model:(images_present?MODEL_VISION:MODEL),
-          max_tokens:300,
-          temperature:0.7,
-          messages:[{role:'system',content:sysPrompt}].concat(history)
-        })
-      }).then(function(r){return r.json();})
+
+    function doRetry(maxTok, extraHeaders){
+      var h=_buildHeaders();
+      if(extraHeaders)Object.assign(h,extraHeaders);
+      fetch(API,{method:'POST',headers:h,body:JSON.stringify({
+        model:(images_present?MODEL_VISION:MODEL),
+        max_tokens:maxTok,temperature:0.7,
+        messages:[{role:'system',content:sysPrompt}].concat(history)
+      })}).then(function(r){return r.json();})
       .then(function(data){
         var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
         var s=getCur();
@@ -2222,13 +2227,27 @@ function send(){
         attachedFiles=[];renderFilePreviews();
         doStream(reply,aiMsg);checkAutoPreview(reply);
       }).catch(function(e2){
-        if(sess){aiMsg.content='⚠️ Maaf, kredit API habis. Silakan top up di openrouter.ai 🙏';}
+        var m=e2.message||'';
+        if(sess){
+          if(m.toLowerCase().includes('user not found')||m.includes('401')||m.includes('403')){
+            aiMsg.content='⚠️ API Key tidak valid atau belum diaktifkan di OpenRouter. Pastikan key sudah benar dan domain sudah di-whitelist di openrouter.ai/settings 🔑';
+          } else {
+            aiMsg.content='⚠️ Error: '+m+'. Coba lagi ya! 🙏';
+          }
+        }
         loading=false;renderMsgs();updateSendBtn();
       });
-      return;
     }
-    if(sess){aiMsg.content='⚠️ Error: '+errMsg+'. Coba lagi ya! 🙏';}
-    loading=false;renderMsgs();updateSendBtn();
+
+    if(errMsg==='__RETRY_SMALL__'){
+      doRetry(300,null);
+    } else if(errMsg==='__RETRY_NOREFERER__'){
+      // Try without HTTP-Referer (some OpenRouter keys are not domain-restricted)
+      doRetry(_smartTokens,{'HTTP-Referer':'','X-Title':''});
+    } else {
+      if(sess){aiMsg.content='⚠️ Error: '+errMsg+'. Coba lagi ya! 🙏';}
+      loading=false;renderMsgs();updateSendBtn();
+    }
   });
 }
 
@@ -3157,19 +3176,40 @@ function confirmAndActivate(planKey){
 (function init(){
   // Device ratio & safe area detection
   (function detectDevice(){
-    // Set real viewport height (fixes iOS 100vh bug)
+    // Set real viewport height (fixes mobile browser 100vh bug)
     function setVh(){
-      var vh=window.innerHeight*0.01;
-      document.documentElement.style.setProperty('--vh',vh+'px');
+      // Use dvh if supported (best for modern Android/iOS)
+      var root=document.documentElement;
+      // visualViewport is most accurate when keyboard is open
+      var h=window.visualViewport?window.visualViewport.height:window.innerHeight;
+      var vh=h*0.01;
+      root.style.setProperty('--vh',vh+'px');
+      // Also set actual px for the root so layout never overflows
+      root.style.setProperty('--real-height',h+'px');
     }
     setVh();
     window.addEventListener('resize',setVh);
+    // visualViewport fires when keyboard opens/closes on mobile
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize',function(){
+        setVh();
+        // Push input into view when keyboard opens
+        var inp=document.getElementById('inp');
+        if(inp&&document.activeElement===inp){
+          setTimeout(function(){inp.scrollIntoView({block:'nearest'});},50);
+        }
+      });
+    }
     // Detect mobile
     var isMobile=window.innerWidth<768||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     document.body.setAttribute('data-mobile',isMobile?'1':'0');
     // Detect iOS for safe area
     if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
       document.body.classList.add('ios-device');
+    }
+    // Detect Android
+    if(/Android/i.test(navigator.userAgent)){
+      document.body.classList.add('android-device');
     }
   })();
   renderLogos();
