@@ -7,10 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;height:calc(var(--vh,1vh)*100);height:100dvh}
-body{height:100%;height:calc(var(--vh,1vh)*100);height:100dvh;font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
+html{height:100%;height:calc(var(--vh,1vh)*100)}
+body{height:100%;height:calc(var(--vh,1vh)*100);font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
 body.ios-device #msgsEl{padding-bottom:env(safe-area-inset-bottom)}
-body.android-device #msgsEl{padding-bottom:12px}
 @media(max-width:767px){
   .split-chat{min-height:0}
   body[data-mobile="1"] aside{max-width:80vw}
@@ -568,7 +567,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
   </div>
 </div>
 
-<div style="display:flex;height:100vh;height:calc(var(--vh,1vh)*100);overflow:hidden">
+<div style="display:flex;height:100vh;overflow:hidden">
 
   <!-- SIDEBAR -->
   <aside id="sidebar" style="position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--border);width:260px;flex-shrink:0;transform:translateX(-100%)">
@@ -699,7 +698,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
     <div id="msgsEl" style="flex:1;overflow-y:auto;display:none;background:var(--bg)"></div>
 
     <!-- INPUT AREA -->
-    <div style="flex-shrink:0;padding:10px 16px max(16px, env(safe-area-inset-bottom, 16px));background:var(--bg)">
+    <div style="flex-shrink:0;padding:10px 16px 16px;background:var(--bg)">
       <div id="limitWarnBar" style="display:none;margin-bottom:10px;padding:9px 14px;border-radius:12px;background:var(--warn-bg);border:1px solid var(--warn-border);font-size:13px;color:var(--warn-text);text-align:center;cursor:pointer" onclick="showLimitModal()">
         ⏳ <span id="limitWarnTxt">Limit harian tercapai.</span>
       </div>
@@ -856,12 +855,6 @@ var _K='sk-or-v1-1d2bb8b39fa30b23c2cce4d51830f0b9bed0a03872ee8da423ae47fcb5786c8
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='google/gemini-2.0-flash-001';
 var MODEL_VISION='google/gemini-2.0-flash-001';
-
-// Build headers — try different referers if one fails
-var _referer=window.location.origin||'https://localhost';
-function _buildHeaders(){
-  return {'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':_referer,'X-Title':'SaaS AI'};
-}
 var MSG_LIMIT=20;
 var RESET_HOUR=2;
 
@@ -1715,7 +1708,7 @@ async function runAgentLoop(initMessages,sysPrompt,images_present,sess,aiMsg){
       };
       var resp=await fetch(API,{
         method:'POST',
-        headers:_buildHeaders(),
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
         body:JSON.stringify(body)
       });
       if(!resp.ok){var ej=await resp.json();throw new Error(ej.error&&ej.error.message?ej.error.message:'HTTP '+resp.status);}
@@ -2174,7 +2167,7 @@ function send(){
   })();
   fetch(API,{
     method:'POST',
-    headers:_buildHeaders(),
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
     body:JSON.stringify({
       model:(images_present?MODEL_VISION:MODEL),
       max_tokens:_smartTokens,
@@ -2185,11 +2178,9 @@ function send(){
   .then(function(res){
     if(!res.ok)return res.json().then(function(e){
       var msg=e.error&&e.error.message?e.error.message:'HTTP '+res.status;
+      // If credits error, retry with smaller tokens
       if(msg.toLowerCase().includes('credits')||msg.toLowerCase().includes('tokens')){
-        throw new Error('__RETRY_SMALL__');
-      }
-      if(msg.toLowerCase().includes('user not found')||res.status===401||res.status===403){
-        throw new Error('__RETRY_NOREFERER__');
+        throw new Error('__RETRY__');
       }
       throw new Error(msg);
     });
@@ -2209,15 +2200,18 @@ function send(){
   .catch(function(err){
     var sess=getCur();
     var errMsg=err.message||'';
-
-    function doRetry(maxTok, extraHeaders){
-      var h=_buildHeaders();
-      if(extraHeaders)Object.assign(h,extraHeaders);
-      fetch(API,{method:'POST',headers:h,body:JSON.stringify({
-        model:(images_present?MODEL_VISION:MODEL),
-        max_tokens:maxTok,temperature:0.7,
-        messages:[{role:'system',content:sysPrompt}].concat(history)
-      })}).then(function(r){return r.json();})
+    if(errMsg==='__RETRY__'){
+      // Retry with minimum tokens
+      fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+        body:JSON.stringify({
+          model:(images_present?MODEL_VISION:MODEL),
+          max_tokens:300,
+          temperature:0.7,
+          messages:[{role:'system',content:sysPrompt}].concat(history)
+        })
+      }).then(function(r){return r.json();})
       .then(function(data){
         var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
         var s=getCur();
@@ -2227,27 +2221,13 @@ function send(){
         attachedFiles=[];renderFilePreviews();
         doStream(reply,aiMsg);checkAutoPreview(reply);
       }).catch(function(e2){
-        var m=e2.message||'';
-        if(sess){
-          if(m.toLowerCase().includes('user not found')||m.includes('401')||m.includes('403')){
-            aiMsg.content='⚠️ API Key tidak valid atau belum diaktifkan di OpenRouter. Pastikan key sudah benar dan domain sudah di-whitelist di openrouter.ai/settings 🔑';
-          } else {
-            aiMsg.content='⚠️ Error: '+m+'. Coba lagi ya! 🙏';
-          }
-        }
+        if(sess){aiMsg.content='⚠️ Maaf, kredit API habis. Silakan top up di openrouter.ai 🙏';}
         loading=false;renderMsgs();updateSendBtn();
       });
+      return;
     }
-
-    if(errMsg==='__RETRY_SMALL__'){
-      doRetry(300,null);
-    } else if(errMsg==='__RETRY_NOREFERER__'){
-      // Try without HTTP-Referer (some OpenRouter keys are not domain-restricted)
-      doRetry(_smartTokens,{'HTTP-Referer':'','X-Title':''});
-    } else {
-      if(sess){aiMsg.content='⚠️ Error: '+errMsg+'. Coba lagi ya! 🙏';}
-      loading=false;renderMsgs();updateSendBtn();
-    }
+    if(sess){aiMsg.content='⚠️ Error: '+errMsg+'. Coba lagi ya! 🙏';}
+    loading=false;renderMsgs();updateSendBtn();
   });
 }
 
@@ -2837,9 +2817,27 @@ function hideSplash(instant){
   var sp=document.getElementById('splashScreen');
   if(!sp)return;
   updateSidebarName();
-  if(instant){sp.style.display='none';updateGreeting();return;}
+  if(instant){
+    sp.style.display='none';
+    updateGreeting();
+    maybeShowUpgradePopup();
+    return;
+  }
   sp.classList.add('hiding');
-  setTimeout(function(){sp.style.display='none';updateGreeting();},450);
+  setTimeout(function(){
+    sp.style.display='none';
+    updateGreeting();
+    maybeShowUpgradePopup();
+  },450);
+}
+
+function maybeShowUpgradePopup(){
+  if(currentPlan && currentPlan !== 'free') return;
+  try{
+    if(localStorage.getItem('saas_upgrade_popup_seen')) return;
+    localStorage.setItem('saas_upgrade_popup_seen','1');
+  }catch(e){}
+  setTimeout(function(){ showUpgradeModal(); }, 800);
 }
 function updateSidebarName(){
   var lbl=document.getElementById('sidebarNameLbl');if(lbl)lbl.textContent=USER_NAME||'...';
@@ -2888,22 +2886,62 @@ function renderThumbsGemini(){
 // ── STREAMING ──
 function doStream(reply,aiMsg){
   var msgsEl=document.getElementById('msgsEl');
-  var chars=reply.split('');
+
+  // FREE PLAN: truncate reply at ~45-55% and show upgrade nudge
+  var isFree = !currentPlan || currentPlan === 'free';
+  var truncatedReply = reply;
+  var truncated = false;
+  if(isFree && reply.length > 120){
+    // Cut at a word boundary around 45-55% of the text
+    var cutTarget = Math.floor(reply.length * (0.45 + Math.random() * 0.1));
+    var cutAt = reply.lastIndexOf(' ', cutTarget);
+    if(cutAt < 60) cutAt = cutTarget;
+    truncatedReply = reply.slice(0, cutAt);
+    truncated = true;
+  }
+
+  var chars = truncatedReply.split('');
   var idx=0;
   var total=chars.length;
   var chunk=total>2000?6:total>800?4:total>300?3:2;
   var delay=total>2000?14:total>800?18:total>300?22:28;
+
   function getEl(){
     if(!msgsEl)return null;
     var all=msgsEl.querySelectorAll('.msg-ai');
     var last=all[all.length-1];
     return last?last.querySelector('.content'):null;
   }
+
+  function showUpgradeNudge(el){
+    if(!el) return;
+    // Remove any previous nudge
+    var old=el.querySelector('.free-truncate-nudge');
+    if(old) old.remove();
+
+    var nudge=document.createElement('div');
+    nudge.className='free-truncate-nudge';
+    nudge.style.cssText='margin-top:14px;background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(14,165,233,.06));border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+    nudge.innerHTML=
+      '<div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">✦ Jawaban dipotong</div>'
+        +'<div style="font-size:12px;color:var(--text3)">Upgrade untuk mendapat jawaban <b>lengkap & akurat</b></div>'
+      +'</div>'
+      +'<button class="nudge-upgrade-btn" style="background:linear-gradient(135deg,#6366f1,#0ea5e9);color:#fff;border:none;padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">⚡ Upgrade</button>';
+    el.appendChild(nudge);
+
+    nudge.querySelector('.nudge-upgrade-btn').onclick = function(){ showUpgradeModal(); };
+  }
+
   function tick(){
     if(idx>=chars.length){
-      aiMsg.content=reply;
+      aiMsg.content=truncatedReply;
       var el=getEl();
-      if(el){el.innerHTML=parseMd(reply);el.classList.remove('streaming-cursor');}
+      if(el){
+        el.innerHTML=parseMd(truncatedReply);
+        el.classList.remove('streaming-cursor');
+        if(truncated) showUpgradeNudge(el);
+      }
       renderHistory();
       return;
     }
@@ -2926,11 +2964,39 @@ function doStream(reply,aiMsg){
 // PLAN SYSTEM
 // ══════════════════════════════════════════
 var PLANS = {
-  free:      {name:'Gratis',    limit:20,   color:'#888888'},
-  basic:     {name:'Basic',     limit:55,   color:'#38bdf8'},
-  premium:   {name:'Premium',   limit:70,   color:'#818cf8'},
-  ultra:     {name:'Ultra',     limit:155,  color:'#f472b6'},
-  permanent: {name:'Permanent', limit:9999, color:'#fbbf24'}
+  free:           {name:'Gratis',         limit:20,   color:'#888888'},
+  basic_harian:   {name:'Basic Harian',   limit:55,   color:'#38bdf8'},
+  basic_mingguan: {name:'Basic Mingguan', limit:55,   color:'#38bdf8'},
+  basic_bulanan:  {name:'Basic Bulanan',  limit:55,   color:'#38bdf8'},
+  basic_tahunan:  {name:'Basic Tahunan',  limit:55,   color:'#38bdf8'},
+  premium_harian:   {name:'Premium Harian',   limit:150,  color:'#818cf8'},
+  premium_mingguan: {name:'Premium Mingguan', limit:150,  color:'#818cf8'},
+  premium_bulanan:  {name:'Premium Bulanan',  limit:150,  color:'#818cf8'},
+  premium_tahunan:  {name:'Premium Tahunan',  limit:150,  color:'#818cf8'}
+};
+
+// Pricing config
+var PRICING = {
+  basic: {
+    color: '#38bdf8',
+    label: 'Basic',
+    limit: '55 pesan/hari',
+    features: ['55 pesan per hari','Akses fitur standar','Prioritas respons normal'],
+    harian:   {price:2000,  label:'Rp 2.000',  period:'/hari',   days:1,   note:''},
+    mingguan: {price:11000, label:'Rp 11.000', period:'/minggu', days:7,   note:'TERBAIK — hemat 21%'},
+    bulanan:  {price:40000, label:'Rp 40.000', period:'/bulan',  days:30,  note:''},
+    tahunan:  {price:400000,label:'Rp 400.000',period:'/tahun',  days:365, note:'Hemat Rp 80.000'}
+  },
+  premium: {
+    color: '#818cf8',
+    label: 'Premium',
+    limit: '150 pesan/hari',
+    features: ['150 pesan per hari','Semua fitur premium','Prioritas respons cepat','Analisis mendalam'],
+    harian:   {price:4000,  label:'Rp 4.000',  period:'/hari',   days:1,   note:''},
+    mingguan: {price:22000, label:'Rp 22.000', period:'/minggu', days:7,   note:'TERBAIK — hemat 21%'},
+    bulanan:  {price:75000, label:'Rp 75.000', period:'/bulan',  days:30,  note:''},
+    tahunan:  {price:750000,label:'Rp 750.000',period:'/tahun',  days:365, note:'Hemat Rp 150.000'}
+  }
 };
 var currentPlan = 'free';
 
@@ -2939,7 +3005,7 @@ function loadPlan(){
     var saved = localStorage.getItem('saas_plan');
     if(saved){
       var d = JSON.parse(saved);
-      if(d.plan && d.plan !== 'permanent' && d.expires && Date.now() > d.expires){
+      if(d.plan && d.plan !== 'free' && d.expires && Date.now() > d.expires){
         currentPlan = 'free';
         localStorage.removeItem('saas_plan');
       } else if(d.plan){
@@ -2978,17 +3044,18 @@ function updatePlanUI(){
   if(el2) el2.textContent = limitText;
 }
 
-function activatePlan(planKey, months){
+function activatePlan(planKey, days){
   currentPlan = planKey;
   var data = {plan: planKey};
-  if(planKey !== 'permanent' && months){
-    data.expires = Date.now() + (months * 30 * 24 * 60 * 60 * 1000);
+  if(days){
+    data.expires = Date.now() + (days * 24 * 60 * 60 * 1000);
   }
   try{ localStorage.setItem('saas_plan', JSON.stringify(data)); }catch(e){}
   applyPlan();
   updateLimitUI();
 }
 
+/* ── UPGRADE / PAYMENT MODALS ── */
 function showUpgradeModal(){
   var ex = document.getElementById('upgradeModal');
   if(ex){ ex.remove(); return; }
@@ -2997,80 +3064,135 @@ function showUpgradeModal(){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)';
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
 
-  var cards = [
-    {key:'basic',    color:'#38bdf8', label:'Basic',     msg:'55 pesan/hari',     price:'Rp 15.000', period:'/bulan',     badge:''},
-    {key:'premium',  color:'#818cf8', label:'Premium',   msg:'70 pesan/hari',     price:'Rp 29.000', period:'/bulan',     badge:'POPULER'},
-    {key:'ultra',    color:'#f472b6', label:'Ultra',     msg:'155 pesan/hari',    price:'Rp 49.000', period:'/bulan',     badge:''},
-    {key:'permanent',color:'#fbbf24', label:'Permanent', msg:'Tanpa batas ♾',    price:'Rp 199.000',period:' sekali bayar',badge:'TERBAIK'}
-  ];
+  var PERIODS = ['harian','mingguan','bulanan','tahunan'];
+  var PERIOD_LABELS = {harian:'Harian',mingguan:'Mingguan',bulanan:'Bulanan',tahunan:'Tahunan'};
+  var activePeriod = 'mingguan'; // default ke mingguan biar user milih ini
 
-  var cardsHTML = cards.map(function(p){
-    var badgeHTML = p.badge ? '<span style="position:absolute;top:-10px;left:14px;background:'+p.color+';color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px">'+p.badge+'</span>' : '';
-    return '<div onclick="document.getElementById(\'upgradeModal\').remove();showPaymentModal(\''+p.key+'\')" style="border:1.5px solid '+p.color+';border-radius:14px;padding:16px;cursor:pointer;position:relative;transition:background .15s" onmouseover="this.style.background=\'rgba(255,255,255,.04)\'" onmouseout="this.style.background=\'transparent\'">'
-      +badgeHTML
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'
-        +'<div><span style="font-size:15px;font-weight:700;color:'+p.color+'">'+p.label+'</span>'
-        +'<span style="font-size:12px;color:var(--text3);margin-left:8px">'+p.msg+'</span></div>'
-        +'<span style="font-size:15px;font-weight:700">'+p.price+'<span style="font-size:11px;font-weight:400;color:var(--text3)">'+p.period+'</span></span>'
+  function buildHTML(){
+    // Period tabs
+    var tabs = PERIODS.map(function(p){
+      var isActive = p === activePeriod;
+      var extraStyle = isActive ? 'background:var(--text);color:var(--bg);font-weight:700;' : 'background:var(--bg3);color:var(--text3);';
+      return '<button data-period="'+p+'" style="'+extraStyle+'border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s">'+PERIOD_LABELS[p]+'</button>';
+    }).join('');
+
+    // Plan cards: basic & premium
+    var cards = ['basic','premium'].map(function(tier){
+      var t = PRICING[tier];
+      var pd = t[activePeriod];
+      var isPopular = (tier === 'premium' && activePeriod === 'mingguan') || (tier === 'basic' && activePeriod === 'mingguan');
+      var isBest = tier === 'premium' && activePeriod === 'mingguan';
+      var badge = isBest ? '<span style="position:absolute;top:-11px;left:14px;background:'+t.color+';color:#fff;font-size:10px;font-weight:800;padding:2px 12px;border-radius:99px;letter-spacing:.05em">✦ TERBAIK</span>' :
+                  (tier === 'basic' && activePeriod === 'mingguan') ? '<span style="position:absolute;top:-11px;left:14px;background:#22c55e;color:#fff;font-size:10px;font-weight:800;padding:2px 12px;border-radius:99px">HEMAT 21%</span>' : '';
+
+      var note = pd.note ? '<div style="font-size:10px;color:#22c55e;font-weight:600;margin-top:2px">'+pd.note+'</div>' : '';
+      var feats = t.features.map(function(f){ return '<div style="font-size:12px;color:var(--text3);padding:3px 0;display:flex;align-items:center;gap:6px"><span style="color:'+t.color+'">✓</span>'+f+'</div>'; }).join('');
+
+      return '<div data-pick="'+tier+'-'+activePeriod+'" style="border:1.5px solid '+t.color+';border-radius:14px;padding:16px;cursor:pointer;position:relative;transition:background .15s;margin-top:6px" onmouseover="this.style.background=\'rgba(255,255,255,.04)\'" onmouseout="this.style.background=\'transparent\'">'
+        +badge
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+          +'<div>'
+            +'<div style="font-size:16px;font-weight:800;color:'+t.color+'">'+t.label+'</div>'
+            +'<div style="font-size:12px;color:var(--text3)">'+t.limit+'</div>'
+          +'</div>'
+          +'<div style="text-align:right">'
+            +'<div style="font-size:20px;font-weight:900">'+pd.label+'</div>'
+            +'<div style="font-size:11px;color:var(--text3)">'+pd.period+'</div>'
+            +note
+          +'</div>'
+        +'</div>'
+        +feats
+      +'</div>';
+    }).join('');
+
+    return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px 24px 20px;width:min(480px,92vw);max-height:90vh;overflow-y:auto;position:relative">'
+      +'<button id="upgClose" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
+      +'<div style="text-align:center;margin-bottom:18px">'
+        +'<div style="font-size:26px;margin-bottom:4px">✦</div>'
+        +'<h2 style="font-size:20px;font-weight:800;margin:0 0 4px">Upgrade SaaS AI</h2>'
+        +'<p style="font-size:13px;color:var(--text3);margin:0">Pilih durasi & paket yang cocok buat kamu</p>'
       +'</div>'
+      // Period selector
+      +'<div id="periodTabs" style="display:flex;gap:6px;background:var(--bg3);padding:5px;border-radius:10px;margin-bottom:16px">'+tabs+'</div>'
+      // Note: mingguan is best value
+      +(activePeriod==='mingguan'?'<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:7px 12px;font-size:12px;color:#22c55e;text-align:center;margin-bottom:12px">💡 Mingguan paling hemat — hanya Rp 1.571/hari untuk Basic</div>':'')
+      +(activePeriod==='harian'?'<div style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:8px;padding:7px 12px;font-size:12px;color:#fb923c;text-align:center;margin-bottom:12px">💡 Pilih Mingguan untuk harga lebih hemat</div>':'')
+      // Plan cards
+      +'<div id="planCards" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">'+cards+'</div>'
+      +'<div style="background:var(--bg3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text4);text-align:center">🌐 Pembayaran internasional via PayPal — Segera hadir</div>'
     +'</div>';
-  }).join('');
+  }
 
-  modal.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(480px,92vw);max-height:88vh;overflow-y:auto;position:relative">'
-    +'<button onclick="document.getElementById(\'upgradeModal\').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
-    +'<div style="text-align:center;margin-bottom:24px">'
-      +'<div style="font-size:28px;margin-bottom:6px">✦</div>'
-      +'<h2 style="font-size:20px;font-weight:800;margin:0 0 4px">Upgrade SaaS AI</h2>'
-      +'<p style="font-size:13px;color:var(--text3);margin:0">Pilih paket yang sesuai kebutuhanmu</p>'
-    +'</div>'
-    +'<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">'+cardsHTML+'</div>'
-    +'<div style="background:var(--bg3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text3);text-align:center">'
-      +'🌐 Pembayaran luar negeri via PayPal — <span style="color:var(--text4)">Segera hadir</span>'
-    +'</div>'
-  +'</div>';
+  function render(){
+    modal.innerHTML = buildHTML();
+
+    // Close btn
+    document.getElementById('upgClose').onclick = function(){ modal.remove(); };
+
+    // Period tabs click
+    var tabs = document.getElementById('periodTabs');
+    if(tabs) tabs.onclick = function(e){
+      var btn = e.target.closest('[data-period]');
+      if(!btn) return;
+      activePeriod = btn.getAttribute('data-period');
+      render();
+    };
+
+    // Card pick click
+    var cards = document.getElementById('planCards');
+    if(cards) cards.onclick = function(e){
+      var card = e.target.closest('[data-pick]');
+      if(!card) return;
+      var pick = card.getAttribute('data-pick'); // e.g. "basic-mingguan"
+      modal.remove();
+      showPaymentModal(pick);
+    };
+  }
+
   document.body.appendChild(modal);
+  render();
 }
 
 function showPaymentModal(planKey){
-  var plan = PLANS[planKey]; if(!plan) return;
-  var prices = {basic:15000, premium:29000, ultra:49000, permanent:199000};
-  var labels  = {basic:'Rp 15.000/bln', premium:'Rp 29.000/bln', ultra:'Rp 49.000/bln', permanent:'Rp 199.000 sekali bayar'};
-  var amount  = prices[planKey];
-  var gopayNo = '082225097900';
+  // planKey format: "basic-mingguan", "premium-harian", etc.
+  var parts = planKey.split('-');
+  var tier = parts[0];   // "basic" or "premium"
+  var period = parts[1]; // "harian","mingguan","bulanan","tahunan"
 
-  // GoPay deep link - buka langsung app GoPay transfer
-  // Format: gojek://gopay/transfer?phone=08xx&amount=xxx&description=xxx
-  var gopayDeep = 'gojek://gopay/transfer?phone='+gopayNo+'&amount='+amount+'&description='+encodeURIComponent('SaaS AI '+plan.name);
-  // Fallback web
-  var gopayWeb  = 'https://gojek.onelink.me/a7Hz/gopay';
+  var t = PRICING[tier];
+  var pd = t[period];
+  if(!t || !pd) return;
+
+  var fullPlanKey = tier+'_'+period; // for PLANS lookup
+  var gopayNo = '082225097900';
+  var amount  = pd.price;
+  var gopayDeep = 'gojek://gopay/transfer?phone='+gopayNo+'&amount='+amount+'&description='+encodeURIComponent('SaaS AI '+t.label+' '+period.charAt(0).toUpperCase()+period.slice(1));
 
   var ex = document.getElementById('paymentModal'); if(ex) ex.remove();
   var modal = document.createElement('div');
   modal.id = 'paymentModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9001;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
 
-  modal.innerHTML = '<div id="pmBox" style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(400px,92vw);position:relative">'
-    +'<button onclick="document.getElementById(\'paymentModal\').remove();clearInterval(window._payPoll)" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
+  var inner = document.createElement('div');
+  inner.id = 'pmBox';
+  inner.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(400px,92vw);position:relative';
+
+  inner.innerHTML =
+    '<button id="pmClose" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>'
     +'<div style="text-align:center;margin-bottom:20px">'
       +'<div style="font-size:28px;margin-bottom:6px">💳</div>'
       +'<h3 style="font-size:18px;font-weight:800;margin:0 0 4px">Bayar dengan GoPay</h3>'
-      +'<p style="font-size:13px;color:var(--text3);margin:0">Paket <b style="color:'+plan.color+'">'+plan.name+'</b> — <b>'+labels[planKey]+'</b></p>'
+      +'<p style="font-size:13px;color:var(--text3);margin:0">Paket <b style="color:'+t.color+'">'+t.label+'</b> <span style="color:var(--text4)">'+period.charAt(0).toUpperCase()+period.slice(1)+'</span> — <b>'+pd.label+pd.period+'</b></p>'
     +'</div>'
-
-    // Nomor & jumlah
     +'<div style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">'
       +'<div style="font-size:11px;color:var(--text3);margin-bottom:6px">Transfer GoPay ke</div>'
       +'<div style="font-size:22px;font-weight:900;letter-spacing:.05em">0822-2509-7900</div>'
       +'<div style="font-size:13px;color:var(--text3);margin-top:2px">Nominal: <b>Rp '+amount.toLocaleString('id-ID')+'</b></div>'
     +'</div>'
-
-    // Tombol buka GoPay
-    +'<a id="gopayBtn" href="'+gopayDeep+'" onclick="startWaitPayment(\''+planKey+'\')" style="display:block;background:#00ADE0;color:#fff;text-align:center;padding:14px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,173,224,.35)">'
-      +'<img src=\'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/100px-Gopay_logo.svg.png\' style=\'height:18px;vertical-align:middle;margin-right:8px;filter:brightness(0)invert(1)\' onerror=\'this.style.display="none"\'>'
+    +'<a id="gopayBtn" href="'+gopayDeep+'" style="display:block;background:#00ADE0;color:#fff;text-align:center;padding:14px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,173,224,.35)">'
+      +'<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/100px-Gopay_logo.svg.png" style="height:18px;vertical-align:middle;margin-right:8px;filter:brightness(0)invert(1)" onerror="this.style.display=\'none\'">'
       +'Buka GoPay & Transfer'
     +'</a>'
-
-    // Status menunggu (hidden dulu)
     +'<div id="waitingPayment" style="display:none;background:var(--bg3);border-radius:12px;padding:16px;text-align:center;margin-bottom:10px">'
       +'<div style="font-size:22px;margin-bottom:8px">⏳</div>'
       +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">Menunggu Pembayaran...</div>'
@@ -3080,23 +3202,32 @@ function showPaymentModal(planKey){
         +'<span style="width:8px;height:8px;border-radius:50%;background:#00ADE0;animation:dot1pulse 1.4s ease-in-out .2s infinite"></span>'
         +'<span style="width:8px;height:8px;border-radius:50%;background:#00ADE0;animation:dot1pulse 1.4s ease-in-out .4s infinite"></span>'
       +'</div>'
-      +'<button onclick="manualConfirm(\''+planKey+'\')" style="margin-top:14px;padding:9px 20px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit">Sudah transfer? Klik di sini</button>'
+      +'<button id="alreadyBtn" style="margin-top:14px;padding:9px 20px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit">Sudah transfer? Klik di sini</button>'
     +'</div>'
-
-    // PayPal disabled
     +'<div style="border:1.5px solid var(--border);border-radius:14px;padding:12px;opacity:.35;margin-top:8px">'
       +'<div style="display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:18px">🌐</span>'
         +'<div><div style="font-weight:700;font-size:13px">PayPal <span style="font-size:10px;background:var(--bg3);padding:1px 7px;border-radius:99px;color:var(--text4)">Segera hadir</span></div>'
         +'<div style="font-size:11px;color:var(--text4)">Untuk pengguna luar negeri</div></div>'
       +'</div>'
-    +'</div>'
-  +'</div>';
+    +'</div>';
+
+  modal.appendChild(inner);
   document.body.appendChild(modal);
+
+  // Wire events safely (no inline onclick)
+  document.getElementById('pmClose').onclick = function(){
+    modal.remove(); clearInterval(window._payPoll);
+  };
+  document.getElementById('gopayBtn').onclick = function(){
+    startWaitPayment(planKey, pd.days);
+  };
+  document.getElementById('alreadyBtn').onclick = function(){
+    manualConfirm(planKey, pd.days);
+  };
 }
 
-function startWaitPayment(planKey){
-  // Tampilkan status menunggu
+function startWaitPayment(planKey, days){
   setTimeout(function(){
     var w = document.getElementById('waitingPayment');
     var btn = document.getElementById('gopayBtn');
@@ -3104,69 +3235,74 @@ function startWaitPayment(planKey){
     if(btn){ btn.textContent='🔄 Buka GoPay lagi'; btn.style.fontSize='13px'; btn.style.padding='10px'; }
   }, 1000);
 
-  // Poll setiap 3 detik - cek apakah user kembali ke tab ini
   window._payPoll = null;
   var attempts = 0;
-  var planKey2 = planKey;
+  var _planKey = planKey;
+  var _days    = days;
 
-  // Deteksi user balik ke tab
   function onVisibilityChange(){
     if(document.visibilityState === 'visible' && attempts > 0){
-      // User kembali ke tab - tanya konfirmasi
       clearInterval(window._payPoll);
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      setTimeout(function(){ manualConfirm(planKey2); }, 800);
+      setTimeout(function(){ manualConfirm(_planKey, _days); }, 800);
     }
   }
   document.addEventListener('visibilitychange', onVisibilityChange);
-
-  window._payPoll = setInterval(function(){
-    attempts++;
-    if(attempts > 60){ // Timeout 3 menit
-      clearInterval(window._payPoll);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-    }
-  }, 3000);
+  attempts++;
 }
 
-function manualConfirm(planKey){
-  clearInterval(window._payPoll);
-  var el = document.getElementById('paymentModal'); if(el) el.remove();
-  var plan = PLANS[planKey]; if(!plan) return;
+function manualConfirm(planKey, days){
+  var parts = planKey.split('-');
+  var tier  = parts[0];
+  var t     = PRICING[tier]; if(!t) return;
 
+  var ex = document.getElementById('confirmModal'); if(ex) ex.remove();
   var modal = document.createElement('div');
   modal.id = 'confirmModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9002;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
-  modal.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(380px,90vw);text-align:center">'
-    +'<div style="font-size:36px;margin-bottom:10px">🧾</div>'
-    +'<h3 style="font-size:17px;font-weight:800;margin:0 0 10px">Transfer berhasil?</h3>'
-    +'<p style="font-size:13px;color:var(--text3);margin:0 0 18px;line-height:1.65">'
-      +'Pastikan transfer GoPay ke <b>0822-2509-7900</b> sudah sukses sebelum mengaktifkan paket.'
-    +'</p>'
-    +'<div style="background:#fff3cd;border-radius:10px;padding:10px 14px;font-size:12px;color:#856404;margin-bottom:18px;line-height:1.6">'
-      +'⚠️ Jangan aktifkan jika transfer belum selesai. Paket tidak bisa di-rollback.'
-    +'</div>'
-    +'<div style="display:flex;gap:10px">'
-      +'<button onclick="document.getElementById(\'confirmModal\').remove();showPaymentModal(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit">Belum transfer</button>'
-      +'<button onclick="confirmAndActivate(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#00ADE0,#818cf8);color:#fff;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit">✅ Aktifkan!</button>'
-    +'</div>'
-  +'</div>';
+
+  var inner = document.createElement('div');
+  inner.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(360px,90vw);text-align:center;animation:popIn .25s ease';
+  inner.innerHTML =
+    '<div style="font-size:36px;margin-bottom:12px">🤔</div>'
+    +'<h3 style="font-size:17px;font-weight:800;margin:0 0 8px">Sudah transfer?</h3>'
+    +'<p style="font-size:13px;color:var(--text3);margin:0 0 20px;line-height:1.6">Pastikan transfer GoPay ke <b>0822-2509-7900</b> sudah berhasil sebelum mengaktifkan paket.</p>'
+    +'<div style="display:flex;gap:8px">'
+      +'<button id="cmBelum" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit">Belum transfer</button>'
+      +'<button id="cmSudah" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#00ADE0,#818cf8);color:#fff;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit">✅ Aktifkan!</button>'
+    +'</div>';
+
+  modal.appendChild(inner);
   document.body.appendChild(modal);
+
+  document.getElementById('cmBelum').onclick = function(){
+    modal.remove(); showPaymentModal(planKey);
+  };
+  document.getElementById('cmSudah').onclick = function(){
+    confirmAndActivate(planKey, days);
+  };
 }
 
-function confirmAndActivate(planKey){
+function confirmAndActivate(planKey, days){
   var el = document.getElementById('confirmModal'); if(el) el.remove();
-  activatePlan(planKey, planKey !== 'permanent' ? 1 : null);
-  var plan = PLANS[planKey];
+  var parts = planKey.split('-');
+  var tier  = parts[0];
+  var t     = PRICING[tier]; if(!t) return;
+  var fullKey = tier+'_'+parts[1];
+
+  activatePlan(fullKey, days);
+
+  var plan = PLANS[fullKey] || {name:t.label, limit:t === PRICING.basic ? 55 : 150, color:t.color};
   var s = document.createElement('div');
   s.style.cssText = 'position:fixed;inset:0;z-index:9003;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
   s.innerHTML = '<div style="background:var(--bg);border:2px solid '+plan.color+';border-radius:20px;padding:36px;width:min(360px,90vw);text-align:center;animation:popIn .3s ease">'
     +'<div style="font-size:52px;margin-bottom:12px">✨</div>'
     +'<h3 style="font-size:20px;font-weight:800;margin:0 0 8px;color:'+plan.color+'">Paket '+plan.name+' Aktif!</h3>'
     +'<p style="font-size:13px;color:var(--text3);margin:0 0 20px;line-height:1.65">Selamat! Kamu sekarang bisa mengirim hingga <b>'+(plan.limit>=9999?'pesan tak terbatas':plan.limit+' pesan/hari')+'</b>.</p>'
-    +'<button onclick="this.parentElement.parentElement.remove()" style="background:'+plan.color+';color:#fff;border:none;padding:12px 32px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Mulai Chat! 🚀</button>'
+    +'<button id="startChatBtn" style="background:'+plan.color+';color:#fff;border:none;padding:12px 32px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Mulai Chat! 🚀</button>'
   +'</div>';
   document.body.appendChild(s);
+  document.getElementById('startChatBtn').onclick = function(){ s.remove(); };
 }
 
 
@@ -3176,40 +3312,19 @@ function confirmAndActivate(planKey){
 (function init(){
   // Device ratio & safe area detection
   (function detectDevice(){
-    // Set real viewport height (fixes mobile browser 100vh bug)
+    // Set real viewport height (fixes iOS 100vh bug)
     function setVh(){
-      // Use dvh if supported (best for modern Android/iOS)
-      var root=document.documentElement;
-      // visualViewport is most accurate when keyboard is open
-      var h=window.visualViewport?window.visualViewport.height:window.innerHeight;
-      var vh=h*0.01;
-      root.style.setProperty('--vh',vh+'px');
-      // Also set actual px for the root so layout never overflows
-      root.style.setProperty('--real-height',h+'px');
+      var vh=window.innerHeight*0.01;
+      document.documentElement.style.setProperty('--vh',vh+'px');
     }
     setVh();
     window.addEventListener('resize',setVh);
-    // visualViewport fires when keyboard opens/closes on mobile
-    if(window.visualViewport){
-      window.visualViewport.addEventListener('resize',function(){
-        setVh();
-        // Push input into view when keyboard opens
-        var inp=document.getElementById('inp');
-        if(inp&&document.activeElement===inp){
-          setTimeout(function(){inp.scrollIntoView({block:'nearest'});},50);
-        }
-      });
-    }
     // Detect mobile
     var isMobile=window.innerWidth<768||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     document.body.setAttribute('data-mobile',isMobile?'1':'0');
     // Detect iOS for safe area
     if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
       document.body.classList.add('ios-device');
-    }
-    // Detect Android
-    if(/Android/i.test(navigator.userAgent)){
-      document.body.classList.add('android-device');
     }
   })();
   renderLogos();
