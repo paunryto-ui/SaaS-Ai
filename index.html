@@ -1,13 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
 <title>SaaS AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
+html{height:100%;height:calc(var(--vh,1vh)*100)}
+body{height:100%;height:calc(var(--vh,1vh)*100);font-family:'Geist',sans-serif;overflow:hidden;transition:background .2s,color .2s}
+body.ios-device #msgsEl{padding-bottom:env(safe-area-inset-bottom)}
+@media(max-width:767px){
+  .split-chat{min-height:0}
+  body[data-mobile="1"] aside{max-width:80vw}
+}
 
 body.light{
   --bg:#ffffff;--bg2:#f7f7f7;--bg3:#f0f0f0;--border:#e5e5e5;--border2:#d0d0d0;
@@ -34,6 +41,19 @@ body.dark{
   --pill-bg:#252525;--pill-border:#3a3a3a;
 }
 
+body.aurora{
+  --bg:#0b0f1a;--bg2:#111827;--bg3:#1a2035;--border:#1e2d45;--border2:#243352;
+  --text:#e2e8f0;--text2:#b8c5d6;--text3:#637089;--text4:#3d4f6b;
+  --hover:#131c2e;--active:#172236;--bubble:#141e30;
+  --input-bg:#111827;--input-shadow:0 0 0 1px rgba(99,198,255,.08),0 2px 12px rgba(0,0,0,.3);
+  --send-off:#243352;--send-on:#e2e8f0;--scroll-thumb:#1e2d45;
+  --card-border:#1e2d45;--card-hover:#131c2e;--badge-bg:#111827;
+  --code-bg:#080d16;--code-head:#0f1622;--code-text:#a5f3c4;
+  --warn-bg:#1a0f2e;--warn-border:#5b21b6;--warn-text:#c084fc;
+  --accent:#22d3ee;--accent2:#a78bfa;--grad:linear-gradient(135deg,#22d3ee,#818cf8,#c084fc);
+  --pill-bg:#1a2035;--pill-border:#243352;
+}
+
 body{background:var(--bg);color:var(--text)}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border-radius:99px}
@@ -48,7 +68,7 @@ textarea::-webkit-scrollbar{display:none}
 .fade-up{animation:fadeUp .3s ease both}
 #sidebar{transition:transform .3s cubic-bezier(.16,1,.3,1)}
 
-.sidebar-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s;font-family:'Geist',sans-serif}
+.sidebar-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s;font-family:inherit}
 .sidebar-btn:hover{background:var(--hover)}
 .hist-item{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:10px;cursor:pointer;transition:background .15s;animation:slideIn .2s ease both}
 .hist-item:hover{background:var(--hover)}
@@ -81,6 +101,27 @@ textarea::-webkit-scrollbar{display:none}
 .md-content td{padding:8px 12px;border:1px solid var(--border)}
 .md-content tr:nth-child(even) td{background:var(--bg2)}
 
+.file-attach{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:12px;background:var(--bg2);border:1px solid var(--border);margin:6px 0;position:relative}
+.file-attach-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.file-attach-info{flex:1;min-width:0}
+.file-attach-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-attach-meta{font-size:11px;color:var(--text4);margin-top:2px}
+.file-attach-remove{position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:var(--text4);font-size:14px;padding:2px 5px;border-radius:4px;line-height:1}
+.file-attach-remove:hover{color:#ef4444;background:rgba(239,68,68,.1)}
+.file-previews{padding:0 14px 4px}
+
+/* File content block in chat */
+.file-content-block{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:10px 0}
+.file-content-head{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--bg3);border-bottom:1px solid var(--border);cursor:pointer}
+.file-content-head:hover{background:var(--hover)}
+.file-content-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.file-content-meta{font-size:11px;color:var(--text4)}
+.file-content-body{max-height:220px;overflow-y:auto;background:var(--code-bg)}
+.file-content-body pre{padding:12px 14px;font-family:'Geist Mono',monospace;font-size:12px;color:var(--code-text);white-space:pre-wrap;word-break:break-all;margin:0}
+
+/* Clipboard toast */
+.clip-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;color:var(--text);pointer-events:none;opacity:0;transition:all .2s;z-index:9999;white-space:nowrap}
+.clip-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .cb{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--code-bg);margin:12px 0}
 .cb-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--code-head)}
 .cb-lang{font-family:'Geist Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600;letter-spacing:.05em}
@@ -88,11 +129,39 @@ textarea::-webkit-scrollbar{display:none}
 .cb code{font-family:'Geist Mono',monospace;font-size:13px;color:var(--code-text);line-height:1.7;white-space:pre}
 .cp-btn{font-family:'Geist Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg);color:var(--text3);cursor:pointer;transition:all .14s;font-weight:600}
 .cp-btn:hover{background:var(--hover)}
+.run-btn{font-family:'Geist Mono',monospace;font-size:10px;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg);color:#22c55e;cursor:pointer;transition:all .14s;font-weight:600;display:flex;align-items:center;gap:4px}
+.run-btn:hover{background:var(--hover);border-color:#22c55e}
+.run-btn.running{opacity:.6;cursor:not-allowed}
+
+/* Agent mode */
+.agent-pill{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff !important;border-color:transparent !important}
+.agent-pill svg{color:#fff}
+.agent-pill span{color:#fff !important}
+
+/* Tool call block */
+.tool-call{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:10px 0;background:var(--bg2)}
+.tool-call-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--border);font-family:'Geist Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;user-select:none}
+.tool-call-head:hover{background:var(--hover)}
+.tool-call-name{font-weight:600;color:var(--accent)}
+.tool-call-status{margin-left:auto;font-size:11px;opacity:.7}
+.tool-call-body{padding:10px 12px;font-family:'Geist Mono',monospace;font-size:12px;color:var(--text2);line-height:1.6;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.tool-call-body.hidden{display:none}
+
+/* Code output terminal */
+.code-output{border-top:1px solid var(--border);background:#0a0a0a;padding:10px 14px;font-family:'Geist Mono',monospace;font-size:12px;color:#e0e0e0;line-height:1.6;max-height:180px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.code-output .out-label{color:#22c55e;font-weight:700;margin-bottom:4px;display:block}
+.code-output .out-error{color:#f87171}
+.code-output .out-line{color:#d4d4d4}
+
+/* Agentic thinking */
+.agent-thinking{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);margin:8px 0;font-size:13px;color:var(--text3)}
+.agent-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:throb 1.2s infinite}
+.agent-step{font-size:11px;color:var(--text4);font-family:'Geist Mono',monospace;margin-left:auto}
 .ic{font-family:'Geist Mono',monospace;font-size:12.5px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:var(--accent)}
 
 /* Input */
 #inputWrap{border-radius:18px;border:1px solid var(--border);background:var(--input-bg);box-shadow:var(--input-shadow)}
-#inp{font-size:15px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:'Geist',sans-serif}
+#inp{font-size:15px;background:transparent;color:var(--text);outline:none;resize:none;width:100%;max-height:200px;overflow-y:auto;caret-color:var(--accent);line-height:1.6;padding:0;font-family:inherit}
 #inp::placeholder{color:var(--text4)}
 
 /* Send button */
@@ -101,14 +170,14 @@ textarea::-webkit-scrollbar{display:none}
 #sendBtn.active:hover{opacity:.85;transform:scale(1.05)}
 
 /* Pills */
-.pill-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;border:1px solid var(--pill-border);background:var(--pill-bg);cursor:pointer;font-size:12.5px;font-family:'Geist',sans-serif;color:var(--text3);transition:all .18s;white-space:nowrap;flex-shrink:0}
+.pill-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;border:1px solid var(--pill-border);background:var(--pill-bg);cursor:pointer;font-size:12.5px;font-family:inherit;color:var(--text3);transition:all .18s;white-space:nowrap;flex-shrink:0}
 .pill-btn:hover{border-color:var(--border2);background:var(--hover)}
 .pill-btn.active{background:rgba(234,88,12,.1);border-color:var(--accent);color:var(--accent)}
 body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 
 /* Tools menu */
 .tools-popup{position:absolute;bottom:74px;left:0;z-index:200;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px;width:270px;box-shadow:0 8px 32px rgba(0,0,0,.14);animation:popIn .15s ease;display:none}
-.tool-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;border-radius:12px;border:none;background:none;cursor:pointer;text-align:left;transition:background .12s;font-family:'Geist',sans-serif}
+.tool-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;border-radius:12px;border:none;background:none;cursor:pointer;text-align:left;transition:background .12s;font-family:inherit}
 .tool-row:hover{background:var(--hover)}
 .tool-ico{width:34px;height:34px;border-radius:9px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tool-title{font-size:13.5px;font-weight:500;color:var(--text)}
@@ -126,7 +195,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .dot:nth-child(2){animation-delay:.2s}
 .dot:nth-child(3){animation-delay:.4s}
 
-.topbar-btn{border:none;background:none;cursor:pointer;padding:7px;border-radius:10px;color:var(--text3);line-height:0;transition:all .15s;font-family:'Geist',sans-serif}
+.topbar-btn{border:none;background:none;cursor:pointer;padding:7px;border-radius:10px;color:var(--text3);line-height:0;transition:all .15s;font-family:inherit}
 .topbar-btn:hover{background:var(--hover);color:var(--text)}
 
 /* Settings */
@@ -135,7 +204,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .settings-section{margin-bottom:28px}
 .settings-section h3{font-size:11px;font-weight:700;color:var(--text4);margin-bottom:14px;text-transform:uppercase;letter-spacing:.1em}
 .option-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
-.option-btn{border:1.5px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;background:var(--bg);text-align:center;transition:all .15s;font-family:'Geist',sans-serif;color:var(--text)}
+.option-btn{border:1.5px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;background:var(--bg);text-align:center;transition:all .15s;font-family:inherit;color:var(--text)}
 .option-btn:hover{border-color:var(--accent);background:var(--hover)}
 .option-btn.active{border-color:var(--accent);background:var(--hover);color:var(--accent)}
 .option-btn .opt-label{font-size:11.5px;color:var(--text3);margin-top:4px}
@@ -155,14 +224,14 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .img-edit-wrap{position:relative;display:inline-block;margin:8px 0;max-width:420px;width:100%}
 .img-edit-wrap img{width:100%;border-radius:14px;display:block;border:1px solid var(--border)}
 .img-edit-tag{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600;backdrop-filter:blur(4px)}
-.img-dl-btn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text3);font-size:12px;cursor:pointer;font-family:'Geist',sans-serif;transition:all .15s;font-weight:600}
+.img-dl-btn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;font-weight:600}
 .img-dl-btn:hover{background:var(--hover);color:var(--text)}
 
 /* Translate modal */
 .trans-modal{position:fixed;inset:0;z-index:400;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 .trans-box{background:var(--bg);border-radius:24px 24px 0 0;padding:20px 16px 32px;width:100%;max-width:500px;animation:slideUp .2s ease}
 .trans-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
-.trans-lang-btn{padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif;font-weight:500;text-align:left;transition:background .12s}
+.trans-lang-btn{padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13.5px;cursor:pointer;font-family:inherit;font-weight:500;text-align:left;transition:background .12s}
 .trans-lang-btn:hover{background:var(--hover);border-color:var(--accent)}
 
 /* Logo gradient text */
@@ -175,7 +244,7 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .info-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--bg3);font-size:12px;color:var(--text3);font-weight:500}
 
 /* Style popup */
-.style-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border-radius:8px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text);transition:background .12s;font-family:'Geist',sans-serif}
+.style-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border-radius:8px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text);transition:background .12s;font-family:inherit}
 .style-item:hover{background:var(--hover)}
 .style-item.active{color:var(--accent);font-weight:600}
 .popup{position:absolute;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:6px;min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:popIn .15s ease;z-index:200}
@@ -297,6 +366,54 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 }
 
 @keyframes dot1pulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
+
+/* ═══ WORKSPACE MODE ═══ */
+.ws-panel{border-top:1px solid var(--border);flex-shrink:0}
+.ws-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none}
+.ws-header:hover{background:var(--hover)}
+.ws-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;flex:1}
+.ws-open-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg);color:var(--text3);cursor:pointer;font-family:'Geist',sans-serif;transition:all .14s;white-space:nowrap}
+.ws-open-btn:hover{background:var(--accent);color:#fff;border-color:transparent}
+.ws-tree{max-height:220px;overflow-y:auto;padding:0 6px 8px}
+.ws-path{font-size:10px;color:var(--accent);padding:4px 12px 2px;font-family:'Geist Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--text2);transition:background .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-item:hover{background:var(--hover);color:var(--text)}
+.ws-item.ws-dir{font-weight:600;color:var(--text)}
+.ws-item.ws-active{background:var(--active);color:var(--accent)}
+.ws-indent{padding-left:calc(8px + var(--depth,0)*14px)}
+.ws-empty{font-size:12px;color:var(--text4);padding:8px 12px;text-align:center}
+.ws-loading{font-size:12px;color:var(--text4);padding:8px 12px;display:flex;align-items:center;gap:6px}
+
+/* ═══ CODE MODE ═══ */
+.code-mode-pill{background:linear-gradient(135deg,#0f172a,#1e3a5f)!important;border-color:#0ea5e9!important;color:#38bdf8!important}
+.code-mode-pill span{color:#38bdf8!important}
+.code-mode-pill svg{color:#38bdf8}
+.code-mode-active .topbar-accent{background:linear-gradient(90deg,#0ea5e9,#6366f1,#8b5cf6)!important}
+
+/* Code split view */
+.split-view{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
+.split-chat{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;min-height:0}
+.split-preview{width:420px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .3s cubic-bezier(.16,1,.3,1);overflow:hidden}
+.split-preview.hidden{width:0 !important;border:none;overflow:hidden}
+@media(max-width:768px){.split-preview:not(.hidden){position:fixed;right:0;top:0;bottom:0;width:100% !important;z-index:500;background:var(--bg)}}
+.preview-topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.preview-title{font-size:12px;font-weight:600;color:var(--text3);flex:1;font-family:'Geist Mono',monospace}
+.preview-frame{flex:1;border:none;background:#fff;width:100%}
+.preview-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg);color:var(--text3);cursor:pointer;font-family:'Geist',sans-serif;transition:all .14s}
+.preview-btn:hover{background:var(--hover)}
+.preview-btn.active{background:#0ea5e9;color:#fff;border-color:transparent}
+
+/* Coding suggestions chips */
+.code-chips{display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 0}
+.code-chip{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);cursor:pointer;transition:all .14s;white-space:nowrap}
+.code-chip:hover{background:var(--bg3);color:var(--text);border-color:var(--accent)}
+
+/* Task mode badge */
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fff;font-size:9px;font-weight:800;border-radius:99px;padding:1px 5px;letter-spacing:.03em;pointer-events:none}
+
+.mode-chip{display:inline-block;margin-right:6px;margin-bottom:4px;font-size:11.5px;padding:4px 11px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);cursor:pointer;font-family:'Geist',sans-serif;white-space:nowrap;transition:border-color .14s,color .14s}
+.mode-chip:hover{border-color:var(--accent);color:var(--accent)}
+.mode-chip.agent-chip{background:#0f0a1e;border-color:#4c1d95;color:#a78bfa}
 </style>
 </head>
 <body class="light">
@@ -363,6 +480,12 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
         <button class="option-btn" id="themeAuto" onclick="setTheme('auto')">
           <div style="width:48px;height:32px;background:linear-gradient(90deg,#fff 50%,#141414 50%);border-radius:8px;border:1px solid #888;margin:0 auto"></div>
           <div class="opt-label" id="st_auto"></div>
+        </button>
+        <button class="option-btn" id="themeAurora" onclick="setTheme('aurora')">
+          <div style="width:48px;height:32px;background:linear-gradient(135deg,#0b0f1a,#22d3ee 200%);border-radius:8px;border:1px solid #243352;margin:0 auto;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(129,140,248,.4),rgba(192,132,252,.3))"></div>
+          </div>
+          <div class="opt-label" style="font-size:10px">Aurora</div>
         </button>
       </div>
       <div id="st_font" style="font-size:13px;color:var(--text3);margin-bottom:10px"></div>
@@ -471,6 +594,20 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
       <div id="histList"></div>
       <p id="histEmpty" style="font-size:13px;color:var(--text4);padding:10px 6px"></p>
     </div>
+    <!-- WORKSPACE PANEL -->
+    <div class="ws-panel" id="wsPanel">
+      <div class="ws-header" onclick="toggleWsPanel()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span class="ws-title">Workspace</span>
+        <button class="ws-open-btn" onclick="event.stopPropagation();openWorkspace()">Buka Folder</button>
+      </div>
+      <div id="wsTree" style="display:none">
+        <div id="wsPath" class="ws-path" style="display:none"></div>
+        <div id="wsContent" class="ws-tree">
+          <div class="ws-empty">Belum ada folder dibuka</div>
+        </div>
+      </div>
+    </div>
     <div style="border-top:1px solid var(--border);padding:10px">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--bg3)">
         <div id="sidebarAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">?</div>
@@ -555,6 +692,9 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
       <div id="suggests" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:560px;width:100%"></div>
     </div>
 
+    <!-- SPLIT VIEW WRAPPER -->
+    <div id="splitView" style="display:flex;flex:1;overflow:hidden;min-height:0">
+    <div id="splitChat" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
     <!-- MESSAGES -->
     <div id="msgsEl" style="flex:1;overflow-y:auto;display:none;background:var(--bg)"></div>
 
@@ -574,6 +714,13 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
             <div><div class="tool-title" id="tl_upload"></div><div class="tool-sub" id="tl_upload_sub"></div></div>
+          </button>
+          <!-- Upload any file -->
+          <button class="tool-row" onclick="document.getElementById('fileAny').click();closeTools()">
+            <div class="tool-ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <div><div class="tool-title">Baca File</div><div class="tool-sub">Semua jenis file didukung</div></div>
           </button>
           <!-- Edit photo -->
           <button class="tool-row" onclick="triggerImgEdit()">
@@ -611,6 +758,13 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
             </div>
             <div><div class="tool-title" id="tl_translate"></div><div class="tool-sub" id="tl_translate_sub"></div></div>
           </button>
+          <!-- Clipboard paste -->
+          <button class="tool-row" onclick="clipboardRead();closeTools()">
+            <div class="tool-ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            </div>
+            <div><div class="tool-title">Paste Clipboard</div><div class="tool-sub">Ambil teks dari clipboard</div></div>
+          </button>
           <div style="height:1px;background:var(--border);margin:5px 4px"></div>
           <!-- Style pills in menu -->
           <div style="padding:4px 8px 2px">
@@ -624,11 +778,12 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
         </div>
 
         <!-- INPUT BOX -->
+        <div id="filePreviews" class="file-previews" style="display:none"></div>
         <div id="imgPreviews"></div>
         <div id="inputWrap" style="padding:12px 14px 8px">
           <textarea id="inp" rows="1" oninput="onInpChange()" onkeydown="onInpKey(event)"></textarea>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
-            <div style="display:flex;align-items:center;gap:6px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;flex:1;min-width:0;padding-bottom:1px">
               <!-- + button -->
               <button id="toolsBtn" onclick="toggleTools()" class="topbar-btn" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;padding:0;transition:all .2s;flex-shrink:0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -636,6 +791,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
               <span id="webSearchCheck" style="display:none"></span>
               <input id="fileIn" type="file" accept="image/*" multiple style="display:none" onchange="onFile(event)"/>
               <input id="fileInEdit" type="file" accept="image/*" style="display:none" onchange="onFileEdit(event)"/>
+              <input id="fileAny" type="file" accept="*/*" multiple style="display:none" onchange="onFileAny(event)"/>
               <!-- Pills -->
               <button id="webPill" class="pill-btn" onclick="toggleWebSearch()">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -644,6 +800,14 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
               <button id="deepPill" class="pill-btn" onclick="toggleDeep()" data-active="0">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span id="deepPillLabel">Mendalam</span>
+              </button>
+              <button id="agentPill" class="pill-btn" onclick="toggleAgent()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span id="agentPillLabel">Agent</span>
+              </button>
+              <button id="codePill" class="pill-btn" onclick="toggleCodeMode()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span id="codePillLabel">Code</span>
               </button>
             </div>
             <!-- Right: mic + send -->
@@ -666,8 +830,21 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
           </div>
         </div>
         <p id="disclaimer_lbl" style="font-size:11px;color:var(--text4);text-align:center;margin-top:8px"></p>
+        <div id="modeChips" style="display:none;margin-top:6px;overflow-x:auto;white-space:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch"></div>
       </div>
     </div>
+    </div><!-- /split-chat -->
+    <!-- SPLIT PREVIEW PANEL -->
+    <div class="split-preview hidden" id="splitPreview">
+      <div class="preview-topbar">
+        <span class="preview-title">⚡ Live Preview</span>
+        <button class="preview-btn" onclick="runPreview()">▶ Run</button>
+        <button class="preview-btn" onclick="closeSplitPreview()" style="color:#ef4444">✕</button>
+      </div>
+      <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
+    </div>
+        </div>
+    </div><!-- /splitView -->
   </div>
 </div>
 
@@ -675,7 +852,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K=atob('c2stb3ItdjEtMDA2OGE2NTI2YTUzODkyMDc4ZjcxYjliZTgzMmU0ZWE1ZTUyYzY3MmEyMTcyZWZhMTVlN2FlM2E5MDc0MWQ4OQ==');
+var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='google/gemini-2.0-flash-001';
 var MODEL_VISION='google/gemini-2.0-flash-001';
@@ -714,8 +891,8 @@ function getRandomSuggests(){
 var SUGGESTS_DATA=getRandomSuggests();
 
 // State
-var sessions=[],curId=null,images=[],totalTok=0,loading=false,msgCount=0;
-var isDark=false,currentLang='id',currentStyle='normal',webSearchOn=false,deepOn=false;
+var sessions=[],curId=null,images=[],totalTok=0,loading=false,msgCount=0,_cbCounter=0,attachedFiles=[];
+var isDark=false,currentLang='id',currentStyle='normal',webSearchOn=false,deepOn=false,agentMode=false;
 var pendingImgEdit=null,cdInterval=null;
 var settings={notif:false};
 
@@ -883,19 +1060,23 @@ function sendTool(toolKey, autoSend){
 // THEME
 // ═══════════════════════════════════════════
 function toggleTheme(){isDark=!isDark;applyTheme(isDark?'dark':'light');savePrefs();}
+var currentTheme='dark';
 function setTheme(t){
-  if(t==='auto') isDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-  else isDark=(t==='dark');
-  applyTheme(isDark?'dark':'light');savePrefs();
-  ['themeLight','themeDark','themeAuto'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('active');});
+  currentTheme=t;
+  if(t==='auto'){isDark=window.matchMedia('(prefers-color-scheme: dark)').matches;applyTheme(isDark?'dark':'light');}
+  else if(t==='aurora'){isDark=true;applyTheme('aurora');}
+  else{isDark=(t==='dark');applyTheme(isDark?'dark':'light');}
+  savePrefs();
+  ['themeLight','themeDark','themeAuto','themeAurora'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('active');});
   var k='theme'+t.charAt(0).toUpperCase()+t.slice(1);
   var el=document.getElementById(k);if(el)el.classList.add('active');
 }
 function applyTheme(cls){
   document.body.className=cls;
   var ico=document.getElementById('themeIco');
-  if(isDark) ico.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  else ico.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  if(cls==='light') ico.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  else if(cls==='aurora') ico.innerHTML='<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>';
+  else ico.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   renderLogos();updateSendBtn();
 }
 
@@ -985,6 +1166,606 @@ function toggleDeep(){
 }
 
 // ═══════════════════════════════════════════
+// AGENT MODE ENGINE
+// ═══════════════════════════════════════════
+var AGENT_TOOLS=[
+  {type:'function',function:{name:'execute_javascript',description:'Execute JavaScript code in a sandboxed browser environment. Use for calculations, data processing, or running any logic.',parameters:{type:'object',properties:{code:{type:'string',description:'The JavaScript code to execute'},description:{type:'string',description:'Brief description of what this code does'}},required:['code','description']}}},
+  {type:'function',function:{name:'web_search',description:'Search the web for current, real-time information. Use when you need up-to-date data, news, or documentation.',parameters:{type:'object',properties:{query:{type:'string',description:'The search query'},reason:{type:'string',description:'Why you need this information'}},required:['query','reason']}}},
+  {type:'function',function:{name:'think',description:'Use this to reason step-by-step before taking action. Plan your approach, verify your logic, or break down complex problems.',parameters:{type:'object',properties:{thought:{type:'string',description:'Your step-by-step reasoning or plan'}},required:['thought']}}}
+];
+
+function toggleAgent(){
+  agentMode=!agentMode;
+  var pill=document.getElementById('agentPill');
+  if(pill){
+    pill.classList.toggle('active',agentMode);
+    pill.classList.toggle('agent-pill',agentMode);
+  }
+  var lbl=document.getElementById('agentPillLabel');
+  if(lbl)lbl.textContent=agentMode?'Agent ON':'Agent';
+  renderModeChips();
+}
+// ═══════════════════════════════════════════
+// WORKSPACE MODE (File System Access API)
+// ═══════════════════════════════════════════
+var wsHandle=null,wsFiles={},wsActiveFile=null,wsPanelOpen=true;
+
+function toggleWsPanel(){
+  wsPanelOpen=!wsPanelOpen;
+  var tree=document.getElementById('wsTree');
+  if(tree)tree.style.display=wsPanelOpen?'block':'none';
+}
+
+async function openWorkspace(){
+  if(!window.showDirectoryPicker){
+    showClipToast('❌ Browser kamu tidak support File System Access API (pakai Chrome/Edge)');
+    return;
+  }
+  try{
+    wsHandle=await window.showDirectoryPicker({mode:'read'});
+    showClipToast('📂 Membaca folder: '+wsHandle.name+'...');
+    wsFiles={};
+    await scanDirectory(wsHandle,'',0);
+    renderWsTree();
+    var pathEl=document.getElementById('wsPath');
+    if(pathEl){pathEl.textContent='📂 /'+wsHandle.name;pathEl.style.display='block';}
+    var treeEl=document.getElementById('wsTree');
+    if(treeEl)treeEl.style.display='block';
+    wsPanelOpen=true;
+    addWsUpdateBtn();
+    showClipToast('✅ Folder '+wsHandle.name+' berhasil dibuka ('+Object.keys(wsFiles).length+' file)');
+  }catch(e){
+    if(e.name!=='AbortError')showClipToast('❌ Gagal buka folder: '+e.message);
+  }
+}
+
+async function scanDirectory(dirHandle,path,depth){
+  if(depth>5)return; // max depth
+  try{
+    for await(var entry of dirHandle.values()){
+      var fullPath=path?path+'/'+entry.name:entry.name;
+      // Skip hidden files and node_modules etc
+      if(entry.name.startsWith('.')&&entry.name!=='.env')continue;
+      if(['node_modules','dist','build','.git','__pycache__','.next','vendor'].includes(entry.name))continue;
+      if(entry.kind==='directory'){
+        wsFiles[fullPath]={type:'dir',name:entry.name,path:fullPath,handle:entry,depth:depth};
+        await scanDirectory(entry,fullPath,depth+1);
+      } else {
+        wsFiles[fullPath]={type:'file',name:entry.name,path:fullPath,handle:entry,depth:depth};
+      }
+    }
+  }catch(e){}
+}
+
+function renderWsTree(){
+  var el=document.getElementById('wsContent');
+  if(!el)return;
+  var entries=Object.values(wsFiles).sort(function(a,b){
+    if(a.depth!==b.depth)return a.depth-b.depth;
+    if(a.type!==b.type)return a.type==='dir'?-1:1;
+    return a.name.localeCompare(b.name);
+  });
+  if(entries.length===0){el.innerHTML='<div class="ws-empty">Folder kosong</div>';return;}
+  var icons={js:'📜',ts:'📘',html:'🌐',css:'🎨',json:'📋',md:'📝',py:'🐍',txt:'📄',zip:'🗜️',png:'🖼️',jpg:'🖼️',svg:'🎭',env:'🔑',sh:'⚙️',yaml:'⚙️',yml:'⚙️',lock:'🔒'};
+  var rows=entries.slice(0,200).map(function(e){
+    if(e.type==='dir'){
+      return '<div class="ws-item ws-dir ws-indent" style="--depth:'+e.depth+'" data-ws-path="'+escHtml(e.path)+'" data-ws-type="dir">'
+        +'<span>📁</span><span>'+escHtml(e.name)+'</span>'
+        +'</div>';
+    }
+    var ext=(e.name.split('.').pop()||'').toLowerCase();
+    var icon=icons[ext]||'📄';
+    return '<div class="ws-item ws-indent'+(wsActiveFile===e.path?' ws-active':'')+'" style="--depth:'+e.depth+'" data-ws-path="'+escHtml(e.path)+'" data-ws-type="file" title="'+escHtml(e.path)+'">'
+      +'<span>'+icon+'</span><span>'+escHtml(e.name)+'</span>'
+      +'</div>';
+  }).join('');
+  el.innerHTML=rows;
+  // Attach click handlers safely
+  el.querySelectorAll('[data-ws-path]').forEach(function(item){
+    item.addEventListener('click',function(){
+      var p=this.getAttribute('data-ws-path');
+      var t=this.getAttribute('data-ws-type');
+      if(t==='dir')toggleWsDir(this,p);
+      else readWsFile(p);
+    });
+    item.addEventListener('contextmenu',function(e){
+      var p=this.getAttribute('data-ws-path');
+      var t=this.getAttribute('data-ws-type');
+      if(t==='file')showWsCtxMenu(e,p);
+    });
+  });
+  if(entries.length>200){
+    el.innerHTML+='<div class="ws-empty">+' +(entries.length-200)+' file lainnya…</div>';
+  }
+  // Initially collapse all subdirectories - only show depth 0 items
+  el.querySelectorAll('[data-ws-path]').forEach(function(item){
+    var p=item.getAttribute('data-ws-path');
+    var entry=wsFiles[p];
+    if(entry&&entry.depth>0)item.style.display='none';
+  });
+}
+
+function toggleWsDir(el,path){
+  var isOpen=el.getAttribute('data-open')==='1';
+  if(isOpen){
+    // Collapse: hide all children
+    el.setAttribute('data-open','0');
+    el.querySelector('span:first-child').textContent='📁';
+    var siblings=el.parentElement.querySelectorAll('[data-ws-path]');
+    siblings.forEach(function(s){
+      var sp=s.getAttribute('data-ws-path');
+      if(sp!==path&&sp.startsWith(path+'/')){
+        s.style.display='none';
+      }
+    });
+  } else {
+    // Expand: show direct children
+    el.setAttribute('data-open','1');
+    el.querySelector('span:first-child').textContent='📂';
+    var depth=wsFiles[path]?wsFiles[path].depth:0;
+    var siblings2=el.parentElement.querySelectorAll('[data-ws-path]');
+    siblings2.forEach(function(s){
+      var sp=s.getAttribute('data-ws-path');
+      if(sp!==path&&sp.startsWith(path+'/')){
+        var entry=wsFiles[sp];
+        if(entry&&entry.depth===depth+1){s.style.display='';}
+      }
+    });
+  }
+}
+
+async function readWsFile(path){
+  var entry=wsFiles[path];
+  if(!entry||entry.type==='dir')return;
+  wsActiveFile=path;
+  renderWsTree();
+  try{
+    var file=await entry.handle.getFile();
+    var textExts=['txt','json','csv','md','js','ts','jsx','tsx','html','htm','css','scss','sass','less','py','sh','bash','yaml','yml','env','log','xml','sql','php','rb','go','rs','java','c','cpp','h','swift','kt','dart','vue','svelte','toml','ini','cfg','conf','gitignore','dockerfile','r','lua','pl','ps1','bat','graphql','proto','asm'];
+    var imgExts=['png','jpg','jpeg','gif','webp','svg','bmp','ico'];
+    var ext=(entry.name.split('.').pop()||'').toLowerCase();
+    var content;
+    if(textExts.includes(ext)){
+      content=await file.text();
+    } else if(imgExts.includes(ext)){
+      var url=URL.createObjectURL(file);
+      // Add as image directly
+      images.push({url:url,name:entry.name});
+      renderThumbs();updateSendBtn();
+      if(window.innerWidth<768)closeSidebar();
+      showClipToast('🖼️ '+entry.name+' siap dikirim');
+      return;
+    } else if(ext==='pdf'){
+      var pdfBuf=await file.arrayBuffer();
+      var bytes=new Uint8Array(pdfBuf);
+      var pdfText='';
+      var pdfStr='';
+      for(var i=0;i<bytes.length;i++){
+        var b=bytes[i];
+        if(b>=32&&b<127)pdfStr+=String.fromCharCode(b);
+        else if(pdfStr.length>3){pdfText+=pdfStr+' ';pdfStr='';}
+        else pdfStr='';
+      }
+      pdfText=pdfText.replace(/\s+/g,' ').replace(/\b(obj|endobj|stream|endstream|xref|trailer|startxref|\/[A-Za-z]+)\b/g,' ').replace(/\s+/g,' ').trim();
+      content='📕 PDF: '+entry.name+'\n\n'+pdfText.slice(0,3000)+(pdfText.length>3000?'\n[terpotong]':'');
+    } else if(ext==='docx'||ext==='doc'){
+      var buf=await file.arrayBuffer();
+      if(typeof mammoth!=='undefined'){
+        var result=await mammoth.extractRawText({arrayBuffer:buf});
+        content='📄 DOCX: '+entry.name+'\n\n'+(result.value||'').slice(0,4000);
+      } else {
+        content='[DOCX: '+entry.name+' — '+fmtSize(file.size)+']';
+      }
+    } else if(ext==='xlsx'||ext==='xls'){
+      var xlBuf=await file.arrayBuffer();
+      if(typeof XLSX!=='undefined'){
+        var wb=XLSX.read(xlBuf,{type:'array'});
+        content='📊 XLSX: '+entry.name+'\nSheet: '+wb.SheetNames.join(', ')+'\n\n';
+        wb.SheetNames.slice(0,3).forEach(function(sn){
+          var ws=wb.Sheets[sn];
+          var csv=XLSX.utils.sheet_to_csv(ws);
+          content+='=== Sheet: '+sn+' ===\n'+csv.slice(0,2000)+'\n\n';
+        });
+      } else {
+        content='[XLSX: '+entry.name+' — '+fmtSize(file.size)+']';
+      }
+    } else {
+      // Unknown: try as text
+      try{
+        var rawText=await file.text();
+        var weird=(rawText.match(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g)||[]).length;
+        if(weird/rawText.length<0.05&&rawText.length>0){
+          content=rawText;
+        } else {
+          content='[File biner: '+path+'] ('+fmtSize(file.size)+')';
+        }
+      }catch(e){
+        content='[File: '+path+'] ('+fmtSize(file.size)+')';
+      }
+    }
+    var truncated=content.slice(0,12000)+(content.length>12000?'\n[...file terpotong, '+Math.round(content.length/1024)+'KB total]':'');
+    addAttachedFile(path,file.size,'=== FILE: '+path+' ===\n'+truncated,ext);
+    if(window.innerWidth<768)closeSidebar();
+    showClipToast('📄 '+entry.name+' siap — ketik pesan atau langsung kirim');
+    var inp=document.getElementById('inp');
+    if(!inp.value.trim()){
+      inp.value='Analisis file ini: '+entry.name;
+      inp.style.height='auto';
+      updateSendBtn();inp.focus();inp.select();
+    }
+  }catch(e){
+    showClipToast('❌ Gagal baca '+entry.name+': '+e.message);
+  }
+}
+
+// Right-click on workspace file → context menu (Update/Baca)
+var _wsCtxMenu=null;
+function showWsCtxMenu(e,path){
+  e.preventDefault();e.stopPropagation();
+  if(_wsCtxMenu)_wsCtxMenu.remove();
+  var entry=wsFiles[path];
+  if(!entry||entry.type==='dir')return;
+  var menu=document.createElement('div');
+  menu.style.cssText='position:fixed;z-index:999;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.18);min-width:160px;animation:popIn .12s ease;';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-180)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-100)+'px';
+  var mkRow=function(icon,label,fn){
+    var r=document.createElement('button');
+    r.style.cssText='display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text);font-family:inherit;transition:background .12s;text-align:left;';
+    r.onmouseover=function(){this.style.background='var(--hover)';};
+    r.onmouseout=function(){this.style.background='none';};
+    r.innerHTML=icon+' '+label;
+    r.onclick=function(){menu.remove();fn();};
+    return r;
+  };
+  menu.appendChild(mkRow('📖','Baca & Analisis',function(){readWsFile(path);}));
+  menu.appendChild(mkRow('📤','Update/Ganti File',function(){updateWsFilePicker(path);}));
+  document.body.appendChild(menu);
+  _wsCtxMenu=menu;
+  setTimeout(function(){document.addEventListener('click',function h(){menu.remove();document.removeEventListener('click',h);});},10);
+}
+
+function updateWsFilePicker(wsPath){
+  var inp=document.createElement('input');
+  inp.type='file';inp.accept='*/*';inp.style.display='none';
+  inp.onchange=async function(){
+    var file=inp.files[0];if(!file)return;
+    inp.remove();
+    var entry=wsFiles[wsPath];
+    if(!entry){showClipToast('❌ File tidak ditemukan di workspace');return;}
+    try{
+      var writable=await entry.handle.createWritable();
+      await writable.write(file);
+      await writable.close();
+      showClipToast('✅ '+entry.name+' berhasil diupdate!');
+    }catch(err){
+      if(err.name==='NotAllowedError'){showClipToast('❌ Izinkan akses tulis ke folder!');}
+      else showClipToast('❌ Gagal update: '+err.message);
+    }
+  };
+  document.body.appendChild(inp);
+  inp.click();
+}
+
+// ═══════════════════════════════════════════
+// CODE MODE + SPLIT PREVIEW
+// ═══════════════════════════════════════════
+var codeMode=false,splitOpen=false,lastCodeContent='';
+
+var CODE_SYSTEM_PROMPT=`You are an elite software engineer and coding assistant. You are extremely precise, knowledgeable, and produce production-grade code.
+
+CAPABILITIES:
+- Write clean, efficient, well-documented code in any language
+- Debug and fix bugs with precise explanations
+- Review code and suggest improvements
+- Architect systems and explain design patterns
+- Explain code clearly with examples
+
+CODING RULES:
+1. Always write complete, working code (no placeholders unless asked)
+2. Add helpful comments for complex logic
+3. Follow language best practices and idioms
+4. Include error handling where appropriate
+5. If writing HTML/JS/CSS, make it production-ready
+6. When debugging, identify root cause then fix
+7. Be direct - show the code first, explain after
+
+OUTPUT FORMAT:
+- Use proper code blocks with language labels
+- For HTML/JS projects, write single self-contained files when possible
+- Show diffs when making small changes (+ for additions, - for removals)
+- Include usage examples for functions/APIs`;
+
+var TASK_SYSTEM_PROMPT=`You are a proactive AI task assistant, like a highly capable intern who can do anything asked of them.
+
+TASK MODE CAPABILITIES:
+- Help plan and break down complex projects
+- Write code, scripts, and automations
+- Analyze files and data you're given
+- Research and synthesize information
+- Help debug and troubleshoot problems
+- Draft documents, emails, content
+- Step-by-step guidance for any task
+
+WORKING STYLE:
+- Be direct and action-oriented
+- Break complex tasks into clear steps
+- Always show your work
+- Ask clarifying questions if the task is ambiguous
+- Proactively suggest next steps
+- If given files, analyze them thoroughly
+
+REAL-TIME ASSISTANCE:
+When files from workspace are attached, analyze them carefully and provide specific, actionable help based on the actual file contents.`;
+
+function toggleCodeMode(){
+  codeMode=!codeMode;
+  var pill=document.getElementById('codePill');
+  if(pill){
+    pill.classList.toggle('code-mode-pill',codeMode);
+    pill.classList.toggle('active',codeMode);
+  }
+  var lbl=document.getElementById('codePillLabel');
+  if(lbl)lbl.textContent=codeMode?'Code ON':'Code';
+  document.body.classList.toggle('code-mode-active',codeMode);
+  renderCodeSuggestions();
+  renderModeChips();
+  showClipToast(codeMode?'⚡ Code Mode aktif':'Code Mode off');
+}
+
+function renderModeChips(){
+  var el=document.getElementById('modeChips');
+  if(!el)return;
+  if(codeMode){
+    var chips=['Debug kode ini','Refactor','Buat unit test','Explain','Optimize','TypeScript','Buat README'];
+    el.style.display='block';
+    el.innerHTML=chips.map(function(t){
+      return '<button class="mode-chip" onclick="injectPrompt(this)">'+t+'</button>';
+    }).join('');
+  } else if(agentMode){
+    var chips2=['Analisis proyek ini','Bantu debug','Buat dokumentasi','Review kode','Rencanakan fitur'];
+    el.style.display='block';
+    el.innerHTML=chips2.map(function(t){
+      return '<button class="mode-chip agent-chip" onclick="injectPrompt(this)">'+t+'</button>';
+    }).join('');
+  } else {
+    el.style.display='none';
+    el.innerHTML='';
+  }
+}
+
+function renderCodeSuggestions(){
+  var sugEl=document.getElementById('suggests');
+  if(!sugEl)return;
+  if(codeMode){
+    var chips=['Debug kode ini','Refactor jadi clean code','Tambah error handling','Buat unit test','Explain line by line','Optimize performance','Convert ke TypeScript'];
+    sugEl.innerHTML='<div class="code-chips" style="grid-column:1/-1">'+chips.map(function(c2){
+      return '<button class="code-chip" onclick="injectPrompt(this)">'+c2+'</button>';
+    }).join('')+'</div>';
+  } else {
+    renderSuggests();
+  }
+}
+function injectPrompt(btn){
+  var inp=document.getElementById('inp');
+  inp.value=btn.textContent;
+  inp.focus();
+  updateSendBtn();
+}
+
+function openSplitPreview(){
+  splitOpen=true;
+  var preview=document.getElementById('splitPreview');
+  var view=document.getElementById('splitView');
+  if(preview)preview.classList.remove('hidden');
+  if(lastCodeContent)runPreview();
+}
+
+function closeSplitPreview(){
+  splitOpen=false;
+  var preview=document.getElementById('splitPreview');
+  if(preview)preview.classList.add('hidden');
+}
+
+function runPreview(){
+  // Find last code block (HTML preferred)
+  var sess=getCur();
+  if(!sess)return;
+  var htmlContent='';
+  for(var i=sess.msgs.length-1;i>=0;i--){
+    var m=sess.msgs[i];
+    if(m.role==='assistant'&&m.content){
+      var htmlMatch=m.content.match(/```(?:html?)\n([\s\S]*?)```/i);
+      if(htmlMatch){htmlContent=htmlMatch[1];break;}
+      var jsMatch=m.content.match(/```(?:javascript|js)\n([\s\S]*?)```/i);
+      if(jsMatch){
+        htmlContent='<!DOCTYPE html><html><body><scr'+'ipt>\n'+jsMatch[1]+'\n<\/scr'+'ipt></body></html>';
+        break;
+      }
+    }
+  }
+  if(!htmlContent){showClipToast('Tidak ada kode HTML/JS untuk di-preview');return;}
+  var frame=document.getElementById('previewFrame');
+  if(!frame)return;
+  var blob=new Blob([htmlContent],{type:'text/html'});
+  frame.src=URL.createObjectURL(blob);
+  lastCodeContent=htmlContent;
+  openSplitPreview();
+}
+
+// Hook: after each AI message, check if there's HTML to auto-offer preview
+function checkAutoPreview(content){
+  if(!codeMode)return;
+  if(content&&(content.includes('```html')||content.includes('```HTML'))){
+    lastCodeContent=content;
+    // Show preview button in topbar
+    var pb=document.getElementById('previewTopBtn');
+    if(!pb){
+      var topRight=document.querySelector('.split-chat');
+      if(topRight){
+        var btn=document.createElement('button');
+        btn.id='previewTopBtn';
+        btn.className='preview-btn';
+        btn.style.cssText='position:fixed;bottom:90px;right:16px;z-index:100;background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.2)';
+        btn.textContent='▶ Preview';
+        btn.onclick=runPreview;
+        document.body.appendChild(btn);
+        setTimeout(function(){if(document.body.contains(btn))document.body.removeChild(btn);},8000);
+      }
+    }
+  }
+}
+
+
+
+
+function executeJS(code){
+  return new Promise(function(resolve){
+    var id='xec_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+    var timeout=setTimeout(function(){
+      window.removeEventListener('message',handler);
+      resolve({output:'',error:'Timeout: execution exceeded 5s'});
+    },5000);
+    function handler(ev){
+      if(!ev.data||ev.data._execId!==id)return;
+      clearTimeout(timeout);
+      window.removeEventListener('message',handler);
+      resolve({output:ev.data.output||'',error:ev.data.error||null});
+    }
+    window.addEventListener('message',handler);
+    var iframe=document.createElement('iframe');
+    iframe.setAttribute('sandbox','allow-scripts');
+    iframe.style.cssText='display:none;position:absolute;width:0;height:0';
+    var blob=new Blob([
+      '<!DOCTYPE html><html><body><scr'+'ipt>'
+      +'var _logs=[];'
+      +'var console={log:function(){_logs.push(Array.from(arguments).map(function(a){try{return typeof a==="object"?JSON.stringify(a,null,2):String(a);}catch(e){return String(a);}}).join(" "));},error:function(){_logs.push("[ERR] "+Array.from(arguments).join(" "));},warn:function(){_logs.push("[WARN] "+Array.from(arguments).join(" "));}};'
+      +'try{'
+      +'var _r=eval('+JSON.stringify(code)+');'
+      +'var _out=_logs.join("\\n");'
+      +'if(_r!==undefined&&_r!==null)_out=(_out?_out+"\\n":"")+String(_r);'
+      +'parent.postMessage({_execId:'+JSON.stringify(id)+',output:_out,error:null},"*");'
+      +'}catch(e){'
+      +'var _out=_logs.join("\\n");'
+      +'parent.postMessage({_execId:'+JSON.stringify(id)+',output:_out,error:e.message},"*");'
+      +'}'
+      +'<\/script></body></html>'
+    ],{type:'text/html'});
+    iframe.src=URL.createObjectURL(blob);
+    iframe.onload=function(){setTimeout(function(){if(document.body.contains(iframe))document.body.removeChild(iframe);},100);URL.revokeObjectURL(iframe.src);};
+    document.body.appendChild(iframe);
+    setTimeout(function(){if(document.body.contains(iframe))document.body.removeChild(iframe);},6000);
+  });
+}
+
+
+async function executeTool(name,args){
+  if(name==='execute_javascript'){
+    var res=await executeJS(args.code||'');
+    if(res.error)return '❌ Error: '+res.error+(res.output?'\n\nOutput:\n'+res.output:'');
+    return res.output||'✅ Code executed successfully (no output)';
+  }
+  if(name==='web_search'){
+    try{
+      var q=encodeURIComponent(args.query||'');
+      var r=await fetch('https://api.duckduckgo.com/?q='+q+'&format=json&no_html=1&skip_disambig=1');
+      var d=await r.json();
+      var parts=[];
+      if(d.AbstractText)parts.push('📖 '+d.AbstractText);
+      if(d.Answer)parts.push('💡 Answer: '+d.Answer);
+      if(d.RelatedTopics&&d.RelatedTopics.length>0){
+        var topics=d.RelatedTopics.slice(0,4).filter(function(t){return t.Text;}).map(function(t){return'• '+t.Text;});
+        if(topics.length)parts.push('🔗 Related:\n'+topics.join('\n'));
+      }
+      if(d.Definition)parts.push('📚 Definition: '+d.Definition);
+      return parts.length?parts.join('\n\n'):'No instant results. Using training knowledge for: '+args.query;
+    }catch(e){return 'Search unavailable. Using knowledge for: '+args.query;}
+  }
+  if(name==='think'){return '💭 Thought logged.';}
+  return 'Unknown tool: '+name;
+}
+
+
+async function runAgentLoop(initMessages,sysPrompt,images_present,sess,aiMsg){
+  var messages=initMessages.slice();
+  var step=0;
+  var MAX_STEPS=8;
+
+  while(step<MAX_STEPS){
+    step++;
+    // Show thinking indicator
+    var thinkMsg={role:'assistant',content:'',_agentThinking:true,_step:step};
+    sess.msgs.push(thinkMsg);
+    renderMsgs();
+
+    try{
+      var body={
+        model:images_present?MODEL_VISION:MODEL,
+        max_tokens:2048,
+        temperature:0.7,
+        messages:[{role:'system',content:sysPrompt}].concat(messages),
+        tools:AGENT_TOOLS,
+        tool_choice:'auto'
+      };
+      var resp=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+        body:JSON.stringify(body)
+      });
+      if(!resp.ok){var ej=await resp.json();throw new Error(ej.error&&ej.error.message?ej.error.message:'HTTP '+resp.status);}
+      var data=await resp.json();
+      var choice=data.choices&&data.choices[0];
+      if(!choice)throw new Error('No response from model');
+      var msg=choice.message;
+
+      // Remove thinking indicator
+      sess.msgs=sess.msgs.filter(function(m){return !m._agentThinking;});
+
+      if(msg.tool_calls&&msg.tool_calls.length>0){
+        messages.push({role:'assistant',content:msg.content||null,tool_calls:msg.tool_calls});
+        var toolResults=[];
+        for(var i=0;i<msg.tool_calls.length;i++){
+          var tc=msg.tool_calls[i];
+          var fn=tc.function;
+          var args={};
+          try{args=JSON.parse(fn.arguments||'{}');}catch(ex){}
+          var tcData={name:fn.name,args:args,status:'running',id:tc.id||('tc_'+Date.now()+'_'+i),result:null};
+          var toolChatMsg={role:'assistant',content:'',_toolCall:tcData};
+          sess.msgs.push(toolChatMsg);
+          renderMsgs();
+          var result=await executeTool(fn.name,args);
+          tcData.status='done';tcData.result=result;
+          renderMsgs();
+          toolResults.push({role:'tool',content:String(result),tool_call_id:tc.id});
+        }
+        messages=messages.concat(toolResults);
+      } else {
+        var reply=msg.content||'Task completed.';
+        aiMsg.content='';
+        if(sess.title==='New')sess.title=reply.slice(0,40)||'Chat';
+        renderHistory();
+        saveLimit(msgCount+1);
+        loading=false;renderMsgs();updateSendBtn();
+        attachedFiles=[];renderFilePreviews();
+        doStream(reply,aiMsg);
+        checkAutoPreview(reply);
+        return;
+      }
+    }catch(err){
+      sess.msgs=sess.msgs.filter(function(m){return !m._agentThinking;});
+      aiMsg.content='⚠️ Agent error (step '+step+'): '+err.message;
+      loading=false;renderMsgs();updateSendBtn();
+      return;
+    }
+  }
+
+  // Max steps fallback
+  sess.msgs=sess.msgs.filter(function(m){return !m._agentThinking;});
+  aiMsg.content='Agent completed '+MAX_STEPS+' steps. See tool results above.';
+  loading=false;renderMsgs();updateSendBtn();
+}
+
+// ═══════════════════════════════════════════
 // TRANSLATE
 // ═══════════════════════════════════════════
 function openTranslateModal(){
@@ -1062,19 +1843,22 @@ function updateCountdown(){
 // SAVE/LOAD PREFS
 // ═══════════════════════════════════════════
 function savePrefs(){
-  try{localStorage.setItem('saas_prefs',JSON.stringify({theme:isDark?'dark':'light',lang:currentLang,style:currentStyle}));}catch(e){}
+  try{localStorage.setItem('saas_prefs',JSON.stringify({theme:currentTheme,lang:currentLang,style:currentStyle}));}catch(e){}
 }
 function loadPrefs(){
   try{
     var r=localStorage.getItem('saas_prefs');
     if(r){
       var p=JSON.parse(r);
-      if(p.theme){isDark=p.theme==='dark';applyTheme(p.theme);}
+      if(p.theme){setTheme(p.theme);}
+      else{setTheme('aurora');}
       var flagMap={id:'🇮🇩 Indonesia',en:'🇬🇧 English',ar:'🇸🇦 العربية',zh:'🇨🇳 中文',ja:'🇯🇵 日本語',ko:'🇰🇷 한국어',es:'🇪🇸 Español',fr:'🇫🇷 Français',de:'🇩🇪 Deutsch',pt:'🇧🇷 Português',ru:'🇷🇺 Русский',hi:'🇮🇳 हिन्दी'};
       if(p.lang)setLang(p.lang,flagMap[p.lang]||p.lang);
       if(p.style){var sLbl=(STYLE_LABELS[p.style]&&STYLE_LABELS[p.style][currentLang])||p.style;setStyle(p.style,sLbl);}
+    } else {
+      setTheme('aurora');
     }
-  }catch(e){}
+  }catch(e){setTheme('aurora');}
 }
 
 // ═══════════════════════════════════════════
@@ -1094,11 +1878,11 @@ function onInpChange(){
 }
 function onInpKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
 function updateSendBtn(){
-  var canSend=!loading&&(document.getElementById('inp').value.trim().length>0||images.length>0)&&!isLimitReached();
+  var canSend=!loading&&(document.getElementById('inp').value.trim().length>0||images.length>0||attachedFiles.length>0)&&!isLimitReached();
   var btn=document.getElementById('sendBtn'),ico=document.getElementById('sendIco');
-  if(canSend){btn.classList.add('active');btn.style.background=isDark?'#efefef':'#1a1918';}
+  if(canSend){btn.classList.add('active');btn.style.background=currentTheme==='aurora'?'#22d3ee':(isDark?'#efefef':'#1a1918');}
   else{btn.classList.remove('active');btn.style.background='var(--send-off)';}
-  ico.setAttribute('stroke',canSend?(isDark?'#141414':'#fff'):'var(--text4)');
+  ico.setAttribute('stroke',canSend?(currentTheme==='aurora'?'#0b0f1a':(isDark?'#141414':'#fff')):'var(--text4)');
 }
 function insertPrompt(text){
   var inp=document.getElementById('inp');
@@ -1226,22 +2010,38 @@ function renderMsgs(){
 }
 
 function msgHTML(m){
+  if(m._agentThinking){
+    return '<div class="agent-thinking"><span class="agent-dot"></span><span style="font-size:13px;color:var(--text3)">Agent sedang berpikir...</span><span class="agent-step">step '+m._step+'</span></div>';
+  }
+  if(m._toolCall){
+    var tc=m._toolCall;
+    var icons={execute_javascript:'⚡',web_search:'🔍',think:'💭'};
+    var icon=icons[tc.name]||'🔧';
+    var statusEl=tc.status==='running'?'<span class="agent-dot" style="width:8px;height:8px"></span>':'<span style="color:#22c55e;font-size:12px">✓</span>';
+    var argsStr='';
+    try{
+      var a=tc.args||{};
+      if(tc.name==='execute_javascript')argsStr=a.description||'';
+      else if(tc.name==='web_search')argsStr='"'+(a.query||'')+'"';
+      else if(tc.name==='think')argsStr=(a.thought||'').slice(0,100);
+    }catch(e){}
+    var resultEl=tc.result?'<div class="tool-call-body">'+escHtml(tc.result)+'</div>':'';
+    return '<div class="tool-call">'
+      +'<div class="tool-call-head" onclick="this.nextElementSibling&&this.nextElementSibling.classList.toggle(\'hidden\')">'+statusEl
+      +'<span class="tool-call-name"> '+icon+' '+escHtml(tc.name)+'</span>'
+      +'<span style="font-size:11px;color:var(--text4);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">'+escHtml(argsStr)+'</span>'
+      +'<span class="tool-call-status">'+escHtml(tc.status==='running'?'running\u2026':'done')+'</span>'
+      +'</div>'+resultEl+'</div>';
+  }
   if(m.role==='user'){
     var imgs=m._imgs||[];
     var text=typeof m.content==='string'?escHtml(m.content):'';
     if(Array.isArray(m.content))m.content.forEach(function(c){if(c.type==='text')text=escHtml(c.text);});
     var html='';
-    // Gambar dulu (bubble terpisah per gambar, Gemini style)
     imgs.forEach(function(u){
-      // Deteksi rasio dari gambar
-      html+='<div class="msg-user fade-up"><div class="bubble-img">'
-        +'<img src="'+u+'" alt="">'
-        +'</div></div>';
+      html+='<div class="msg-user fade-up"><div class="bubble-img"><img src="'+u+'" alt=""></div></div>';
     });
-    // Teks di bubble sendiri (hanya kalau ada)
-    if(text){
-      html+='<div class="msg-user fade-up"><div class="bubble"><span>'+text+'</span></div></div>';
-    }
+    if(text){html+='<div class="msg-user fade-up"><div class="bubble"><span>'+text+'</span></div></div>';}
     return html||'';
   }
   var content=m.content||'';
@@ -1250,13 +2050,15 @@ function msgHTML(m){
     var t=I18N[currentLang]||I18N['id'];
     imgResult='<div class="img-created-label">'+t.enhanced+'</div>'
       +'<div class="img-edit-wrap"><img src="'+m._editedImg+'" alt="Enhanced"/>'
-      +'<div class="img-edit-tag">✨ '+t.enhanced+'</div></div>'
-      +'<button class="img-dl-btn" onclick="downloadImg(\''+m._editedImg+'\')">⬇ '+(t.download||'Download')+'</button><br/>';
+      +'<div class="img-edit-tag">\u2728 '+t.enhanced+'</div></div>'
+      +'<button class="img-dl-btn" onclick="downloadImg(\''+m._editedImg+'\')">\u2b07 '+(t.download||'Download')+'</button><br/>';
   }
-  return '<div class="msg-ai fade-up">'
-    +makeAIAvatar(false)
-    +'<div class="content md-content">'+imgResult+parseMd(content)+'</div>'
-    +'</div>';
+  var copyBtn='';
+  if(content&&content.length>0){
+    copyBtn='<button class="ai-copy-btn" onclick="copyAiMsg(this)" style="margin-top:8px;font-size:11px;color:var(--text4);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px">📋 Salin</button>';
+  }
+  var msgDiv='<div class="msg-ai fade-up">'+makeAIAvatar(false)+'<div class="content md-content" data-raw-content>'+imgResult+parseMd(content)+copyBtn+'</div></div>';
+  return msgDiv;
 }
 function typingHTML(){
   return '<div class="msg-ai">'+makeAIAvatar(true)
@@ -1279,12 +2081,8 @@ function send(){
   var userContent;
   if(images.length>0){
     userContent=[];
-    // OpenAI/Gemini format via OpenRouter - image_url dengan base64
     images.forEach(function(img){
-      userContent.push({
-        type:'image_url',
-        image_url:{url:img.url}
-      });
+      userContent.push({type:'image_url',image_url:{url:img.url}});
     });
     userContent.push({type:'text',text:text||'Analyze this image.'});
   } else {
@@ -1299,64 +2097,139 @@ function send(){
   images=[];pendingImgEdit=null;
   renderThumbs();loading=true;updateSendBtn();renderMsgs();
 
-  // Build smart system prompt
   var langNames={id:'Bahasa Indonesia',en:'English',ar:'Arabic',zh:'Chinese (Mandarin)',ja:'Japanese',ko:'Korean',es:'Spanish',fr:'French',de:'German',pt:'Portuguese',ru:'Russian',hi:'Hindi'};
-  var lang=currentLang!=='id'?'Always respond in '+langNames[currentLang]+'. ':'' ;
+  var lang=currentLang!=='id'?'Always respond in '+langNames[currentLang]+'. ':'';
   var styleInst=STYLE_PROMPTS[currentStyle]||'';
   var webInst=webSearchOn?' When relevant, simulate web search results to provide up-to-date information. Format search results naturally.':'';
   var imgInst=isEditRequest
-    ?' You are an expert photo editor and visual artist. The user wants you to edit their photo. '
-    +'Analyze the image carefully, then describe EXACTLY how you would apply the requested edit/effect. '
-    +'Be very specific and visual: describe colors, light, texture, mood changes. '
-    +'Show your expertise with technical terms (bloom, vignette, color grade, etc). '
-    +'Make the user FEEL the transformation. End with practical tips if they want to apply it in apps like Lightroom, Photoshop, or VSCO.'
+    ?' You are an expert photo editor and visual artist. Analyze the image carefully, describe EXACTLY how you would apply the requested edit. Be very specific about colors, light, texture, mood. End with practical tips for Lightroom, Photoshop, or VSCO.'
     :' For images: analyze thoroughly with specific, accurate observations.';
-  
-  var sysPrompt='You are SaaS AI — an exceptionally intelligent, fast, and helpful AI assistant. '
-    +'You are powered by cutting-edge AI and always provide accurate, thoughtful, high-quality responses. '
-    +styleInst+' '+lang+webInst+imgInst
-    +' Use markdown formatting (headers, bullets, code blocks, tables) when it genuinely helps clarity. '
-    +'Be concise yet comprehensive. Always answer directly without unnecessary preamble. '
-    +'For code: write clean, working, well-commented code. '
-    +'For analysis: be insightful, structured, and actionable. '
-    +'For images: analyze thoroughly with specific, accurate observations.';
+  var agentInst=agentMode?' You are running in AGENT MODE. You have access to tools: execute_javascript, web_search, think. Use them proactively to complete tasks. Always think before acting. Loop through steps until the task is fully complete.':'';
 
-  var history=getCur().msgs.slice(-20).map(function(m){return{role:m.role,content:m.content};});
-  
+  var baseSys;
+  if(codeMode){
+    baseSys=CODE_SYSTEM_PROMPT;
+  } else if(agentMode){
+    baseSys=TASK_SYSTEM_PROMPT;
+  } else {
+    baseSys='You are SaaS AI — an exceptionally intelligent, fast, and helpful AI assistant. You are powered by cutting-edge AI and always provide accurate, thoughtful, high-quality responses.';
+  }
+  var sysPrompt=baseSys+' '+styleInst+' '+lang+webInst+imgInst+agentInst
+    +' Use markdown formatting when it genuinely helps clarity.'
+    +' Be concise yet comprehensive. Always answer directly without unnecessary preamble.'
+    +' For code: write clean, working, well-commented code.'
+    +' For analysis: be insightful, structured, and actionable.';
+
+  var history=getCur().msgs.filter(function(m){return !m._agentThinking&&!m._toolCall;}).slice(-20).map(function(m){return{role:m.role,content:m.content};});
+
+  // Append attached files to user message
+  var fileContext='';
+  if(attachedFiles.length>0){
+    fileContext='\n\n--- ATTACHED FILES ---\n';
+    attachedFiles.forEach(function(f){
+      fileContext+='\n['+f.name+' | '+fmtSize(f.size)+']\n';
+      fileContext+=f.content.slice(0,8000)+(f.content.length>8000?'\n… [file terpotong]':'');
+      fileContext+='\n---\n';
+    });
+    // Append to last user message in history
+    if(history.length>0){
+      var last=history[history.length-1];
+      if(last.role==='user'){
+        if(typeof last.content==='string')last.content+=fileContext;
+        else if(Array.isArray(last.content)){
+          var txtPart=last.content.find(function(p){return p.type==='text';});
+          if(txtPart)txtPart.text+=fileContext;
+          else last.content.push({type:'text',text:fileContext});
+        }
+      }
+    }
+    // Show file names in userMsg display
+    if(typeof userContent==='string')userContent+=fileContext;
+  }
+
+  var aiMsg={role:'assistant',content:''};
+  if(isEditRequest&&capturedImgs.length>0)aiMsg._editedImg=capturedImgs[0].url;
+  getCur().msgs.push(aiMsg);
+  renderMsgs();
+
+  if(agentMode){
+    runAgentLoop(history,sysPrompt,images_present,getCur(),aiMsg);
+    return;
+  }
+
+  // Smart token allocation: short queries = fewer tokens, long/code = more
+  var _smartTokens=(function(){
+    var q=text||'';
+    var isCode=q.toLowerCase().includes('buat')||q.toLowerCase().includes('code')||q.toLowerCase().includes('kode')||q.toLowerCase().includes('script')||q.toLowerCase().includes('html')||codeMode;
+    var isLong=q.length>200||deepOn||agentMode;
+    if(isCode||isLong) return 800;
+    if(q.length<80) return 400;
+    return 600;
+  })();
   fetch(API,{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
     body:JSON.stringify({
       model:(images_present?MODEL_VISION:MODEL),
-      max_tokens:1024,
+      max_tokens:_smartTokens,
       temperature:0.7,
       messages:[{role:'system',content:sysPrompt}].concat(history)
     })
   })
   .then(function(res){
-    if(!res.ok)return res.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'HTTP '+res.status);});
+    if(!res.ok)return res.json().then(function(e){
+      var msg=e.error&&e.error.message?e.error.message:'HTTP '+res.status;
+      // If credits error, retry with smaller tokens
+      if(msg.toLowerCase().includes('credits')||msg.toLowerCase().includes('tokens')){
+        throw new Error('__RETRY__');
+      }
+      throw new Error(msg);
+    });
     return res.json();
   })
-    .then(function(data){
+  .then(function(data){
     var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
     var sess=getCur();
-    if(sess&&sess.title==='New')sess.title=(typeof text!=='undefined'?text:'Chat').slice(0,40)||'Chat';
-    var aiMsg={role:'assistant',content:''};
-    if(typeof isEditRequest!=='undefined'&&isEditRequest&&capturedImgs.length>0)aiMsg._editedImg=capturedImgs[0].url;
-    if(sess)sess.msgs.push(aiMsg);
+    if(sess&&sess.title==='New')sess.title=text.slice(0,40)||'Chat';
     renderHistory();
     saveLimit(msgCount+1);
     loading=false;renderMsgs();updateSendBtn();
+    attachedFiles=[];renderFilePreviews();
     doStream(reply,aiMsg);
+    checkAutoPreview(reply);
   })
-  .catchatch(function(err){
+  .catch(function(err){
     var sess=getCur();
-    var errMsgs={id:'⚠️ Oops, ada error nih: ',en:'⚠️ Error: ',ja:'⚠️ エラー: ',ko:'⚠️ 오류: '};
-    var errPre=errMsgs[currentLang]||errMsgs['en'];
-    if(false&&sess)sess.msgs.push({role:'assistant',content:errPre+err.message+'\n\n'+
-      (currentLang==='id'?'Coba lagi ya! 🙏':currentLang==='ja'?'もう一度お試しください！':'Please try again! 🙏')});
-  })
-  .finally(function(){loading=false;renderMsgs();updateSendBtn();});
+    var errMsg=err.message||'';
+    if(errMsg==='__RETRY__'){
+      // Retry with minimum tokens
+      fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_K,'HTTP-Referer':'https://saas-ai.app','X-Title':'SaaS AI'},
+        body:JSON.stringify({
+          model:(images_present?MODEL_VISION:MODEL),
+          max_tokens:300,
+          temperature:0.7,
+          messages:[{role:'system',content:sysPrompt}].concat(history)
+        })
+      }).then(function(r){return r.json();})
+      .then(function(data){
+        var reply=data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:'No response.';
+        var s=getCur();
+        if(s&&s.title==='New')s.title=text.slice(0,40)||'Chat';
+        renderHistory();saveLimit(msgCount+1);
+        loading=false;renderMsgs();updateSendBtn();
+        attachedFiles=[];renderFilePreviews();
+        doStream(reply,aiMsg);checkAutoPreview(reply);
+      }).catch(function(e2){
+        if(sess){aiMsg.content='⚠️ Maaf, kredit API habis. Silakan top up di openrouter.ai 🙏';}
+        loading=false;renderMsgs();updateSendBtn();
+      });
+      return;
+    }
+    if(sess){aiMsg.content='⚠️ Error: '+errMsg+'. Coba lagi ya! 🙏';}
+    loading=false;renderMsgs();updateSendBtn();
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1366,9 +2239,15 @@ function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function parseMd(text){
   text=text.replace(/```(\w*)\n?([\s\S]*?)```/g,function(_,lang,code){
     var t=I18N[currentLang]||I18N['id'];
+    var isRunnable=(lang==='javascript'||lang==='js'||lang==='');
+    var isPreviewable=(lang==='html'||lang==='HTML');
+    var runBtn=isRunnable?'<button class="run-btn" onclick="runCodeBlock(this)">▶ Run</button>':'';
+    var previewBtn=isPreviewable?'<button class="run-btn" onclick="previewHtmlBlock(this)" style="color:#38bdf8;border-color:#38bdf8">◉ Preview</button>':'';
     return '<div class="cb"><div class="cb-head"><span class="cb-lang">'+(lang||'code')+'</span>'
-      +'<button class="cp-btn" onclick="cpCode(this)">'+(t.copy||'Copy')+'</button></div>'
-      +'<pre><code>'+escHtml(code.trim())+'</code></pre></div>';
+      +'<div style="display:flex;gap:6px;align-items:center">'+runBtn+previewBtn+'<button class="cp-btn" onclick="cpCode(this)">'+(t.copy||'Copy')+'</button></div></div>'
+      +'<pre><code>'+escHtml(code.trim())+'</code></pre>'
+      +'<div class="code-output" id="out_'+(++_cbCounter)+'" style="display:none"></div>'
+      +'</div>';
   });
   text=text.replace(/`([^`\n]+)`/g,'<span class="ic">$1</span>');
   text=text.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
@@ -1400,6 +2279,454 @@ function parseMd(text){
     if(/^<(h[1-3]|ul|ol|hr|blockquote|div|table)/.test(b))return b;
     return'<p>'+b.replace(/\n/g,'<br>')+'</p>';
   }).join('');
+}
+function previewHtmlBlock(btn){
+  var cb=btn.closest('.cb');
+  var code=cb.querySelector('code').textContent;
+  lastCodeContent=code;
+  var frame=document.getElementById('previewFrame');
+  if(!frame)return;
+  var blob=new Blob([code],{type:'text/html'});
+  frame.src=URL.createObjectURL(blob);
+  openSplitPreview();
+}
+function runCodeBlock(btn){
+  var cb=btn.closest('.cb');
+  var code=cb.querySelector('code').textContent;
+  var outEl=cb.querySelector('.code-output');
+  if(!outEl)return;
+  btn.classList.add('running');btn.textContent='⏳ Running';
+  outEl.style.display='block';
+  outEl.innerHTML='<span class="out-label">▶ Output</span><span class="out-line">Running...</span>';
+  executeJS(code).then(function(res){
+    btn.classList.remove('running');btn.textContent='▶ Run';
+    var html='<span class="out-label">▶ Output</span>';
+    if(res.error){html+='<span class="out-error">'+escHtml(res.error)+'</span>';}
+    else if(res.output){html+='<span class="out-line">'+escHtml(res.output)+'</span>';}
+    else{html+='<span class="out-line" style="opacity:.5">// no output</span>';}
+    outEl.innerHTML=html;
+  });
+}
+
+// ═══════════════════════════════════════════
+// FILE READING ENGINE
+// ═══════════════════════════════════════════
+
+function getFileIcon(name){
+  var ext=(name.split('.').pop()||'').toLowerCase();
+  var map={zip:'🗜️',json:'📋',csv:'📊',txt:'📄',pdf:'📕',js:'⚡',ts:'⚡',html:'🌐',css:'🎨',md:'📝',xml:'🔖',yaml:'⚙️',yml:'⚙️',log:'🔍',py:'🐍'};
+  return map[ext]||'📄';
+}
+
+function fmtSize(bytes){
+  if(bytes<1024)return bytes+'B';
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/(1024*1024)).toFixed(1)+'MB';
+}
+
+function onFileAny(e){
+  var files=Array.from(e.target.files||[]);
+  if(!files.length)return;
+  e.target.value='';
+  files.forEach(function(file){
+    readAnyFile(file);
+  });
+}
+
+function readAnyFile(file){
+  var name=file.name;
+  var ext=(name.split('.').pop()||'').toLowerCase();
+  var textExts=['txt','json','csv','js','ts','jsx','tsx','html','htm','css','scss','sass','less','md','xml','yaml','yml','log','env','sh','bash','py','rb','php','java','c','cpp','h','go','rs','swift','kt','dart','vue','svelte','sql','graphql','toml','ini','cfg','conf','gitignore','dockerfile','r','lua','pl','ps1','bat','asm','proto'];
+  var imgExts=['png','jpg','jpeg','gif','webp','svg','bmp','ico','tiff','avif'];
+  var audioExts=['mp3','wav','ogg','m4a','flac','aac'];
+  var videoExts=['mp4','webm','mov','avi','mkv'];
+
+  if(ext==='zip'){
+    readZipFile(file);
+  } else if(ext==='pdf'){
+    readPdfFile(file);
+  } else if(ext==='docx'||ext==='doc'){
+    readDocxFile(file);
+  } else if(ext==='xlsx'||ext==='xls'){
+    readXlsxFile(file);
+  } else if(imgExts.indexOf(ext)>-1){
+    // Images — add as visual attachment
+    var ir=new FileReader();
+    ir.onload=function(ev){
+      images.push({url:ev.target.result,name:name});
+      renderThumbs();
+      updateSendBtn();
+      showClipToast('🖼️ '+name+' siap dikirim');
+    };
+    ir.readAsDataURL(file);
+  } else if(audioExts.indexOf(ext)>-1||videoExts.indexOf(ext)>-1){
+    addAttachedFile(name,file.size,'[File media: '+name+' ('+fmtSize(file.size)+') — tidak dapat dibaca sebagai teks, mohon deskripsikan isinya]',ext);
+  } else if(textExts.indexOf(ext)>-1){
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var content=ev.target.result;
+      addAttachedFile(name,file.size,content,ext);
+    };
+    reader.onerror=function(){showClipToast('❌ Gagal baca file: '+name);};
+    reader.readAsText(file,'UTF-8');
+  } else {
+    // Unknown/binary — try as text first, fallback to binary info
+    var reader2=new FileReader();
+    reader2.onload=function(ev){
+      try{
+        var txt=ev.target.result;
+        // Check if readable text (not too many weird chars)
+        var weird=(txt.match(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g)||[]).length;
+        if(weird/txt.length<0.05&&txt.length>0){
+          addAttachedFile(name,file.size,txt,ext);
+        } else {
+          addAttachedFile(name,file.size,'[File biner: '+name+' ('+fmtSize(file.size)+') — tipe: '+ext.toUpperCase()+']',ext);
+        }
+      }catch(e){
+        addAttachedFile(name,file.size,'[File biner: '+name+' ('+fmtSize(file.size)+')]',ext);
+      }
+    };
+    reader2.onerror=function(){
+      addAttachedFile(name,file.size,'[File: '+name+' ('+fmtSize(file.size)+')]',ext);
+    };
+    reader2.readAsText(file,'UTF-8');
+  }
+}
+
+function readDocxFile(file){
+  if(typeof mammoth==='undefined'){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    s.onload=function(){doReadDocx(file);};
+    s.onerror=function(){
+      // Fallback: read as binary text
+      var r=new FileReader();
+      r.onload=function(ev){
+        var bytes=new Uint8Array(ev.target.result);
+        var text='';
+        for(var i=0;i<bytes.length;i++){var b=bytes[i];if(b>=32&&b<127)text+=String.fromCharCode(b);}
+        text=text.replace(/\s+/g,' ').slice(0,3000);
+        addAttachedFile(file.name,file.size,'📄 DOCX: '+file.name+'\n\n'+text,'docx');
+      };
+      r.readAsArrayBuffer(file);
+    };
+    document.head.appendChild(s);
+  } else {
+    doReadDocx(file);
+  }
+}
+
+function doReadDocx(file){
+  var r=new FileReader();
+  r.onload=function(ev){
+    mammoth.extractRawText({arrayBuffer:ev.target.result}).then(function(result){
+      var text=result.value||'(kosong)';
+      addAttachedFile(file.name,file.size,'📄 DOCX: '+file.name+'\n\n'+text.slice(0,4000)+(text.length>4000?'\n… [terpotong]':''),'docx');
+    }).catch(function(err){
+      addAttachedFile(file.name,file.size,'📄 DOCX: '+file.name+' — Gagal baca: '+err.message,'docx');
+    });
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function readXlsxFile(file){
+  if(typeof XLSX==='undefined'){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=function(){doReadXlsx(file);};
+    s.onerror=function(){addAttachedFile(file.name,file.size,'[XLSX tidak bisa dibaca — library gagal load]','xlsx');};
+    document.head.appendChild(s);
+  } else {
+    doReadXlsx(file);
+  }
+}
+
+function doReadXlsx(file){
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var wb=XLSX.read(ev.target.result,{type:'array'});
+      var out='📊 XLSX: '+file.name+'\nSheet: '+wb.SheetNames.join(', ')+'\n\n';
+      wb.SheetNames.slice(0,3).forEach(function(sn){
+        var ws=wb.Sheets[sn];
+        var csv=XLSX.utils.sheet_to_csv(ws);
+        out+='=== Sheet: '+sn+' ===\n'+csv.slice(0,2000)+(csv.length>2000?'\n… [terpotong]':'')+'\n\n';
+      });
+      addAttachedFile(file.name,file.size,out,'xlsx');
+    }catch(err){
+      addAttachedFile(file.name,file.size,'[XLSX error: '+err.message+']','xlsx');
+    }
+  };
+  r.readAsArrayBuffer(file);
+}
+
+// ═══════════════════════════════════════════
+// WORKSPACE FILE UPDATE (write to folder)
+// ═══════════════════════════════════════════
+var wsUpdateInput=null;
+
+function addWsUpdateBtn(){
+  // Add "Update File" button to workspace panel if not already there
+  var wsHeader=document.querySelector('.ws-header');
+  if(!wsHeader||document.getElementById('wsUpdateBtn'))return;
+  var btn=document.createElement('button');
+  btn.id='wsUpdateBtn';
+  btn.title='Ganti/Update file di folder';
+  btn.style.cssText='border:none;background:none;cursor:pointer;padding:4px 6px;border-radius:7px;color:var(--text3);font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;transition:background .15s;';
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Update File';
+  btn.onmouseover=function(){this.style.background='var(--hover)';};
+  btn.onmouseout=function(){this.style.background='none';};
+  btn.onclick=function(){if(!wsUpdateInput)createWsUpdateInput();wsUpdateInput.click();};
+  wsHeader.appendChild(btn);
+}
+
+function createWsUpdateInput(){
+  wsUpdateInput=document.createElement('input');
+  wsUpdateInput.type='file';
+  wsUpdateInput.accept='*/*';
+  wsUpdateInput.multiple=true;
+  wsUpdateInput.style.display='none';
+  wsUpdateInput.onchange=onWsUpdateFile;
+  document.body.appendChild(wsUpdateInput);
+}
+
+async function onWsUpdateFile(e){
+  var files=Array.from(e.target.files||[]);
+  if(!files.length)return;
+  e.target.value='';
+  if(!wsHandle){showClipToast('❌ Buka folder workspace dulu!');return;}
+  if(!window.showDirectoryPicker){showClipToast('❌ Browser tidak support File System Access API');return;}
+  for(var i=0;i<files.length;i++){
+    await writeFileToWorkspace(files[i]);
+  }
+}
+
+async function writeFileToWorkspace(file){
+  try{
+    // Try to find existing file handle in wsFiles
+    var existing=null;
+    var matchPath=Object.keys(wsFiles).find(function(p){return wsFiles[p].name===file.name&&wsFiles[p].type==='file';});
+    if(matchPath){
+      existing=wsFiles[matchPath].handle;
+    } else {
+      // Create new file in root of workspace
+      try{
+        existing=await wsHandle.getFileHandle(file.name,{create:true});
+      }catch(err){
+        showClipToast('❌ Tidak bisa buat file: '+err.message);
+        return;
+      }
+    }
+    // Write content
+    var writable=await existing.createWritable();
+    await writable.write(file);
+    await writable.close();
+    showClipToast('✅ '+file.name+' berhasil diupdate di folder!');
+    // Refresh workspace tree
+    await scanDirectory(wsHandle,'',0);
+    renderWsTree();
+  }catch(err){
+    if(err.name==='NotAllowedError'){
+      showClipToast('❌ Izinkan akses tulis ke folder di browser!');
+    } else {
+      showClipToast('❌ Gagal update '+file.name+': '+err.message);
+    }
+  }
+}
+
+function readZipFile(file){
+  // Use JSZip via CDN
+  if(typeof JSZip==='undefined'){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=function(){doReadZip(file);};
+    s.onerror=function(){
+      // fallback: read as binary and list entries via simple scan
+      showClipToast('JSZip gagal load, mencoba metode alternatif…');
+      readZipFallback(file);
+    };
+    document.head.appendChild(s);
+  } else {
+    doReadZip(file);
+  }
+}
+
+function doReadZip(file){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    JSZip.loadAsync(ev.target.result).then(function(zip){
+      var entries=Object.keys(zip.files);
+      var dirs=entries.filter(function(k){return zip.files[k].dir;});
+      var files=entries.filter(function(k){return !zip.files[k].dir;});
+      var summary='📦 ZIP: '+file.name+'\n';
+      summary+='Files: '+files.length+' | Folders: '+dirs.length+'\n\n';
+      summary+='=== CONTENTS ===\n';
+
+      // List all entries
+      entries.slice(0,80).forEach(function(k){
+        var f=zip.files[k];
+        summary+=(f.dir?'📁 ':'  ')+k+'\n';
+      });
+      if(entries.length>80)summary+='\n… dan '+(entries.length-80)+' entri lainnya';
+
+      // Also extract text files content
+      var textExts=['txt','json','csv','md','js','ts','html','css','xml','yaml','yml','py','log','env','sh'];
+      var promises=files.filter(function(k){
+        var ext=(k.split('.').pop()||'').toLowerCase();
+        return textExts.indexOf(ext)>-1 && !k.includes('__MACOSX');
+      }).slice(0,5).map(function(k){
+        return zip.files[k].async('string').then(function(content){
+          return '\n=== '+k+' ===\n'+content.slice(0,1500)+(content.length>1500?'\n… [terpotong]':'');
+        });
+      });
+
+      Promise.all(promises).then(function(parts){
+        if(parts.length>0)summary+='\n\n=== FILE CONTENTS (preview) ===\n'+parts.join('\n');
+        addAttachedFile(file.name,file.size,summary,'zip');
+      });
+    }).catch(function(err){
+      addAttachedFile(file.name,file.size,'❌ Error membaca ZIP: '+err.message,'zip');
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function readZipFallback(file){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var bytes=new Uint8Array(ev.target.result);
+    // Find local file headers (PK\x03\x04)
+    var entries=[];
+    for(var i=0;i<bytes.length-4;i++){
+      if(bytes[i]===0x50&&bytes[i+1]===0x4B&&bytes[i+2]===0x03&&bytes[i+3]===0x04){
+        var fnLen=bytes[i+26]|(bytes[i+27]<<8);
+        var extraLen=bytes[i+28]|(bytes[i+29]<<8);
+        var fnBytes=bytes.slice(i+30,i+30+fnLen);
+        var name='';
+        for(var j=0;j<fnBytes.length;j++)name+=String.fromCharCode(fnBytes[j]);
+        entries.push(name);
+        i+=30+fnLen+extraLen-1;
+      }
+    }
+    var summary='📦 ZIP: '+file.name+' ('+fmtSize(file.size)+')\n';
+    summary+='Entri ditemukan: '+entries.length+'\n\n';
+    entries.slice(0,50).forEach(function(n){summary+='  '+n+'\n';});
+    if(entries.length>50)summary+='\n… dan '+(entries.length-50)+' lainnya';
+    addAttachedFile(file.name,file.size,summary,'zip');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function readPdfFile(file){
+  // Read PDF as text using simple extraction (no external lib needed for basic text)
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var bytes=new Uint8Array(ev.target.result);
+    // Extract readable text from PDF bytes
+    var text='';
+    var str='';
+    for(var i=0;i<bytes.length;i++){
+      var b=bytes[i];
+      if(b>=32&&b<127)str+=String.fromCharCode(b);
+      else if(str.length>3){text+=str+' ';str='';}
+      else str='';
+    }
+    // Clean up extracted text
+    text=text.replace(/\s+/g,' ').replace(/[^\x20-\x7E\u00C0-\u024F\u0400-\u04FF]/g,'').trim();
+    // Remove PDF keywords noise
+    text=text.replace(/\b(obj|endobj|stream|endstream|xref|trailer|startxref|\/[A-Za-z]+)\b/g,' ').replace(/\s+/g,' ').trim();
+    var preview=text.slice(0,3000)+(text.length>3000?'\n… [terpotong, total ~'+Math.round(text.length/5)+' kata]':'');
+    var summary='📕 PDF: '+file.name+' ('+fmtSize(file.size)+')\n\n'+preview;
+    addAttachedFile(file.name,file.size,summary,'pdf');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function addAttachedFile(name,size,content,ext){
+  var id='af_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  attachedFiles.push({id:id,name:name,size:size,content:content,ext:ext});
+  renderFilePreviews();
+  updateSendBtn();
+  showClipToast('📁 '+name+' siap dikirim ke AI');
+}
+
+function removeAttachedFile(id){
+  attachedFiles=attachedFiles.filter(function(f){return f.id!==id;});
+  renderFilePreviews();
+  updateSendBtn();
+}
+
+function renderFilePreviews(){
+  var el=document.getElementById('filePreviews');
+  if(!el)return;
+  if(attachedFiles.length===0){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML=attachedFiles.map(function(f){
+    return '<div class="file-attach" id="fp_'+f.id+'">'
+      +'<div class="file-attach-icon" style="background:var(--bg3)">'+getFileIcon(f.name)+'</div>'
+      +'<div class="file-attach-info">'
+      +'<div class="file-attach-name">'+escHtml(f.name)+'</div>'
+      +'<div class="file-attach-meta">'+fmtSize(f.size)+'</div>'
+      +'</div>'
+      +'<button class="file-attach-remove" onclick="removeAttachedFile(\''+f.id+'\')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// CLIPBOARD ENGINE
+// ═══════════════════════════════════════════
+function showClipToast(msg){
+  var t=document.getElementById('clipToast');
+  if(!t)return;
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+function clipboardRead(){
+  if(!navigator.clipboard||!navigator.clipboard.readText){
+    showClipToast('❌ Clipboard read tidak didukung browser ini');
+    return;
+  }
+  navigator.clipboard.readText().then(function(text){
+    if(!text){showClipToast('📋 Clipboard kosong');return;}
+    // Inject into textarea or send as context
+    var inp=document.getElementById('inp');
+    var current=inp.value;
+    var prefix=current?current+'\n\n':'';
+    inp.value=prefix+'[Clipboard]:\n'+text;
+    inp.style.height='auto';
+    inp.style.height=Math.min(inp.scrollHeight,200)+'px';
+    inp.focus();
+    updateSendBtn();
+    showClipToast('📋 Clipboard ditempel ke input ('+text.length+' karakter)');
+  }).catch(function(){
+    showClipToast('❌ Izin clipboard ditolak');
+  });
+}
+
+function clipboardWrite(text){
+  if(!navigator.clipboard){showClipToast('❌ Clipboard tidak didukung');return;}
+  navigator.clipboard.writeText(text).then(function(){
+    showClipToast('✅ Tersalin ke clipboard!');
+  }).catch(function(){
+    showClipToast('❌ Gagal menyalin');
+  });
+}
+
+function copyAiMsg(btn){
+  // Get the text content of the closest AI message content div
+  var contentDiv=btn.closest('.content');
+  if(!contentDiv)return;
+  // Get all text nodes excluding the copy button itself
+  btn.style.display='none';
+  var text=contentDiv.innerText||contentDiv.textContent||'';
+  btn.style.display='';
+  clipboardWrite(text.trim());
+  btn.textContent='✅ Tersalin';
+  setTimeout(function(){btn.innerHTML='📋 Salin';},1500);
 }
 function cpCode(btn){
   var code=btn.closest('.cb').querySelector('code').textContent;
@@ -1828,6 +3155,23 @@ function confirmAndActivate(planKey){
 // INIT
 // ═══════════════════════════════════════════
 (function init(){
+  // Device ratio & safe area detection
+  (function detectDevice(){
+    // Set real viewport height (fixes iOS 100vh bug)
+    function setVh(){
+      var vh=window.innerHeight*0.01;
+      document.documentElement.style.setProperty('--vh',vh+'px');
+    }
+    setVh();
+    window.addEventListener('resize',setVh);
+    // Detect mobile
+    var isMobile=window.innerWidth<768||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    document.body.setAttribute('data-mobile',isMobile?'1':'0');
+    // Detect iOS for safe area
+    if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+      document.body.classList.add('ios-device');
+    }
+  })();
   renderLogos();
   loadPrefs();
   loadLimit();
@@ -1940,16 +3284,17 @@ function stopMic(keepText){
       <div id="toolModalTitle" style="font-size:16px;font-weight:700;color:var(--text)"></div>
       <button onclick="document.getElementById('toolInputModal').style.display='none'" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:20px;padding:2px 8px;border-radius:8px;line-height:1">✕</button>
     </div>
-    <textarea id="toolModalInput" rows="4" style="width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:'Geist',sans-serif;outline:none;resize:none;line-height:1.6;caret-color:var(--accent)" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){document.getElementById('toolModalSendBtn').click()}"></textarea>
+    <textarea id="toolModalInput" rows="4" style="width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;line-height:1.6;caret-color:var(--accent)" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){document.getElementById('toolModalSendBtn').click()}"></textarea>
     <div id="toolModalHint" style="font-size:11.5px;color:var(--text4);margin:8px 0 14px">Ctrl+Enter to send</div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button onclick="document.getElementById('toolInputModal').style.display='none'" style="padding:9px 18px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text3);font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif;font-weight:500" id="toolModalCancelBtn">Cancel</button>
-      <button id="toolModalSendBtn" style="padding:9px 20px;border-radius:12px;border:none;background:var(--send-on);color:var(--bg);font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px">
+      <button onclick="document.getElementById('toolInputModal').style.display='none'" style="padding:9px 18px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text3);font-size:13.5px;cursor:pointer;font-family:inherit;font-weight:500" id="toolModalCancelBtn">Cancel</button>
+      <button id="toolModalSendBtn" style="padding:9px 20px;border-radius:12px;border:none;background:var(--send-on);color:var(--bg);font-size:13.5px;cursor:pointer;font-family:inherit;font-weight:600;display:flex;align-items:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
         <span id="toolModalSendLbl">Send</span>
       </button>
     </div>
   </div>
 </div>
+<div id="clipToast" class="clip-toast"></div>
 </body>
 </html>
