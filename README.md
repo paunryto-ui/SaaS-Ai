@@ -2,7 +2,7 @@
 
 <img src="https://raw.githubusercontent.com/paunryto-ui/saas-ai/main/logo.png" width="80" alt="SaaS AI Logo"/>
 
-# SaaS AI
+# Oryx
 
 **Asisten Kecerdasan Buatan Buatan Indonesia**
 
