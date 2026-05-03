@@ -1,117 +1,94 @@
 
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SaaS AI</title>
+<title>Oryx</title>
 <style>
-@supports (font: -apple-system-body) {
-  :root { --sys-font: -apple-system, "SF Pro Text", "SF Pro Display", BlinkMacSystemFont, "Helvetica Neue", sans-serif; --mono-font: "SF Mono", "Fira Code", ui-monospace, monospace; }
-}
-
-/* ── APPLE HIG POLISH ── */
+/* ── MINIMAL DESIGN SYSTEM ── */
 * { -webkit-tap-highlight-color: transparent; }
-
-/* SF Pro rendering */
 body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-
-/* iMessage bubble tail effect */
-.msg-user { align-items: flex-end; }
-.msg-ai { align-items: flex-start; }
-.msg-ai .content { position: relative; }
-
-/* Frosted glass sidebar */
-#sidebar { backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); background: rgba(var(--bg-rgb,255,255,255),.85) !important; }
-body.dark #sidebar, body.aurora #sidebar { background: rgba(28,28,30,.85) !important; }
 
 /* Spring send button */
 @keyframes sendPop { 0%{transform:scale(1)} 40%{transform:scale(.88)} 70%{transform:scale(1.12)} 100%{transform:scale(1)} }
-#sendBtn.active:active { animation: sendPop .25s cubic-bezier(.34,1.56,.64,1); }
+#sendBtn.active:active { animation: sendPop .2s cubic-bezier(.34,1.56,.64,1); }
 
-/* Smooth pill active state */
-.pill-btn.active { background: rgba(0,122,255,.12) !important; border-color: rgba(0,122,255,.35) !important; color: var(--accent) !important; }
-body.aurora .pill-btn.active { background: rgba(34,211,238,.12) !important; border-color: rgba(34,211,238,.4) !important; }
+/* Pill active state */
+.pill-btn.active { background: rgba(0,122,255,.1) !important; border-color: rgba(0,122,255,.3) !important; color: var(--accent) !important; }
+body.aurora .pill-btn.active { background: rgba(34,211,238,.08) !important; border-color: rgba(34,211,238,.3) !important; }
 
-/* Refined card */
-.sug-card { border-radius: 14px; transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, background .15s; }
-.sug-card:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
-
-/* Code block polish */
-.cb { border-radius: 14px; }
-.cb code { font-size: 13px; }
+/* Suggestion card hover */
+.sug-card { border-radius: 12px; transition: transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .16s, background .12s; }
+.sug-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
 
 /* Input focus ring */
-#inputWrap:focus-within { box-shadow: 0 0 0 3px rgba(0,122,255,.18), 0 2px 8px rgba(0,0,0,.08); border-color: rgba(0,122,255,.35); }
-body.aurora #inputWrap:focus-within { box-shadow: 0 0 0 3px rgba(34,211,238,.18), 0 2px 8px rgba(0,0,0,.2); border-color: rgba(34,211,238,.35); }
+#inputWrap:focus-within { box-shadow: 0 0 0 2px rgba(0,122,255,.15); border-color: rgba(0,122,255,.3); }
+body.aurora #inputWrap:focus-within { box-shadow: 0 0 0 2px rgba(34,211,238,.12); border-color: rgba(34,211,238,.3); }
 
-/* Mic button recording pulse */
-#micBtn.recording { background: rgba(255,59,48,.12) !important; color: #ff3b30 !important; border-color: rgba(255,59,48,.35) !important; }
-@keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,.4)} 50%{box-shadow:0 0 0 6px rgba(255,59,48,0)} }
-#micBtn.recording { animation: micPulse 1.4s ease-in-out infinite; }
+/* Mic recording */
+#micBtn.recording { background: rgba(255,59,48,.1) !important; color: #ff3b30 !important; border-color: rgba(255,59,48,.3) !important; }
 
-/* History item */
-.hist-item { border-radius: 10px; }
-.hist-item.active { background: rgba(0,122,255,.1) !important; }
-body.aurora .hist-item.active { background: rgba(34,211,238,.1) !important; }
-
-/* Scrollbar thinner */
-::-webkit-scrollbar { width: 4px; }
+/* Scrollbars */
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-thumb { border-radius: 99px; background: var(--scroll-thumb); }
 
-/* Message fade-in */
-.msg-user, .msg-ai { animation: msgIn .22s cubic-bezier(.34,1.56,.64,1) both; }
-@keyframes msgIn { from{opacity:0;transform:translateY(8px) scale(.97)} to{opacity:1;transform:none} }
+/* Message animation */
+.msg-user, .msg-ai { animation: msgIn .2s ease both; }
+@keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-/* Bottom bar safe area */
+/* History item */
+.hist-item.active { background: rgba(0,122,255,.08) !important; }
+body.aurora .hist-item.active { background: rgba(34,211,238,.08) !important; }
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .bottom-bar { padding-bottom: calc(env(safe-area-inset-bottom) + 12px) !important; }
 }
-
 </style>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,'SF Pro Text','SF Pro Display',BlinkMacSystemFont,'Helvetica Neue',sans-serif;overflow:hidden;transition:background .2s,color .2s}
 
 body.light{
-  --bg:#ffffff;--bg2:#f2f2f7;--bg3:#e5e5ea;--border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.18);
-  --text:#000000;--text2:#1c1c1e;--text3:#636366;--text4:#aeaeb2;
-  --hover:rgba(0,0,0,.04);--active:rgba(0,122,255,.1);--bubble:#e9e9eb;
-  --input-bg:#ffffff;--input-shadow:0 0 0 1px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.06);
-  --send-off:#c7c7cc;--send-on:#007aff;--scroll-thumb:#c7c7cc;
-  --card-border:rgba(0,0,0,.08);--card-hover:rgba(0,0,0,.03);--badge-bg:#f2f2f7;
-  --code-bg:#f2f2f7;--code-head:#e5e5ea;--code-text:#1c1c1e;
-  --warn-bg:#fff3e0;--warn-border:#ff9500;--warn-text:#c75000;
+  --bg:#fafafa;--bg2:#f5f5f7;--bg3:#ebebed;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
+  --text:#111111;--text2:#1c1c1e;--text3:#6e6e73;--text4:#b0b0b5;
+  --hover:rgba(0,0,0,.035);--active:rgba(0,122,255,.08);--bubble:#ebebed;
+  --input-bg:#ffffff;--input-shadow:0 0 0 1px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
+  --send-off:#d0d0d5;--send-on:#1a1a1a;--scroll-thumb:#d0d0d5;
+  --card-border:rgba(0,0,0,.07);--card-hover:rgba(0,0,0,.025);--badge-bg:#f0f0f2;
+  --code-bg:#f5f5f7;--code-head:#ebebed;--code-text:#1c1c1e;
+  --warn-bg:#fffbf0;--warn-border:#e0a800;--warn-text:#9a6a00;
   --accent:#007aff;--accent2:#5856d6;--grad:linear-gradient(135deg,#007aff,#5856d6,#af52de);
-  --pill-bg:#f2f2f7;--pill-border:rgba(0,0,0,.1);
-  --user-bubble:#007aff;--user-bubble-text:#ffffff;
+  --pill-bg:#f0f0f2;--pill-border:rgba(0,0,0,.08);
+  --user-bubble:#1a1a1a;--user-bubble-text:#ffffff;
 }
 body.dark{
-  --bg:#000000;--bg2:#1c1c1e;--bg3:#2c2c2e;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);
-  --text:#ffffff;--text2:#ebebf5;--text3:#8e8e93;--text4:#48484a;
-  --hover:rgba(255,255,255,.05);--active:rgba(0,122,255,.2);--bubble:#2c2c2e;
-  --input-bg:#1c1c1e;--input-shadow:0 0 0 1px rgba(255,255,255,.08);
-  --send-off:#3a3a3c;--send-on:#0a84ff;--scroll-thumb:#3a3a3c;
-  --card-border:rgba(255,255,255,.08);--card-hover:rgba(255,255,255,.04);--badge-bg:#2c2c2e;
-  --code-bg:#1c1c1e;--code-head:#2c2c2e;--code-text:#e5e5ea;
-  --warn-bg:#2a1500;--warn-border:#ff9f0a;--warn-text:#ff9f0a;
-  --accent:#0a84ff;--accent2:#5e5ce6;--grad:linear-gradient(135deg,#0a84ff,#5e5ce6,#bf5af2);
-  --pill-bg:#2c2c2e;--pill-border:rgba(255,255,255,.1);
-  --user-bubble:#0a84ff;--user-bubble-text:#ffffff;
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1e1e1e;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --text:#f0f0f0;--text2:#d8d8d8;--text3:#808080;--text4:#404040;
+  --hover:rgba(255,255,255,.04);--active:rgba(255,255,255,.07);--bubble:#1e1e1e;
+  --input-bg:#161616;--input-shadow:0 0 0 1px rgba(255,255,255,.06);
+  --send-off:#2a2a2a;--send-on:#f0f0f0;--scroll-thumb:#2a2a2a;
+  --card-border:rgba(255,255,255,.06);--card-hover:rgba(255,255,255,.03);--badge-bg:#1e1e1e;
+  --code-bg:#111111;--code-head:#1a1a1a;--code-text:#d4d4d4;
+  --warn-bg:#1a1200;--warn-border:#806600;--warn-text:#c0a000;
+  --accent:#ffffff;--accent2:#a0a0a0;--grad:linear-gradient(135deg,#fff,#a0a0a0);
+  --pill-bg:#1e1e1e;--pill-border:rgba(255,255,255,.07);
+  --user-bubble:#f0f0f0;--user-bubble-text:#0d0d0d;
 }
 
 body.aurora{
-  --bg:#0b0f1a;--bg2:#111827;--bg3:#1a2035;--border:#1e2d45;--border2:#243352;
-  --text:#e2e8f0;--text2:#b8c5d6;--text3:#637089;--text4:#3d4f6b;
-  --hover:#131c2e;--active:#172236;--bubble:#141e30;
-  --input-bg:#111827;--input-shadow:0 0 0 1px rgba(99,198,255,.08),0 2px 12px rgba(0,0,0,.3);
-  --send-off:#243352;--send-on:#e2e8f0;--scroll-thumb:#1e2d45;
-  --card-border:#1e2d45;--card-hover:#131c2e;--badge-bg:#111827;
-  --code-bg:#080d16;--code-head:#0f1622;--code-text:#a5f3c4;
-  --warn-bg:#1a0f2e;--warn-border:#5b21b6;--warn-text:#c084fc;
-  --accent:#22d3ee;--accent2:#a78bfa;--grad:linear-gradient(135deg,#22d3ee,#818cf8,#c084fc);
-  --pill-bg:#1a2035;--pill-border:#243352;
-  --user-bubble:#22d3ee;--user-bubble-text:#0b0f1a;
+  --bg:#0a0e1a;--bg2:#0f1525;--bg3:#172035;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+  --text:#dde6f0;--text2:#a8b8cc;--text3:#506070;--text4:#2d3d50;
+  --hover:rgba(255,255,255,.03);--active:rgba(34,211,238,.06);--bubble:#121c30;
+  --input-bg:#0f1525;--input-shadow:0 0 0 1px rgba(34,211,238,.07),0 2px 8px rgba(0,0,0,.25);
+  --send-off:#1e3045;--send-on:#dde6f0;--scroll-thumb:#1e3045;
+  --card-border:rgba(255,255,255,.05);--card-hover:rgba(255,255,255,.025);--badge-bg:#0f1525;
+  --code-bg:#060a12;--code-head:#0a0e1a;--code-text:#86efac;
+  --warn-bg:#140d25;--warn-border:#4a1d7a;--warn-text:#a855f7;
+  --accent:#22d3ee;--accent2:#818cf8;--grad:linear-gradient(135deg,#22d3ee,#818cf8,#c084fc);
+  --pill-bg:#172035;--pill-border:rgba(255,255,255,.06);
+  --user-bubble:#22d3ee;--user-bubble-text:#060a12;
 }
 
 body{background:var(--bg);color:var(--text)}
@@ -138,10 +115,10 @@ textarea::-webkit-scrollbar{display:none}
 .hist-item:hover .hist-del{opacity:1}
 .hist-del:hover{color:#ef4444}
 
-.msg-user{display:flex;justify-content:flex-end;margin-bottom:24px}
-.msg-user .bubble{background:var(--user-bubble,#007aff);border-radius:20px 20px 5px 20px;padding:11px 16px;max-width:72%;font-size:15px;line-height:1.6;color:var(--user-bubble-text,#fff);word-break:break-word;border:none;box-shadow:0 1px 2px rgba(0,0,0,.15)}
-.msg-ai{display:flex;align-items:flex-start;gap:12px;margin-bottom:24px}
-.ai-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;flex-shrink:0;margin-top:2px}
+.msg-user{display:flex;justify-content:flex-end;margin-bottom:20px}
+.msg-user .bubble{background:var(--user-bubble,#1a1a1a);border-radius:18px 18px 4px 18px;padding:10px 15px;max-width:72%;font-size:15px;line-height:1.6;color:var(--user-bubble-text,#fff);word-break:break-word;border:none;box-shadow:none}
+.msg-ai{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px}
+.ai-avatar{width:26px;height:26px;border-radius:50%;overflow:hidden;flex-shrink:0;margin-top:3px}
 .ai-avatar img{width:100%;height:100%;object-fit:contain}
 .msg-ai .content{flex:1;min-width:0;font-size:15px;line-height:1.75;color:var(--text);word-break:break-word}
 
@@ -244,25 +221,25 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .tool-sub{font-size:11.5px;color:var(--text4);margin-top:1px}
 
 /* Sug cards */
-.sug-card{border:1px solid var(--card-border);border-radius:16px;padding:16px;font-size:13px;color:var(--text2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45;transition:all .18s;width:100%;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.sug-card:hover{background:var(--card-hover);border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.sug-card{border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--text3);cursor:pointer;background:var(--bg2);text-align:left;line-height:1.45;transition:all .15s;width:100%}
+.sug-card:hover{background:var(--bg3);border-color:var(--border2);color:var(--text2)}
 
 /* Model badge */
-.model-badge{font-size:13px;color:var(--text2);font-weight:600;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--badge-bg);user-select:none;transition:background .15s}
+.model-badge{font-size:13px;color:var(--text3);font-weight:500;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;background:transparent;user-select:none;transition:background .12s}
 .model-badge:hover{background:var(--hover)}
 
 .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:throb 1.4s ease-in-out infinite}
 .dot:nth-child(2){animation-delay:.2s}
 .dot:nth-child(3){animation-delay:.4s}
 
-.topbar-btn{border:none;background:none;cursor:pointer;padding:7px;border-radius:10px;color:var(--text3);line-height:0;transition:all .15s;font-family:-apple-system,'SF Pro Text','SF Pro Display',BlinkMacSystemFont,'Helvetica Neue',sans-serif}
-.topbar-btn:hover{background:var(--hover);color:var(--text)}
+.topbar-btn{border:none;background:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--text3);line-height:0;transition:background .12s,color .12s;font-family:-apple-system,'SF Pro Text','SF Pro Display',BlinkMacSystemFont,'Helvetica Neue',sans-serif}
+.topbar-btn:hover{background:var(--hover);color:var(--text2)}
 
 /* Settings */
-#settingsPanel{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(6px)}
-.settings-box{background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:28px;width:min(560px,95vw);max-height:82vh;overflow-y:auto;position:relative}
-.settings-section{margin-bottom:28px}
-.settings-section h3{font-size:11px;font-weight:700;color:var(--text4);margin-bottom:14px;text-transform:uppercase;letter-spacing:.1em}
+#settingsPanel{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(8px)}
+.settings-box{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;width:min(540px,95vw);max-height:84vh;overflow-y:auto;position:relative}
+.settings-section{margin-bottom:24px}
+.settings-section h3{font-size:10px;font-weight:600;color:var(--text4);margin-bottom:12px;text-transform:uppercase;letter-spacing:.12em}
 .option-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .option-btn{border:1.5px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;background:var(--bg);text-align:center;transition:all .15s;font-family:-apple-system,'SF Pro Text','SF Pro Display',BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:var(--text)}
 .option-btn:hover{border-color:var(--accent);background:var(--hover)}
@@ -294,11 +271,11 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 .trans-lang-btn{padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13.5px;cursor:pointer;font-family:-apple-system,'SF Pro Text','SF Pro Display',BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-weight:500;text-align:left;transition:background .12s}
 .trans-lang-btn:hover{background:var(--hover);border-color:var(--accent)}
 
-/* Logo gradient text */
-.logo-gradient{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;font-size:16px}
+/* Logo text */
+.logo-gradient{color:var(--text);font-weight:700;font-size:15px;letter-spacing:-.02em}
 
-/* Topbar accent */
-.topbar-accent{height:2px;background:var(--grad);flex-shrink:0}
+/* Topbar accent - minimal */
+.topbar-accent{height:1px;background:var(--border);flex-shrink:0}
 
 /* Info chip */
 .info-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--bg3);font-size:12px;color:var(--text3);font-weight:500}
@@ -329,19 +306,19 @@ body.dark .pill-btn.active{background:rgba(249,115,22,.12)}
 }
 
 /* ─── SPLASH ──── */
-#splashScreen{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-#splashScreen.hiding{opacity:0;transform:scale(1.03);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
-.splash-logo-wrap{width:120px;height:120px;margin-bottom:24px;animation:splashIn .7s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 0 24px rgba(168,139,250,.5));}
+#splashScreen{position:fixed;inset:0;z-index:9999;background:#08090f;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#splashScreen.hiding{opacity:0;transition:opacity .35s ease;pointer-events:none}
+.splash-logo-wrap{width:72px;height:72px;margin-bottom:28px;animation:splashIn .5s ease both;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
 .splash-logo-wrap img{width:100%;height:100%;object-fit:contain}
-@keyframes splashIn{from{opacity:0;transform:scale(.3) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
-.splash-title{font-size:30px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;animation:fadeUp .6s ease .25s both;}
-.splash-sub{font-size:14px;color:#666;margin-bottom:32px;animation:fadeUp .5s ease .4s both}
-.splash-form{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(300px,88vw);animation:fadeUp .5s ease .5s both;}
-.splash-input{width:100%;padding:13px 18px;border-radius:14px;border:1.5px solid #222236;background:#111122;color:#eee;font-size:15px;outline:none;text-align:center;caret-color:#818cf8;transition:border-color .2s;}
-.splash-input::placeholder{color:#3a3a52}
-.splash-input:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(129,140,248,.18)}
-.splash-btn{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#f472b6,#818cf8,#38bdf8);color:#fff;font-size:14.5px;font-weight:700;box-shadow:0 4px 16px rgba(129,140,248,.3);transition:opacity .18s,transform .18s;}
-.splash-btn:hover{opacity:.87;transform:translateY(-1px)}
+@keyframes splashIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.splash-title{font-size:22px;font-weight:700;letter-spacing:-.03em;color:#e8eaf0;margin-bottom:4px;animation:fadeUp .4s ease .15s both;}
+.splash-sub{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:36px;animation:fadeUp .4s ease .25s both;letter-spacing:.01em}
+.splash-form{display:flex;flex-direction:column;align-items:center;gap:10px;width:min(280px,88vw);animation:fadeUp .4s ease .3s both;}
+.splash-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#e8eaf0;font-size:14px;outline:none;text-align:center;caret-color:#22d3ee;transition:border-color .2s,background .2s;}
+.splash-input::placeholder{color:rgba(255,255,255,.2)}
+.splash-input:focus{border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.04)}
+.splash-btn{width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;background:rgba(255,255,255,.9);color:#0a0a0a;font-size:14px;font-weight:600;transition:opacity .15s,transform .12s;letter-spacing:.01em}
+.splash-btn:hover{opacity:.88;transform:translateY(-1px)}
 /* ─── ERROR POPUP ──── */
 .error-overlay{position:fixed;inset:0;z-index:8000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);animation:fadeInBg .2s ease;}
 @keyframes fadeInBg{from{opacity:0}to{opacity:1}}
@@ -575,10 +552,9 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
     <div class="settings-section">
       <h3 id="st_account"></h3>
 
-      <!-- UPGRADE BUTTON - besar, biru menyala, multibahasa -->
-      <button id="upgradeBtn" onclick="showUpgradeModal()" style="width:100%;margin-bottom:12px;padding:14px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#0ea5e9,#6366f1,#818cf8);color:#fff;font-size:15px;font-weight:800;font-family:inherit;letter-spacing:.02em;box-shadow:0 4px 20px rgba(99,102,241,.45);transition:opacity .15s,transform .15s;position:relative;overflow:hidden" onmouseover="this.style.opacity='.88';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">
-        <span style="position:relative;z-index:1">⚡ <span id="upgradeBtnLabel">Upgrade</span> ✦</span>
-        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);animation:shimmerUpgrade 2.5s linear infinite"></div>
+      <!-- UPGRADE BUTTON - coming soon -->
+      <button id="upgradeBtn" onclick="showUpgradeModal()" style="width:100%;margin-bottom:12px;padding:12px;border-radius:12px;border:1px solid var(--border);cursor:pointer;background:var(--bg2);color:var(--text2);font-size:14px;font-weight:600;font-family:inherit;transition:background .15s">
+        <span id="upgradeBtnLabel">⚡ Upgrade — Coming Soon</span>
       </button>
 
       <div style="background:var(--bg3);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
@@ -626,15 +602,14 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 <div style="display:flex;height:100vh;overflow:hidden">
 
   <!-- SIDEBAR -->
-  <aside id="sidebar" style="position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--border);width:260px;flex-shrink:0;transform:translateX(-100%)">
-    <div class="topbar-accent"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;height:56px;flex-shrink:0">
-      <div style="display:flex;align-items:center;gap:9px">
-        <div id="logoSidebar" style="width:28px;height:28px;flex-shrink:0"></div>
+  <aside id="sidebar" style="position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--border);width:252px;flex-shrink:0;transform:translateX(-100%)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px;height:54px;flex-shrink:0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="logoSidebar" style="width:24px;height:24px;flex-shrink:0"></div>
         <span class="logo-gradient">SaaS AI</span>
       </div>
       <button onclick="closeSidebar()" class="topbar-btn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div style="padding:8px 10px;flex-shrink:0">
@@ -664,14 +639,14 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
       </div>
     </div>
     <div style="border-top:1px solid var(--border);padding:10px">
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--bg3)">
-        <div id="sidebarAvatar" style="width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">?</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--bg2)">
+        <div id="sidebarAvatar" style="width:30px;height:30px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-weight:600;font-size:13px;flex-shrink:0">?</div>
         <div style="flex:1;min-width:0">
-          <p id="user_lbl" style="font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:pointer" onclick="resetName()">👤 <span id="sidebarNameLbl">...</span></p>
+          <p id="user_lbl" style="font-size:13px;font-weight:500;color:var(--text);margin:0;cursor:pointer" onclick="resetName()">👤 <span id="sidebarNameLbl">...</span></p>
           <p id="limitSmall" style="font-size:11px;color:var(--text4);margin:0">0 / 20</p>
         </div>
-        <button onclick="document.getElementById('settingsPanel').style.display='flex'" class="topbar-btn" title="Settings" style="padding:5px">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <button onclick="document.getElementById('settingsPanel').style.display='flex'" class="topbar-btn" title="Settings" style="padding:4px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </div>
@@ -679,17 +654,15 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 
   <!-- MAIN -->
   <div style="display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden">
-    <div class="topbar-accent"></div>
     <!-- Topbar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:54px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:52px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg)">
       <div style="display:flex;align-items:center;gap:8px">
         <button onclick="openSidebar()" class="topbar-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <div class="model-badge" onclick="openSidebar()">
-          <div id="logoTopbar" style="width:18px;height:18px;flex-shrink:0"></div>
-          <span style="font-weight:700">SaaS AI</span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <div id="logoTopbar" style="width:16px;height:16px;flex-shrink:0"></div>
+          <span style="font-weight:600;color:var(--text2)">SaaS AI</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
@@ -742,9 +715,9 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 
     <!-- EMPTY STATE -->
     <div id="emptyEl" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;overflow-y:auto;background:var(--bg)">
-      <div id="logoEmpty" style="width:72px;height:72px;margin-bottom:20px;flex-shrink:0"></div>
-      <h1 id="greetingLbl" style="font-size:clamp(24px,4vw,36px);font-weight:700;color:var(--text);margin:0 0 30px;letter-spacing:-.02em"></h1>
-      <div id="suggests" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:560px;width:100%"></div>
+      <div id="logoEmpty" style="width:52px;height:52px;margin-bottom:16px;flex-shrink:0;opacity:.7"></div>
+      <h1 id="greetingLbl" style="font-size:clamp(20px,3.5vw,30px);font-weight:600;color:var(--text);margin:0 0 24px;letter-spacing:-.02em"></h1>
+      <div id="suggests" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:520px;width:100%"></div>
     </div>
 
     <!-- SPLIT VIEW WRAPPER -->
@@ -906,7 +879,7 @@ body:not(.dark) #logoEmpty img,body:not(.dark) #logoTopbar img,body:not(.dark) #
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-var _K='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';
+var _K='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';
 var API='https://openrouter.ai/api/v1/chat/completions';
 var MODEL='google/gemini-2.0-flash-001';
 var MODEL_VISION='google/gemini-2.0-flash-001';
@@ -2622,192 +2595,23 @@ function activatePlan(planKey, months){
 function showUpgradeModal(){
   var ex=document.getElementById('upgradeModal');
   if(ex){ex.remove();return;}
-  var pricesUSD={basic:'1.00',premium:'2.00',ultra:'3.00',permanent:'12.00'};
-  var cards=[
-    {key:'basic',    color:'#007aff',label:'Basic',    msg:'55 pesan/hari',  usd:'$1.00', period:'/bulan',      badge:''},
-    {key:'premium',  color:'#5856d6',label:'Premium',  msg:'70 pesan/hari',  usd:'$2.00', period:'/bulan',      badge:'POPULER'},
-    {key:'ultra',    color:'#af52de',label:'Ultra',    msg:'155 pesan/hari', usd:'$3.00', period:'/bulan',      badge:''},
-    {key:'permanent',color:'#ff9500',label:'Permanent',msg:'Tanpa batas ♾', usd:'$12.00',period:' sekali bayar',badge:'TERBAIK'}
-  ];
   var modal=document.createElement('div');
   modal.id='upgradeModal';
-  modal.style.cssText='position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)';
+  modal.style.cssText='position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)';
   modal.onclick=function(e){if(e.target===modal)modal.remove();};
-  var cardsHTML=cards.map(function(p){
-    var badge=p.badge?'<span style="position:absolute;top:-9px;right:14px;background:'+p.color+';color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;letter-spacing:.04em">'+p.badge+'</span>':'';
-    return '<div onclick="document.getElementById(\'upgradeModal\').remove();showPaymentModal(\''+p.key+'\')" '
-      +'style="border:1.5px solid '+p.color+'22;border-radius:16px;padding:16px 18px;cursor:pointer;position:relative;transition:all .18s;background:var(--bg2)" '
-      +'onmouseover="this.style.background=\''+p.color+'11\';this.style.borderColor=\''+p.color+'55\'" '
-      +'onmouseout="this.style.background=\'var(--bg2)\';this.style.borderColor=\''+p.color+'22\'">'
-      +badge
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'
-        +'<div style="display:flex;align-items:center;gap:10px">'
-          +'<div style="width:10px;height:10px;border-radius:50%;background:'+p.color+';flex-shrink:0"></div>'
-          +'<div>'
-            +'<div style="font-size:15px;font-weight:700;color:var(--text)">'+p.label+'</div>'
-            +'<div style="font-size:12px;color:var(--text3);margin-top:1px">'+p.msg+'</div>'
-          +'</div>'
-        +'</div>'
-        +'<div style="text-align:right">'
-          +'<div style="font-size:16px;font-weight:700;color:'+p.color+'">'+p.usd+'</div>'
-          +'<div style="font-size:11px;color:var(--text4)">'+p.period+'</div>'
-        +'</div>'
-      +'</div>'
-    +'</div>';
-  }).join('');
-  modal.innerHTML='<div style="background:var(--bg);border-radius:20px;padding:28px 24px;width:min(420px,92vw);max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.28)">'
+  modal.innerHTML='<div style="background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:32px 28px;width:min(380px,92vw);text-align:center;position:relative">'
     +'<button onclick="document.getElementById(\'upgradeModal\').remove()" style="position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:var(--bg3);border:none;cursor:pointer;color:var(--text3);font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>'
-    +'<div style="text-align:center;margin-bottom:22px">'
-      +'<div style="font-size:32px;margin-bottom:8px">⚡</div>'
-      +'<h2 style="font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:-.3px">Upgrade SaaS AI</h2>'
-      +'<p style="font-size:13px;color:var(--text3);margin:0">Bayar via PayPal · Aktif instan</p>'
-    +'</div>'
-    +'<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">'+cardsHTML+'</div>'
-    +'<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:12px;background:var(--bg3)">'
-      +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text4)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
-      +'<span style="font-size:12px;color:var(--text4)">Pembayaran aman via PayPal</span>'
-    +'</div>'
-  +'</div>';
-  document.body.appendChild(modal);
-}
-
-function showPaymentModal(planKey){
-  var plan=PLANS[planKey];if(!plan)return;
-  var pricesUSD={basic:'1.00',premium:'2.00',ultra:'3.00',permanent:'12.00'};
-  var amountUSD=pricesUSD[planKey];
-  var ex=document.getElementById('paymentModal');if(ex)ex.remove();
-  var modal=document.createElement('div');
-  modal.id='paymentModal';
-  modal.style.cssText='position:fixed;inset:0;z-index:9001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)';
-  modal.onclick=function(e){if(e.target===modal)modal.remove();};
-  modal.innerHTML='<div style="background:var(--bg);border-radius:22px 22px 0 0;padding:28px 24px 36px;width:min(480px,100vw);position:relative;box-shadow:0 -4px 40px rgba(0,0,0,.2);animation:slideUp .3s cubic-bezier(.16,1,.3,1)">'
-    +'<div style="width:36px;height:4px;border-radius:99px;background:var(--border2);margin:0 auto 20px"></div>'
-    +'<button onclick="document.getElementById(\'paymentModal\').remove()" style="position:absolute;top:20px;right:20px;width:28px;height:28px;border-radius:50%;background:var(--bg3);border:none;cursor:pointer;color:var(--text3);font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>'
-    +'<div style="margin-bottom:20px">'
-      +'<h3 style="font-size:18px;font-weight:700;margin:0 0 4px;letter-spacing:-.3px">Upgrade ke '+plan.name+'</h3>'
-      +'<p style="font-size:13px;color:var(--text3);margin:0">$'+amountUSD+' USD · Aktif setelah pembayaran</p>'
-    +'</div>'
-    +'<div id="paypal-button-container" style="min-height:50px"></div>'
-    +'<p style="text-align:center;font-size:11px;color:var(--text4);margin-top:14px">Aman & terenkripsi oleh PayPal</p>'
-  +'</div>';
-  document.body.appendChild(modal);
-  loadPayPalSDK(amountUSD, plan.name, planKey);
-}
-
-function loadPayPalSDK(amountUSD, planName, planKey){
-  var CLIENT_ID='AeU_74Rx5d5AySMhrB28Y3UOkP2j_lbCi6g_0cwRVzh0BLzxrLH2jlKABiuSRN';
-  var container=document.getElementById('paypal-button-container');
-  if(!container)return;
-  container.innerHTML='<div style="text-align:center;padding:18px;color:var(--text3);font-size:13px">⏳ Memuat PayPal...</div>';
-
-  function showErr(msg){
-    if(container)container.innerHTML='<div style="text-align:center;padding:16px;color:#ff3b30;font-size:13px;line-height:1.5">⚠️ '+msg+'</div>';
-  }
-
-  function renderButtons(){
-    container.innerHTML='';
-    paypal.Buttons({
-      createOrder:function(d,a){
-        return a.order.create({purchase_units:[{amount:{value:amountUSD,currency_code:'USD'},description:'SaaS AI '+planName}]});
-      },
-      onApprove:function(d,a){
-        container.innerHTML='<div style="text-align:center;padding:16px;font-size:13px;color:#34c759">✅ Pembayaran berhasil! Mengaktifkan...</div>';
-        return a.order.capture().then(function(){
-          var pm=document.getElementById('paymentModal');if(pm)pm.remove();
-          confirmAndActivate(planKey);
-        });
-      },
-      onCancel:function(){showErr('Pembayaran dibatalkan.');},
-      onError:function(){showErr('Gagal memproses. Coba lagi.');},
-      style:{layout:'vertical',color:'blue',shape:'pill',label:'pay',height:48}
-    }).render('#paypal-button-container').catch(function(){showErr('Tombol PayPal gagal dimuat.');});
-  }
-
-  // Remove stale SDK
-  var old=document.querySelector('script[src*="paypal.com/sdk"]');
-  if(old)old.remove();
-  if(window.paypal)delete window.paypal;
-
-  var s=document.createElement('script');
-  s.src='https://www.paypal.com/sdk/js?client-id='+CLIENT_ID+'&currency=USD&intent=capture&components=buttons';
-  s.onload=function(){window.paypal?renderButtons():showErr('PayPal SDK tidak termuat.');};
-  s.onerror=function(){showErr('Koneksi ke PayPal gagal.');};
-  document.head.appendChild(s);
-}
-function startWaitPayment(planKey){
-  // Tampilkan status menunggu
-  setTimeout(function(){
-    var w = document.getElementById('waitingPayment');
-    var btn = document.getElementById('gopayBtn');
-    if(w){ w.style.display='block'; }
-    if(btn){ btn.textContent='🔄 Buka GoPay lagi'; btn.style.fontSize='13px'; btn.style.padding='10px'; }
-  }, 1000);
-
-  // Poll setiap 3 detik - cek apakah user kembali ke tab ini
-  window._payPoll = null;
-  var attempts = 0;
-  var planKey2 = planKey;
-
-  // Deteksi user balik ke tab
-  function onVisibilityChange(){
-    if(document.visibilityState === 'visible' && attempts > 0){
-      // User kembali ke tab - tanya konfirmasi
-      clearInterval(window._payPoll);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      setTimeout(function(){ manualConfirm(planKey2); }, 800);
-    }
-  }
-  document.addEventListener('visibilitychange', onVisibilityChange);
-
-  window._payPoll = setInterval(function(){
-    attempts++;
-    if(attempts > 60){ // Timeout 3 menit
-      clearInterval(window._payPoll);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-    }
-  }, 3000);
-}
-
-function manualConfirm(planKey){
-  clearInterval(window._payPoll);
-  var el = document.getElementById('paymentModal'); if(el) el.remove();
-  var plan = PLANS[planKey]; if(!plan) return;
-
-  var modal = document.createElement('div');
-  modal.id = 'confirmModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9002;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
-  modal.innerHTML = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(380px,90vw);text-align:center">'
-    +'<div style="font-size:36px;margin-bottom:10px">🧾</div>'
-    +'<h3 style="font-size:17px;font-weight:800;margin:0 0 10px">Transfer berhasil?</h3>'
-    +'<p style="font-size:13px;color:var(--text3);margin:0 0 18px;line-height:1.65">'
-      +'Pastikan transfer GoPay ke <b>0822-2509-7900</b> sudah sukses sebelum mengaktifkan paket.'
-    +'</p>'
-    +'<div style="background:#fff3cd;border-radius:10px;padding:10px 14px;font-size:12px;color:#856404;margin-bottom:18px;line-height:1.6">'
-      +'⚠️ Jangan aktifkan jika transfer belum selesai. Paket tidak bisa di-rollback.'
-    +'</div>'
-    +'<div style="display:flex;gap:10px">'
-      +'<button onclick="document.getElementById(\'confirmModal\').remove();showPaymentModal(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit">Belum transfer</button>'
-      +'<button onclick="confirmAndActivate(\''+planKey+'\')" style="flex:1;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#00ADE0,#818cf8);color:#fff;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit">✅ Aktifkan!</button>'
-    +'</div>'
+    +'<div style="font-size:36px;margin-bottom:14px">⚡</div>'
+    +'<h2 style="font-size:18px;font-weight:700;margin:0 0 8px;color:var(--text);letter-spacing:-.02em">Upgrade Segera Hadir</h2>'
+    +'<p style="font-size:13px;color:var(--text3);margin:0 0 24px;line-height:1.65">Paket Premium, Ultra, dan Permanent sedang dalam pengembangan. Untuk saat ini nikmati <strong style="color:var(--text)">20 pesan/hari gratis</strong> tanpa batas waktu!</p>'
+    +'<button onclick="document.getElementById(\'upgradeModal\').remove()" style="width:100%;padding:12px;border-radius:11px;border:none;background:var(--text);color:var(--bg);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Oke, Mengerti</button>'
   +'</div>';
   document.body.appendChild(modal);
 }
 
 function confirmAndActivate(planKey){
-  var el = document.getElementById('confirmModal'); if(el) el.remove();
   activatePlan(planKey, planKey !== 'permanent' ? 1 : null);
-  var plan = PLANS[planKey];
-  var s = document.createElement('div');
-  s.style.cssText = 'position:fixed;inset:0;z-index:9003;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)';
-  s.innerHTML = '<div style="background:var(--bg);border:2px solid '+plan.color+';border-radius:20px;padding:36px;width:min(360px,90vw);text-align:center;animation:popIn .3s ease">'
-    +'<div style="font-size:52px;margin-bottom:12px">✨</div>'
-    +'<h3 style="font-size:20px;font-weight:800;margin:0 0 8px;color:'+plan.color+'">Paket '+plan.name+' Aktif!</h3>'
-    +'<p style="font-size:13px;color:var(--text3);margin:0 0 20px;line-height:1.65">Selamat! Kamu sekarang bisa mengirim hingga <b>'+(plan.limit>=9999?'pesan tak terbatas':plan.limit+' pesan/hari')+'</b>.</p>'
-    +'<button onclick="this.parentElement.parentElement.remove()" style="background:'+plan.color+';color:#fff;border:none;padding:12px 32px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Mulai Chat! 🚀</button>'
-  +'</div>';
-  document.body.appendChild(s);
 }
-
 
 // ═══════════════════════════════════════════
 // INIT
