@@ -9,7 +9,7 @@
 ![Made in Indonesia](https://img.shields.io/badge/Made%20in-Indonesia%20🇮🇩-red?style=flat-square)
 ![Built by Wira](https://img.shields.io/badge/Built%20by-Wira-blue?style=flat-square)
 ![License](https://img.shields.io/badge/License-Proprietary-gray?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
+![Status](https://img.shields.io/badge/Status-NonActive-brightgreen?style=flat-square)
 
 > *"AI yang dibangun dari ❤️, untuk semua."*
 
