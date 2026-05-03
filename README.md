@@ -19,7 +19,7 @@
 
 ## Tentang Proyek
 
-**SaaS AI** adalah platform asisten kecerdasan buatan berbasis web yang dirancang agar siapa pun bisa berinteraksi dengan AI modern secara mudah dan nyaman. Tampilannya bersih dan intuitif, terinspirasi dari ChatGPT, namun dibangun sendiri dari nol oleh developer lokal Indonesia.
+**Oryx** adalah platform asisten kecerdasan buatan berbasis web yang dirancang agar siapa pun bisa berinteraksi dengan AI modern secara mudah dan nyaman. Tampilannya bersih dan intuitif, terinspirasi dari ChatGPT, namun dibangun sendiri dari nol oleh developer lokal Indonesia.
 
 Proyek ini lahir dari semangat inovasi teknologi dalam negeri — dibuat sepenuhnya oleh **Wira**, seorang pengembang muda asal Indonesia yang percaya bahwa teknologi AI harus bisa diakses semua kalangan, tanpa batas.
 
